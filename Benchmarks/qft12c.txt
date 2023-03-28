@@ -1,0 +1,78 @@
+H 11 
+CP 11 10
+H 10 
+CP 11 9
+CP 10 9
+CP 11 8
+CP 10 8
+CP 11 7
+CP 10 7
+CP 11 6
+CP 10 6
+CP 11 5
+CP 10 5
+CP 11 4
+CP 10 4
+CP 11 3
+CP 10 3
+CP 11 2
+CP 10 2
+CP 11 1
+CP 10 1
+CP 11 0
+CP 10 0
+H 9 
+CP 9 8
+H 8 
+CP 9 7
+CP 8 7
+H 7 
+CP 9 6
+CP 8 6
+CP 7 6
+H 6 
+CP 9 5
+CP 8 5
+CP 7 5
+CP 6 5
+H 5 
+CP 9 4
+CP 8 4
+CP 7 4
+CP 6 4
+CP 5 4
+H 4 
+CP 9 3
+CP 8 3
+CP 7 3
+CP 6 3
+CP 5 3
+CP 4 3
+H 3 
+CP 9 2
+CP 8 2
+CP 7 2
+CP 6 2
+CP 5 2
+CP 4 2
+CP 3 2
+H 2 
+CP 9 1
+CP 8 1
+CP 7 1
+CP 6 1
+CP 5 1
+CP 4 1
+CP 3 1
+CP 2 1
+H 1 
+CP 9 0
+CP 8 0
+CP 7 0
+CP 6 0
+CP 5 0
+CP 4 0
+CP 3 0
+CP 2 0
+CP 1 0
+H 0 
