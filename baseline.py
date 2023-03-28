@@ -28,7 +28,8 @@ while(circuit!=[]):
         else:
             layer.append(t1)
         map[tracker[t1]*2] = map[tracker[t1]*2] + gate
-        physical_gate.append(name + str(tracker[t1]))
+        #physical_gate.append(name + str(tracker[t1]))
+        physical_gate.append({'gate':name, 'type':'S', 't1':str(tracker[t1])})
     elif(gate==CNOT):
         if t1 in layer or t2 in layer:
             layer = []
@@ -42,25 +43,25 @@ while(circuit!=[]):
             map[tracker[t1] * 2].extend(CNOT[0])
             map[tracker[t2] * 2 + 1].extend(CNOT[1])
             map[tracker[t2] * 2].extend(CNOT[2])
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         elif tracker[t1] - tracker[t2] == -1:
             map[tracker[t1] * 2].extend(CNOT[0])
             map[tracker[t1] * 2 + 1].extend(CNOT[1])
             map[tracker[t2] * 2].extend(CNOT[2])
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         elif tracker[t1] - tracker[t2] > 1:
             #worst case
             swap(map, t2, t1, tracker, direc, physical_gate)
             map[tracker[t1] * 2].extend(CNOT[0])
             map[tracker[t2] * 2 + 1].extend(CNOT[1])
             map[tracker[t2] * 2].extend(CNOT[2])
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         else:
             swap(map, t1, t2, tracker, direc, physical_gate)
             map[tracker[t1] * 2].extend(CNOT[0])
             map[tracker[t1] * 2 + 1].extend(CNOT[1])
             map[tracker[t2] * 2].extend(CNOT[2])
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
     elif(gate==CZS):
         if t1 in layer or t2 in layer:
             layer = []
@@ -77,7 +78,7 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         elif tracker[t1] - tracker[t2] == -1:
             map[tracker[t1] * 2].extend(CZS[0])
             map[tracker[t1] * 2 + 1].extend(CZS[1])
@@ -85,7 +86,7 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         elif tracker[t1] - tracker[t2] > 1:
             swap(map, t2, t1, tracker, direc, physical_gate)
             map[tracker[t1] * 2].extend(CZS[0])
@@ -94,7 +95,7 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         else:
             swap(map, t1, t2, tracker, direc, physical_gate)
             map[tracker[t1] * 2].extend(CZS[0])
@@ -103,7 +104,7 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
     elif (gate == CPS):
         if t1 in layer or t2 in layer:
             layer = []
@@ -120,7 +121,7 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         elif tracker[t1] - tracker[t2] == -1:
             map[tracker[t1] * 2].extend(CPS[0])
             map[tracker[t1] * 2 + 1].extend(CPS[1])
@@ -128,7 +129,7 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         elif tracker[t1] - tracker[t2] > 1:
             swap(map, t2, t1, tracker, direc, physical_gate)
             map[tracker[t1] * 2].extend(CPS[0])
@@ -137,7 +138,7 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
         else:
             swap(map, t1, t2, tracker, direc, physical_gate)
             map[tracker[t1] * 2].extend(CPS[0])
@@ -146,8 +147,9 @@ while(circuit!=[]):
             temp = tracker[t1]
             tracker[t1] = tracker[t2]
             tracker[t2] = temp
-            physical_gate.append(name + str(tracker[t1]) + str(tracker[t2]))
+            physical_gate.append({'gate':name, 'type':'D', 't1':str(tracker[t1]), 't2':str(tracker[t2])})
 fill_map(qubits,map)
+print(physical_gate[0]["gate"])
 new_map = eliminate_redundant(map, qubits)
 redun1 = cal_utilization(map, qubits)
 redun2 = cal_utilization(new_map, qubits)
