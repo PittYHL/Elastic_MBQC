@@ -151,6 +151,7 @@ while(circuit!=[]):
 fill_map(qubits,map)
 print(physical_gate[0]["gate"])
 DAG = dense(qubits, physical_gate)
+dense_map = fill_new_map(qubits,DAG)
 new_map = eliminate_redundant(map, qubits)
 redun1 = cal_utilization(map, qubits)
 redun2 = cal_utilization(new_map, qubits)
