@@ -61,9 +61,9 @@ def de_gate(gate):
 def swap(map, t3, t4, tracker, dir, physical_gate):
     qubits = int((len(map) + 1) / 2)
     while tracker[t4] - tracker[t3] > 2:
-        physical_gate.append({'gate': 'SW', 'type':'D', 't1': str(tracker[t3]), 't2': str(tracker[t3] + 1)})
+        physical_gate.append({'gate': 'SW', 'type':'D', 't1': tracker[t3], 't2': tracker[t3] + 1})
         new_swap(map, t3, tracker.index(tracker[t3] + 1), tracker)
-        physical_gate.append({'gate': 'SW', 'type':'D', 't1': str(tracker[t4] - 1), 't2': str(tracker[t4])})
+        physical_gate.append({'gate': 'SW', 'type':'D', 't1': tracker[t4] - 1, 't2': tracker[t4]})
         new_swap(map, tracker.index(tracker[t4] - 1), t4, tracker)
     if math.fabs(tracker[t4] - tracker[t3]) == 2:
         if dir == 'u':
@@ -78,7 +78,7 @@ def swap(map, t3, t4, tracker, dir, physical_gate):
             if len(map[(tracker[t1]+1) * 2]) != len(map[(tracker[t1]+1) * 2 - 1]) or len(map[(tracker[t1]+1) * 2 - 1]) != len(map[tracker[t1] * 2]) or len(map[(tracker[t1]+1) * 2]) != len(map[tracker[t1] * 2]):
                 fill_map(qubits, map)
             if dir == 'u':
-                physical_gate.append({'gate': 'SW', 'type':'D', 't1': str(tracker[t2] - 1), 't2': str(tracker[t2])})
+                physical_gate.append({'gate': 'SW', 'type':'D', 't1': tracker[t2] - 1, 't2': tracker[t2]})
                 map[(tracker[t2] - 1) * 2].extend(SW[0])
                 map[(tracker[t2] - 1) * 2 + 1].extend(SW[1])
                 map[tracker[t2] * 2].extend(SW[2])
@@ -86,7 +86,7 @@ def swap(map, t3, t4, tracker, dir, physical_gate):
                 tracker[t2] = tracker[t2] - 1
                 tracker[index] = tracker[index] + 1
             else:
-                physical_gate.append({'gate': 'SW', 'type':'D', 't1': str(tracker[t1]), 't2': str(tracker[t1] + 1)})
+                physical_gate.append({'gate': 'SW', 'type':'D', 't1': tracker[t1], 't2': tracker[t1] + 1})
                 map[(tracker[t1]) * 2].extend(SW[0])
                 map[(tracker[t1] + 1) * 2 - 1].extend(SW[1])
                 map[(tracker[t1] + 1) * 2].extend(SW[2])
@@ -186,6 +186,14 @@ def cal_utilization(map, qubits):
             else:
                 end = end + 1
     return redundancy
+
+def num_photons(map):
+    num = 0
+    for row in map:
+        for p in row:
+            if p!= 'Z':
+                num = num + 1
+    return  num
 
 
 
