@@ -12,7 +12,7 @@ X = ['X', 'P']
 A = ['X','RX','RZ','RX']
 RZ = ['X','X','RZ','X']
 CNOT = [['X','Y','Y','Y','Y','Y'],['Z','Z','Z','Y','Z','Z'],['X','X','X','Y','X','X']]
-SW = [['X','X','P','X'],['Z','P','X','Z'],['X','X','P','X']]
+SW = [['X','X','S','X'],['Z','S','X','Z'],['X','X','S','X']]
 CPS = [['X','X','P','X'],['Z','P','X','Z'],['X','X','P','X']]
 CZS = [['X','X','pi','X'],['Z','pi','X','Z'],['X','X','pi','X']]
 DCNOT1 = [ ['X','Y','Y','Y'],
@@ -58,6 +58,8 @@ def de_gate(gate):
             return DCNOT1, int(X[1]), int(X[2]), int(X[3]), 'DCN1'
         case 'DCN2':
             return DCNOT2, int(X[1]), int(X[2]), int(X[3]), 'DCN2'
+        case 'SW':
+            return SW, int(X[1]), int(X[1]), int(X[2]), 'SW'
 def swap(map, t3, t4, tracker, dir, physical_gate):
     qubits = int((len(map) + 1) / 2)
     while tracker[t4] - tracker[t3] > 2:
@@ -177,10 +179,10 @@ def cal_utilization(map, qubits):
                 end = end + 2
             else:
                 end = end + 1
-    for i in range(qubits - 1):
+    for i in range(qubits*2 - 1):
         end = 0
         while(end < len(map[0])):
-            if (map[i*2 + 1][end] == 'Z'):
+            if (map[i][end] == 'Z'):
                 end = end + 1
                 redundancy = redundancy + 1
             else:
