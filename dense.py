@@ -133,3 +133,29 @@ def new_fill_map(n,map, active):
         if len(map[i]) < max:
             map[i].extend(['Z']* (max - len(map[i])))
 
+def new_eliminate_redundant(map, qubits):
+    new_map = copy.deepcopy(map)
+    two_qubit_gate = []
+    for i in range(qubits - 1):
+        temp = []
+        indx = 0
+        while indx < len(new_map[i]):
+            if new_map[i*2 + 1][indx] != 'Z':
+                if new_map[i*2 + 1][indx + 1] != 'Z':
+                    temp.append(indx + 1)
+                    indx += 1
+                else:
+                    temp.append(indx)
+            indx += 1
+        two_qubit_gate.append(temp)
+    front = [-1] * qubits
+    back = [-1] * qubits
+    front[0] = two_qubit_gate[0][0]
+    back[0] = two_qubit_gate[0][-1]
+    front[-1] = two_qubit_gate[-1][0]
+    back[-1] = two_qubit_gate[-1][-1]
+    for i in range(1, qubits - 1):
+        front[i] = min(two_qubit_gate[i -1][0], two_qubit_gate[i][0])
+        back[i] = max(two_qubit_gate[i - 1][-1], two_qubit_gate[i][-1])
+    print('g')
+
