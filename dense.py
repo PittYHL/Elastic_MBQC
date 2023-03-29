@@ -35,8 +35,8 @@ def dense(qubits, physical_gate):
                 layer.append(gate['t2'])
     DAG.append(layer_q)
     # generate dense DAG
-    front_barrier = [-1]*4 #push the front single gate
-    back_barrier = [-1] * 4 #push the back single gate
+    front_barrier = [-1]*qubits #push the front single gate
+    back_barrier = [-1] * qubits #push the back single gate
     newDAG = copy.deepcopy(DAG)
     for i in range(len(newDAG)):
         for j in range(len(newDAG[i])):
@@ -105,6 +105,10 @@ def cons_new_map(n,DAG):
     for i in range(n * 2 - 1):
         map.append([])
     for i in range(len(DAG)):
+        length = 4 #record length iof the DAG layer
+        for gate in DAG[i]:
+            if gate['gate'] == 'CNOT':
+                length = 6
         for gate in DAG[i]:
             pattern, t1, t2, t3, name = de_gate(gate['gate'] + ' 0 0 ')
             if gate['type'] == 'S':
@@ -148,6 +152,7 @@ def new_eliminate_redundant(map, qubits):
                     temp.append(indx)
             indx += 1
         two_qubit_gate.append(temp)
+    #prune outside the DAG
     front = [-1] * qubits
     back = [-1] * qubits
     front[0] = two_qubit_gate[0][0]
@@ -157,5 +162,76 @@ def new_eliminate_redundant(map, qubits):
     for i in range(1, qubits - 1):
         front[i] = min(two_qubit_gate[i -1][0], two_qubit_gate[i][0])
         back[i] = max(two_qubit_gate[i - 1][-1], two_qubit_gate[i][-1])
+    for i in range(qubits):
+        indx = 0
+        end = 1
+        while end != front[i]: #remove the front X
+            if (new_map[i * 2][end - 1] == new_map[i * 2][end] == 'X'):
+                new_map[i * 2].pop(end - 1)
+                new_map[i * 2].pop(end - 1)
+                new_map[i * 2].insert(0, 'Z')
+                new_map[i * 2].insert(0, 'Z')
+            end = end + 1
+        end = back[i] + 2
+        while end != len(new_map[i]) - 2:  # remove the back X
+            if (new_map[i * 2][end - 1] == new_map[i * 2][end] == 'X'):
+                new_map[i * 2].pop(end - 1)
+                new_map[i * 2].pop(end - 1)
+                new_map[i * 2].append('Z')
+                new_map[i * 2].append('Z')
+            else:
+                end = end + 1
+    # prune the Z
+    new_map = prune_Z(new_map)
+    #update two qubit gate
+    two_qubit_gate = []
+    wires = [[] for _ in range(qubits)]
+    for i in range(qubits - 1):
+        temp = []
+        indx = 0
+        while indx < len(new_map[i]):
+            if new_map[i * 2 + 1][indx] != 'Z':
+                if new_map[i * 2 + 1][indx + 1] != 'Z':
+                    temp.append(indx + 1)
+                    indx += 1
+                    wires[i].append(indx)
+                    wires[i + 1].append(indx)
+                else:
+                    temp.append(indx)
+                    wires[i].append(indx)
+                    wires[i + 1].append(indx)
+            indx += 1
+        two_qubit_gate.append(temp)
+    #for i in range(qubits):
+    partition = []
+    for wire in wires:
+        wire.sort()
+        partition.extend(wire)
+    partition = [*set(partition)]
+    partition.sort()
+    for i in range(len(partition) - 1):
+        start = partition[i]
+        end = partition[i + 1]
+        row = [] #which row to be removed
+        portion = [] #the portion in each row
+        for j in range(qubits):
+            if len(wires[j]) == 1:
+                continue
+            elif wires[j][0] > start
+
     print('g')
+
+def prune_Z(map):
+    end = 0
+    while end < len(map[0]):
+        record = [0] * len(map)
+        for i in range(len(map)):
+            if map[i][end] == 'Z':
+                record[i] = 1
+        if 0 not in record:
+            for i in range(len(map)):
+                map[i].pop(end)
+        else:
+            end = end + 1
+    return map
 

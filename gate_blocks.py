@@ -161,11 +161,20 @@ def eliminate_redundant(map, qubits):
                 tracker[i*2 + 1] = 1
                 position[i*2 + 1] = end - 1
         if (all(ele == 1 for ele in tracker)):
-            tracker = [0] * (qubits * 2 - 1)
-            for i in range(qubits * 2 - 1):
-                del new_map[i][position[i]]
-                del new_map[i][position[i]]
-            end = end - 2
+            valid = 1
+            for j in range(len(position) - 1):
+                if position[j+1] - position[j] > 1:
+                    tracker[j] = 0
+                    valid = 0
+                elif position[j] - position[j + 1] > 1:
+                    tracker[j+1] = 0
+                    valid = 0
+            if valid:
+                tracker = [0] * (qubits * 2 - 1)
+                for i in range(qubits * 2 - 1):
+                    del new_map[i][position[i]]
+                    del new_map[i][position[i]]
+                end = end - 2
         end += 1
     return new_map
 
