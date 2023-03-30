@@ -209,6 +209,7 @@ def new_eliminate_redundant(map, qubits):
         partition.extend(wire)
     partition = [*set(partition)]
     partition.sort()
+    wire_group = []
     for i in range(len(partition) - 1):
         start = partition[i]
         end = partition[i + 1]
@@ -216,10 +217,99 @@ def new_eliminate_redundant(map, qubits):
         portion = [] #the portion in each row
         for j in range(qubits):
             if len(wires[j]) == 1:
+                portion.append([])
                 continue
-            elif wires[j][0] > start
-
-    print('g')
+            elif start >= wires[j][-1] or end <= wires[j][0]:
+                portion.append([])
+                continue
+            row.append(j)
+            for k in range(len(wires[j]) - 1):
+                if start >= wires[j][k] and end <= wires[j][k + 1]:
+                    portion.append([wires[j][k], wires[j][k + 1]])
+        wire_group.append(portion)
+    for i in range(len(wire_group)):
+        start = -1
+        end = 10000000000
+        row = [] #which row to remove
+        num = 0
+        for wire in wire_group[i]:
+            if wire == []:
+                num = num + 1
+                continue
+            row.append(num)
+            num = num + 1
+            if wire[0] > start:
+                start = wire[0]
+            if wire[1] < end:
+                end = wire[1]
+        for row_num in row:
+            if wire_group[i][row_num][0] == start and wire_group[i][row_num][1] == end:
+                main_row = row_num
+                break
+        indication = [0]*len(row) #indicate found wire
+        x_loc = [[] for _ in range(len(row))] #wire location
+        num_x = [0]*len(row) #number of wires found
+        min_x = 10000000 #minimun wires number
+        min_row = -1 #minimum x measurements row
+        ind = 0
+        for r in row:
+            indx = wire_group[i][r][0] + 1
+            while (indx < wire_group[i][r][1]):
+                if new_map[r*2][indx] == new_map[r*2][indx + 1] == 'X':
+                    indication[ind] = 1
+                    x_loc[ind].append(indx)
+                    indx = indx + 1
+                indx = indx + 1
+            x_loc[ind] = [*set(x_loc[ind])]
+            num_x[ind] = len(x_loc[ind])
+            if num_x[ind]< min_x:
+                min_x = num_x[ind]
+                min_row = ind
+            ind = ind + 1
+        if (all(ele == 1 for ele in indication)):
+            for j in range(len(row)):
+                to_be_remove = []
+                for k in range(min_x):
+                    loc = x_loc[j].pop(0)
+                    del new_map[row[j] * 2][loc]
+                    del new_map[row[j] * 2][loc]
+                    if len(x_loc[j]) != 0:
+                        for element in x_loc[j]:
+                            element = element - 2
+                    if j > 0:
+                        del new_map[row[j] * 2 - 1][start + 1]
+                        del new_map[row[j] * 2 - 1][start + 1]
+            #remove the upper part
+            if row[0] != 0:
+                for j in range(0, row[0]):
+                    if start + 1 < wires[j][0]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(0)
+                            new_map[j * 2].pop(0)
+                            new_map[j * 2 + 1].pop(0)
+                            new_map[j * 2 + 1].pop(0)
+                    elif start + 1 > wires[j][0]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(-1)
+                            new_map[j * 2].pop(-1)
+                            new_map[j * 2 + 1].pop(-1)
+                            new_map[j * 2 + 1].pop(-1)
+            # remove the lower part
+            if row[-1] != qubits - 1:
+                for j in range(row[-1] + 1, qubits):
+                    if start + 1 < wires[j][0]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(0)
+                            new_map[j * 2].pop(0)
+                            new_map[j * 2 - 1].pop(0)
+                            new_map[j * 2 - 1].pop(0)
+                    elif start + 1 > wires[j][0]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(-1)
+                            new_map[j * 2].pop(-1)
+                            new_map[j * 2 - 1].pop(-1)
+                            new_map[j * 2 - 1].pop(-1)
+    return new_map
 
 def prune_Z(map):
     end = 0
