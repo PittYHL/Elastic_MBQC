@@ -1,14 +1,16 @@
 import numpy as np
 import math
 from gate_blocks import *
+from new_swap import *
+import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-direc = 'u'
 qubits = 4
 physical_gate = []
 tracker= []
 map = []
+direc = 'd'
 for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
@@ -17,8 +19,74 @@ with open('Benchmarks/iqp4b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
-while(circuit!=[]):
-    current = circuit.pop(0)
+tracker = [] #track physical location
+for i in range(qubits):
+    tracker.append(i)
+next = 0
+for current in circuit:
+    gate, t1, t2, _, name = de_gate(current)
+    if t1 != t2:
+        if next == 1:
+            break
+        t3 = t1
+        t4 = t2
+        next = 1
+
+while math.fabs(tracker[t3] - tracker[t4]) != 1:
+    if tracker[t3] - tracker[t4] > 2:
+        tracker[tracker.index(tracker[t3] - 1)] = tracker[tracker.index(tracker[t3] - 1)] + 1
+        tracker[t3] = tracker[t3] - 1
+        tracker[tracker.index(tracker[t4] + 1)] = tracker[tracker.index(tracker[t4] + 1)] - 1
+        tracker[t4] = tracker[t4] + 1
+    elif tracker[t4] - tracker[t3]> 2:
+        tracker[tracker.index(tracker[t3] + 1)] = tracker[tracker.index(tracker[t3] + 1)] - 1
+        tracker[t3] = tracker[t3] + 1
+        tracker[tracker.index(tracker[t4] - 1)] = tracker[tracker.index(tracker[t4] - 1)] + 1
+        tracker[t4] = tracker[t4] - 1
+    elif tracker[t3] - tracker[t4] == 2:
+        temp_t1 = copy.deepcopy(tracker)
+        temp_t2 = copy.deepcopy(tracker)
+        current_dis = math.fabs(tracker[t1] - tracker[t2])
+        temp_t1[tracker.index(tracker[t3] - 1)] = temp_t1[tracker.index(tracker[t3] - 1)] + 1
+        temp_t1[t3] = temp_t1[t3] - 1
+        temp_t2[tracker.index(tracker[t4] + 1)] = temp_t2[tracker.index(tracker[t4] + 1)] - 1
+        temp_t2[t4] = temp_t2[t4] + 1
+        new_dist1 = math.fabs(temp_t1[t1] - temp_t1[t2])
+        new_dist2 = math.fabs(temp_t2[t1] - temp_t2[t2])
+        if new_dist1 < new_dist2:
+            tracker = temp_t1
+        else:
+            tracker = temp_t2
+    elif tracker[t4] - tracker[t3] == 2:
+        temp_t1 = copy.deepcopy(tracker)
+        temp_t2 = copy.deepcopy(tracker)
+        current_dis = math.fabs(tracker[t1] - tracker[t2])
+        temp_t1[tracker.index(tracker[t4] - 1)] = temp_t1[tracker.index(tracker[t4] - 1)] + 1
+        temp_t1[t4] = temp_t1[t4] - 1
+        temp_t2[tracker.index(tracker[t3] + 1)] = temp_t2[tracker.index(tracker[t3] + 1)] - 1
+        temp_t2[t3] = temp_t2[t3] + 1
+        new_dist1 = math.fabs(temp_t1[t1] - temp_t1[t2])
+        new_dist2 = math.fabs(temp_t2[t1] - temp_t2[t2])
+        if new_dist1 < new_dist2:
+            tracker = temp_t1
+        else:
+            tracker = temp_t2
+new_circuit = []
+for gate in circuit:
+    X = gate.split()
+    if X[0] == 'H' or X[0] == 'P' or X[0] == 'S' or X[0] == 'Z' or X[0] == 'RX' or X[0] == 'RZ' or X[0] == 'X' or X[0] == 'T':
+        t1 = str(tracker[int(X[1])])
+        new_circuit.append(X[0] + ' ' + t1)
+    else:
+        t1 = str(tracker[int(X[1])])
+        t2 = str(tracker[int(X[2])])
+        new_circuit.append(X[0] + ' ' + t1 + ' ' + t2)
+
+tracker= []
+for i in range(qubits):
+    tracker.append(i)
+while(new_circuit!=[]):
+    current = new_circuit.pop(0)
     gate, t1, t2, _, name = de_gate(current)
     if (gate == H or gate == P or gate == S or gate == T or gate == Z or gate == RX or gate == A):
         if t1 in layer:
@@ -51,13 +119,13 @@ while(circuit!=[]):
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
         elif tracker[t1] - tracker[t2] > 1:
             #worst case
-            swap(map, t2, t1, tracker, direc, physical_gate)
+            intel_swap(map, t2, t1, tracker, new_circuit, physical_gate)
             map[tracker[t1] * 2].extend(CNOT[0])
             map[tracker[t2] * 2 + 1].extend(CNOT[1])
             map[tracker[t2] * 2].extend(CNOT[2])
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
         else:
-            swap(map, t1, t2, tracker, direc, physical_gate)
+            intel_swap(map, t1, t2, tracker, new_circuit, physical_gate)
             map[tracker[t1] * 2].extend(CNOT[0])
             map[tracker[t1] * 2 + 1].extend(CNOT[1])
             map[tracker[t2] * 2].extend(CNOT[2])
@@ -88,7 +156,7 @@ while(circuit!=[]):
             tracker[t2] = temp
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
         elif tracker[t1] - tracker[t2] > 1:
-            swap(map, t2, t1, tracker, direc, physical_gate)
+            intel_swap(map, t2, t1, tracker, new_circuit, physical_gate)
             map[tracker[t1] * 2].extend(CZS[0])
             map[tracker[t2] * 2 + 1].extend(CZS[1])
             map[tracker[t2] * 2].extend(CZS[2])
@@ -97,7 +165,7 @@ while(circuit!=[]):
             tracker[t2] = temp
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
         else:
-            swap(map, t1, t2, tracker, direc, physical_gate)
+            intel_swap(map, t1, t2, tracker, new_circuit, physical_gate)
             map[tracker[t1] * 2].extend(CZS[0])
             map[tracker[t1] * 2 + 1].extend(CZS[1])
             map[tracker[t2] * 2].extend(CZS[2])
@@ -131,7 +199,7 @@ while(circuit!=[]):
             tracker[t2] = temp
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
         elif tracker[t1] - tracker[t2] > 1:
-            swap(map, t2, t1, tracker, direc, physical_gate)
+            intel_swap(map, t2, t1, tracker, new_circuit, physical_gate)
             map[tracker[t1] * 2].extend(CPS[0])
             map[tracker[t2] * 2 + 1].extend(CPS[1])
             map[tracker[t2] * 2].extend(CPS[2])
@@ -140,7 +208,7 @@ while(circuit!=[]):
             tracker[t2] = temp
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
         else:
-            swap(map, t1, t2, tracker, direc, physical_gate)
+            intel_swap(map, t1, t2, tracker, new_circuit, physical_gate)
             map[tracker[t1] * 2].extend(CPS[0])
             map[tracker[t1] * 2 + 1].extend(CPS[1])
             map[tracker[t2] * 2].extend(CPS[2])

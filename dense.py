@@ -276,6 +276,15 @@ def new_eliminate_redundant(map, qubits):
                     if len(x_loc[j]) != 0:
                         for element in x_loc[j]:
                             element = element - 2
+                    for l in range(len(wires[row[j]])):
+                        if wires[row[j]][l] > start + 1:
+                            wires[row[j]][l] = wires[row[j]][l] - 2
+                    for l in range(len(wire_group)):
+                        if wire_group[l][row[j]] != []:
+                            if wire_group[l][row[j]][0] > start + 1:
+                                wire_group[l][row[j]][0] = wire_group[l][row[j]][0] - 2
+                            if wire_group[l][row[j]][1] > start + 1:
+                                wire_group[l][row[j]][1] = wire_group[l][row[j]][1] - 2
                     if j > 0:
                         del new_map[row[j] * 2 - 1][start + 1]
                         del new_map[row[j] * 2 - 1][start + 1]
@@ -288,6 +297,14 @@ def new_eliminate_redundant(map, qubits):
                             new_map[j * 2].pop(0)
                             new_map[j * 2 + 1].pop(0)
                             new_map[j * 2 + 1].pop(0)
+                            for l in range(len(wires[j])):
+                                wires[j][l] = wires[j][l] - 2
+                            for l in range(len(wire_group)):
+                                if wire_group[l][j]!=[]:
+                                    if wire_group[l][j][0] > start + 1:
+                                        wire_group[l][j][0] = wire_group[l][j][0] - 2
+                                    if wire_group[l][j][1] > start + 1:
+                                        wire_group[l][j][1] = wire_group[l][j][1] - 2
                     elif start + 1 > wires[j][0]:
                         for k in range(min_x):
                             new_map[j*2].pop(-1)
@@ -303,6 +320,14 @@ def new_eliminate_redundant(map, qubits):
                             new_map[j * 2].pop(0)
                             new_map[j * 2 - 1].pop(0)
                             new_map[j * 2 - 1].pop(0)
+                            for l in range(len(wires[j])):
+                                wires[j][l] = wires[j][l] - 2
+                            for l in range(len(wire_group)):
+                                if wire_group[l][j]!=[]:
+                                    if wire_group[l][j][0] > start + 1:
+                                        wire_group[l][j][0] = wire_group[l][j][0] - 2
+                                    if wire_group[l][j][1] > start + 1:
+                                        wire_group[l][j][1] = wire_group[l][j][1] - 2
                     elif start + 1 > wires[j][0]:
                         for k in range(min_x):
                             new_map[j*2].pop(-1)
