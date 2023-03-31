@@ -3,10 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/bv4b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/bv4b.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp4b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp4b.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
