@@ -60,6 +60,8 @@ def de_gate(gate):
             return DCNOT2, int(X[1]), int(X[2]), int(X[3]), 'DCN2'
         case 'SW':
             return SW, int(X[1]), int(X[1]), int(X[2]), 'SW'
+        case 'I':
+            return I, int(X[1]), int(X[1]), int(X[1]), 'I'
 def swap(map, t3, t4, tracker, dir, physical_gate):
     qubits = int((len(map) + 1) / 2)
     while tracker[t4] - tracker[t3] > 2:

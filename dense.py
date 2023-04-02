@@ -98,6 +98,11 @@ def dense(qubits, physical_gate):
         for j in range(back_barrier[i]+2, len(newDAG)):
             for gate in newDAG[j]:
                 gate['active'].remove(i)
+    #assign barrier for 2-qubit gate
+    for i in range(len(newDAG)):
+        for gate in newDAG[i]:
+            gate['front'] = front_barrier
+            gate['back'] = back_barrier
     return newDAG
 
 def cons_new_map(n,DAG):
@@ -109,10 +114,12 @@ def cons_new_map(n,DAG):
         for gate in DAG[i]:
             if gate['gate'] == 'CNOT':
                 length = 6
+        qubit = []  # record non-wire gate location
         for gate in DAG[i]:
             pattern, t1, t2, t3, name = de_gate(gate['gate'] + ' 0 0 ')
             if gate['type'] == 'S':
                 t1 = gate['t1']
+                qubit.append(t1)
                 if length == 6 and (i == 0 or t1 not in DAG[i-1][0]['active']):
                     map[gate['t1'] * 2] = map[gate['t1'] * 2] + ['Z','Z'] + pattern
                 elif length == 6 and (i == len(DAG) - 1 or t1 not in DAG[i+1][0]['active']):
@@ -120,12 +127,23 @@ def cons_new_map(n,DAG):
                 else:
                     map[gate['t1']*2] = map[gate['t1']*2] + pattern
             elif gate['type'] == 'D':
+                qubit.append(gate['t1'])
+                qubit.append(gate['t2'])
                 map[gate['t1'] * 2].extend(pattern[0])
                 map[gate['t2'] * 2].extend(pattern[2])
                 if gate['t1'] - gate['t2'] > 0:
                     map[gate['t1'] * 2 - 1].extend(pattern[1])
                 else:
                     map[gate['t2'] * 2 - 1].extend(pattern[1])
+        # add wire
+        active = gate['active']
+        s = set(qubit)
+        temp3 = [x for x in active if x not in s]
+        if temp3 != []:
+            for target in temp3:
+                for j in range(int(length/2)):
+                    DAG[i].append({'gate':'I', 'type':'S', 't1':target, 'active':active})
+                    map[target*2] = map[target*2] + ['X','X']
         new_fill_map(n,map, gate['active'])
     return map
 

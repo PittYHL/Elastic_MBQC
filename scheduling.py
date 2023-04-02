@@ -9,7 +9,7 @@ qubits = 4
 physical_gate = []
 tracker= []
 map = []
-rows = 7
+rows = 9
 extra_row = rows - 2 * qubits + 1
 def scheduling(n,DAG):
     extra_row = rows - 2 * n + 1
@@ -24,6 +24,30 @@ def scheduling(n,DAG):
     print("shortest depth is:" + str(depth - len(DAG) + 1))
     if (extra_row < 0):
         print("illegal row number")
+    qubit_range = []
+    for i in range(n):
+        qubit_range.append([i*2, rows - (n - i - 1)*2 - 1])
+    front_DAG = []
+    middle_DAG = []
+    back_DAG = []
+    two_qubits = [] #track physical qubits that with two_qubit_gate
+    #create three DAG
+    for i in range(len(DAG)):
+        front_DAG.append([])
+        middle_DAG.append([])
+        back_DAG.append([])
+        for gate in DAG[i]:
+            if gate['gate'] == 'I':
+                middle_DAG[i].append(gate)
+            elif gate['type'] == 'S' and i < gate['front'][gate['t1']]:
+                front_DAG[i].append(gate)
+            elif gate['type'] == 'S' and i > gate['front'][gate['t1']] and i < gate['back'][gate['t1']]:
+                middle_DAG[i].append(gate)
+            elif gate['type'] == 'S' and i > gate['back'][gate['t1']]:
+                back_DAG[i].append(gate)
+            elif gate['type'] == 'D':
+                middle_DAG[i].append(gate)
+
     map = []
     for i in range(n * 2 - 1):
         map.append([])
