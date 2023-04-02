@@ -112,7 +112,13 @@ def cons_new_map(n,DAG):
         for gate in DAG[i]:
             pattern, t1, t2, t3, name = de_gate(gate['gate'] + ' 0 0 ')
             if gate['type'] == 'S':
-                map[gate['t1']*2] = map[gate['t1']*2] + pattern
+                t1 = gate['t1']
+                if length == 6 and (i == 0 or t1 not in DAG[i-1][0]['active']):
+                    map[gate['t1'] * 2] = map[gate['t1'] * 2] + ['Z','Z'] + pattern
+                elif length == 6 and (i == len(DAG) - 1 or t1 not in DAG[i+1][0]['active']):
+                    map[gate['t1'] * 2] = map[gate['t1'] * 2] + pattern + ['Z', 'Z']
+                else:
+                    map[gate['t1']*2] = map[gate['t1']*2] + pattern
             elif gate['type'] == 'D':
                 map[gate['t1'] * 2].extend(pattern[0])
                 map[gate['t2'] * 2].extend(pattern[2])
