@@ -206,6 +206,15 @@ def cal_utilization(map, qubits):
                 end = end + 1
     return redundancy
 
+def cal_utilization2(map, rows): #also count x measurement
+    useful = 0
+    for row in map:
+        for element in row:
+            if element != 'Z':
+                useful = useful + 1
+    utilization = useful/(rows * len(map[0]))
+    return utilization
+
 def num_photons(map):
     num = 0
     for row in map:
