@@ -8,13 +8,14 @@ def biuld_DAG(gates):
 direc = 'd'
 qubits = 4
 physical_gate = []
+rows = 11
 tracker= []
 map = []
 for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/bv4c.txt') as f:
+with open('Benchmarks/qft4.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -158,10 +159,11 @@ new_map = eliminate_redundant(map, qubits)
 new_map = new_eliminate_redundant(map, qubits)
 redun0 = cal_utilization(map, qubits)
 redun1 = cal_utilization(dense_map, qubits)
+useful = len(map[0])*len(map) - redun0
 redun2 = cal_utilization(new_map, qubits)
 utilization0 = 1 - redun0/(len(map[0])*len(map))
-utilization1 = 1 - redun1/(len(dense_map[0])*len(dense_map))
-utilization2 = 1 - redun2/(len(new_map[0])*len(new_map))
+utilization1 = useful/(len(dense_map[0])*rows)
+utilization2 = useful/(len(schedule[0])*len(schedule))
 np_map = np.array(dense_map)
 np_new_map = np.array(new_map)
 #np.savetxt("result/iqp7_base.csv", np_map, fmt = '%s',delimiter=",")
@@ -173,6 +175,6 @@ print(num_photons(map))
 print(str(len(dense_map[0])))
 print(str(utilization1))
 print(num_photons(dense_map))
-print(str(len(new_map[0])))
+print(str(len(schedule[0])))
 print(str(utilization2))
-print(num_photons(new_map))
+print(num_photons(schedule))

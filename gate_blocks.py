@@ -6,7 +6,9 @@ P = ['X','X','P','X']
 S = ['X','X','p','X'] #pi/2
 Z = ['X','X','p','X'] #pi
 T = ['X','X','p','X'] #pi/4
-I = ['X','X']
+I1 = ['X','X']
+I2 = ['X','X','X','X']
+I3 = ['X','X','X','X','X','X']
 RX = ['X','RX']
 X = ['X', 'P']
 A = ['X','RX','RZ','RX']
@@ -60,8 +62,12 @@ def de_gate(gate):
             return DCNOT2, int(X[1]), int(X[2]), int(X[3]), 'DCN2'
         case 'SW':
             return SW, int(X[1]), int(X[1]), int(X[2]), 'SW'
-        case 'I':
-            return I, int(X[1]), int(X[1]), int(X[1]), 'I'
+        case 'I1':
+            return I1, int(X[1]), int(X[1]), int(X[1]), 'I1'
+        case 'I2':
+            return I2, int(X[1]), int(X[1]), int(X[1]), 'I2'
+        case 'I3':
+            return I3, int(X[1]), int(X[1]), int(X[1]), 'I3'
 def swap(map, t3, t4, tracker, dir, physical_gate):
     qubits = int((len(map) + 1) / 2)
     while tracker[t4] - tracker[t3] > 2:

@@ -116,6 +116,7 @@ def cons_new_map(n,DAG):
                 length = 6
         qubit = []  # record non-wire gate location
         for gate in DAG[i]:
+            gate['length'] = length
             pattern, t1, t2, t3, name = de_gate(gate['gate'] + ' 0 0 ')
             if gate['type'] == 'S':
                 t1 = gate['t1']
@@ -141,9 +142,12 @@ def cons_new_map(n,DAG):
         temp3 = [x for x in active if x not in s]
         if temp3 != []:
             for target in temp3:
+                num_wire = 0
                 for j in range(int(length/2)):
-                    DAG[i].append({'gate':'I', 'type':'S', 't1':target, 'active':active})
+                    num_wire = num_wire + 1
                     map[target*2] = map[target*2] + ['X','X']
+                wire = 'I' + str(num_wire)
+                DAG[i].append({'gate': wire, 'type': 'S', 't1': target, 'active': active, 'length': num_wire * 2})
         new_fill_map(n,map, gate['active'])
     return map
 
