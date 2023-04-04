@@ -9,8 +9,7 @@ qubits = 4
 physical_gate = []
 tracker= []
 map = []
-rows = 9
-def scheduling(n,DAG):
+def scheduling(n,DAG, rows):
     extra_row = rows - 2 * n + 1
     print("widest width is:" + str((n-1) * 3 + 2))
     depth = 0
@@ -51,7 +50,7 @@ def scheduling(n,DAG):
                 back_DAG[i].append(gate)
             elif gate['type'] == 'D':
                 middle_DAG[i].append(gate)
-    map = placement(rows, qubits, DAG, front_DAG, middle_DAG, qubit_range)
+    map = place_middle(rows, qubits, DAG, front_DAG, middle_DAG, qubit_range)
     return map
 
 def placement(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
@@ -106,7 +105,24 @@ def placement(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
             map[start[0]][start[1]:start[1]] = pattern[0]
             map[start[0]+1][start[1]:start[1]] = pattern[1]
             map[start[0]+2][start[1]:start[1]] = pattern[2]
-
+    #delete redundancy
+    min = 100000
+    for row in map:
+        if len(row) < min:
+            min = len(row)
+    for i in range(min):
+        found = 1
+        for row in map:
+            if row[i] != 'Z':
+                found = 0
+        if found == 1:
+            end = i
+            break
+    for row in map:
+        delete_length = len(row) - end
+        for i in range(delete_length):
+            row.pop(-1)
+    return map
 
 def place_middle(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     widest_mid = 3 * (qubits - 1) #without single gate in the middle

@@ -4,6 +4,9 @@
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gate_blocks.py" beforeDir="false" afterPath="$PROJECT_DIR$/gate_blocks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scheduling.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduling.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -63,34 +66,19 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>221</line>
-          <option name="timeStamp" value="62" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/baseline.py</url>
-          <line>169</line>
+          <line>171</line>
           <option name="timeStamp" value="103" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/scheduling.py</url>
-          <line>53</line>
-          <option name="timeStamp" value="105" />
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>223</line>
+          <option name="timeStamp" value="118" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/baseline.py</url>
-          <line>163</line>
-          <option name="timeStamp" value="106" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/scheduling.py</url>
-          <line>33</line>
-          <option name="timeStamp" value="111" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/scheduling.py</url>
-          <line>96</line>
-          <option name="timeStamp" value="113" />
+          <line>156</line>
+          <option name="timeStamp" value="133" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -98,6 +86,7 @@
       <configuration name="PythonConfigurationType">
         <watch expression="x_loc" />
         <watch expression="map[0]" />
+        <watch expression="lines" />
       </configuration>
     </watches-manager>
   </component>

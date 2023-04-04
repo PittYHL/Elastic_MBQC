@@ -95,9 +95,13 @@ def dense(qubits, physical_gate):
             track.sort()
             gate['active'] = copy.deepcopy(track)
     for i in range(len(back_barrier)):
-        for j in range(back_barrier[i]+2, len(newDAG)):
+        for j in range(back_barrier[i]+1, len(newDAG)):
+            current_active = []
             for gate in newDAG[j]:
-                gate['active'].remove(i)
+                current_active.append(gate['t1'])
+            for gate in newDAG[j]:
+                if i not in current_active:
+                    gate['active'].remove(i)
     #assign barrier for 2-qubit gate
     for i in range(len(newDAG)):
         for gate in newDAG[i]:

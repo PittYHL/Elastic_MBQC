@@ -213,7 +213,7 @@ def cal_utilization2(map, rows): #also count x measurement
             if element != 'Z':
                 useful = useful + 1
     utilization = useful/(rows * len(map[0]))
-    return utilization
+    return utilization, useful
 
 def num_photons(map):
     num = 0
