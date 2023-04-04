@@ -2,12 +2,13 @@ import numpy as np
 import math
 from gate_blocks import *
 from new_swap import *
+from scheduling import *
 import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
 qubits = 7
-rows = 11
+rows = 20
 physical_gate = []
 tracker= []
 map = []
@@ -221,6 +222,7 @@ fill_map(qubits,map)
 print(physical_gate[0]["gate"])
 DAG = dense(qubits, physical_gate)
 dense_map = cons_new_map(qubits,DAG)
+schedule = scheduling(qubits,DAG, rows)
 new_map = eliminate_redundant(map, qubits)
 new_map = new_eliminate_redundant(map, qubits)
 redun0 = cal_utilization(map, qubits)
