@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/bv5b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/bv5b.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gate_blocks.py" beforeDir="false" afterPath="$PROJECT_DIR$/gate_blocks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduling.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduling.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,14 +71,14 @@
           <option name="timeStamp" value="103" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>225</line>
-          <option name="timeStamp" value="118" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/baseline.py</url>
           <line>156</line>
           <option name="timeStamp" value="133" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>238</line>
+          <option name="timeStamp" value="144" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -82,6 +87,8 @@
         <watch expression="x_loc" />
         <watch expression="map[0]" />
         <watch expression="lines" />
+        <watch expression="DAG[8]" />
+        <watch expression="DAG" />
       </configuration>
     </watches-manager>
   </component>

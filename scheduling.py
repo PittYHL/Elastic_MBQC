@@ -5,7 +5,6 @@ from new_swap import *
 from dense import *
 import copy
 from dense import *
-qubits = 4
 physical_gate = []
 tracker= []
 map = []
@@ -50,7 +49,7 @@ def scheduling(n,DAG, rows):
                 back_DAG[i].append(gate)
             elif gate['type'] == 'D':
                 middle_DAG[i].append(gate)
-    map = place_middle(rows, qubits, DAG, front_DAG, middle_DAG, qubit_range)
+    map = place_middle(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
     return map
 
 def placement(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):

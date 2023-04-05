@@ -7,7 +7,7 @@ import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 7
+qubits = 5
 rows = 20
 physical_gate = []
 tracker= []
@@ -17,7 +17,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/bv7.txt') as f:
+with open('Benchmarks/iqp5.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -222,26 +222,27 @@ fill_map(qubits,map)
 print(physical_gate[0]["gate"])
 DAG = dense(qubits, physical_gate)
 dense_map = cons_new_map(qubits,DAG)
-schedule = scheduling(qubits,DAG, rows)
-new_map = eliminate_redundant(map, qubits)
-new_map = new_eliminate_redundant(map, qubits)
-redun0 = cal_utilization(map, qubits)
-redun1 = cal_utilization(dense_map, qubits)
-redun2 = cal_utilization(new_map, qubits)
-utilization0 = 1 - redun0/(len(map[0])*len(map))
-utilization1 = 1 - redun1/(len(dense_map[0])*len(dense_map))
-utilization2 = 1 - redun2/(len(new_map[0])*len(new_map))
-np_map = np.array(dense_map)
-np_new_map = np.array(new_map)
+#schedule = scheduling(qubits,DAG, rows)
+new_map = eliminate_redundant(dense_map, qubits)
+#new_map = new_eliminate_redundant(map, qubits)
+redun2 = cal_utilization(map, qubits)
+useful2 = len(map) * len(map[0]) - redun2
+old_uti2 = useful2/(len(map[0])*rows)
+old_uti1 = useful2/(len(new_map[0])*rows)
+uti0, use0 = cal_utilization2(dense_map, rows)
+#uti1, use1 = cal_utilization2(schedule, rows)
+uti2, use2 = cal_utilization2(map, rows)
+uti3, use3 = cal_utilization2(new_map, rows)
 #np.savetxt("result/iqp7_base.csv", np_map, fmt = '%s',delimiter=",")
 #np.savetxt("result/iqp7_base_el.csv", np_new_map, fmt = '%s',delimiter=",")
 #np_map.tofile('hlf4_base.csv', sep = ',')
-print(str(len(map[0])))
-print(str(utilization0))
-print(num_photons(map))
 print(str(len(dense_map[0])))
-print(str(utilization1))
+print(str(uti0))
 print(num_photons(dense_map))
-print(str(len(new_map[0])))
-print(str(utilization2))
-print(num_photons(new_map))
+#print(str(len(schedule[0])))
+#print(str(uti1))
+#print(num_photons(schedule))
+print(str(len(map[0])))
+print(str(old_uti2))
+print(str(uti2))
+print(num_photons(map))
