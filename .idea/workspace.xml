@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/bv5b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/bv5b.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gate_blocks.py" beforeDir="false" afterPath="$PROJECT_DIR$/gate_blocks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp4b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp4b.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp5b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp5b.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iqp4_sche.csv" beforeDir="false" afterPath="$PROJECT_DIR$/iqp4_sche.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scheduling.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduling.py" afterDir="false" />
     </list>
@@ -77,7 +77,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>238</line>
+          <line>242</line>
           <option name="timeStamp" value="144" />
         </line-breakpoint>
       </breakpoints>
@@ -87,8 +87,9 @@
         <watch expression="x_loc" />
         <watch expression="map[0]" />
         <watch expression="lines" />
-        <watch expression="DAG[8]" />
-        <watch expression="DAG" />
+        <watch expression="schedule" />
+        <watch expression="schedule" />
+        <watch expression="circuit" />
       </configuration>
     </watches-manager>
   </component>

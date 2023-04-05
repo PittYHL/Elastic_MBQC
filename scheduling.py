@@ -188,7 +188,7 @@ def place_middle(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
                 index = index + 1
     elif rows >= widest_mid + 2:
         current = gate_list.pop(0)
-        qubit_loc = init_qubit2(rows, qubits, current, widest_mid, mid_length, front_length, back_length)
+        qubit_loc = init_qubit2(rows, qubits, current, mid_DAG, mid_length, front_length, back_length)
         index = 0  # for qubit loc
         for i in range(len(DAG)):
             if DAG[i] != []:
@@ -213,7 +213,7 @@ def place_middle(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
                         else:
                             map[qubit_loc[index][gate['t1']]].extend(pattern)
                             fill_length = len(map[qubit_loc[index][gate['t1']]])
-                schedule_fill(map, fill_length)
+                schedule_fill(map, fill_length, qubit_loc, index)
                 index = index + 1
 
     only_z = 1
@@ -275,7 +275,7 @@ def init_qubit1(rows, qubits, gate, widest_mid, mid_length, front_length, back_l
         qubit_loc.append(qubit_loc[len(qubit_loc) - 2])
     return qubit_loc
 
-def init_qubit2(rows, qubits, gate, widest_mid, mid_length, front_length, back_length):
+def init_qubit2(rows, qubits, gate, mid_DAG, mid_length, front_length, back_length):
     qubit_loc = []
     qubits_layer = [0] * qubits
     if gate['type'] == 'D':
@@ -295,27 +295,54 @@ def init_qubit2(rows, qubits, gate, widest_mid, mid_length, front_length, back_l
         else:
             layout2.append(layout2[i - 1] + 4)
     if start % 2 == 0:
-        for i in range(mid_length):
-            if i % 2 == 1:
-                qubit_loc.append(layout1)
-            else:
-                qubit_loc.append(layout2)
+        current_layout = layout2
     else:
-        for i in range(mid_length):
-            if i % 2 == 0:
-                qubit_loc.append(layout1)
-            else:
-                qubit_loc.append(layout2)
+        current_layout = layout1
+    qubit_loc.append(current_layout)
+    index = copy.deepcopy(front_length)
+    current_2 = []
+    for gate in mid_DAG[index]:
+        if gate['type'] == 'D':
+            target = [gate['t1'], gate['t2']]
+            target.sort()
+            current_2.append(copy.deepcopy(target))
+    index = index + 1
+    for i in range(1, mid_length):
+        next_2 = []
+        for gate in mid_DAG[index]:
+            if gate['type'] == 'D':
+                target = [gate['t1'], gate['t2']]
+                target.sort()
+                next_2.append(copy.deepcopy(target))
+        same = 0 #found same target 2 qubit gates
+        for gate1 in current_2:
+            for gate2 in next_2:
+                if gate1 == gate2:
+                    same = 1
+                    break
+        if same == 0:
+            if current_layout == layout2:
+                current_layout = layout1
+            elif current_layout == layout1:
+                current_layout = layout2
+        qubit_loc.append(current_layout)
+        index = index + 1
+        current_2 = copy.deepcopy(next_2)
     for i in range(front_length):
         qubit_loc.insert(0, qubit_loc[1])
     for i in range(back_length):
         qubit_loc.append(qubit_loc[len(qubit_loc) - 2])
     return qubit_loc
-def schedule_fill(map, fill):
+def schedule_fill(map, fill, qubit_loc, index):
     max = 0
-    for i in range(len(map)):
-        if len(map[i]) < fill:
-            map[i].extend(['Z'] * (fill - len(map[i]) - 1))
+    if (len(qubit_loc) - 1 > index and qubit_loc[index] == qubit_loc[index + 1]):
+        for i in range(len(map)):
+            if len(map[i]) < fill + 1:
+                map[i].extend(['Z'] * (fill - len(map[i])))
+    else:
+        for i in range(len(map)):
+            if len(map[i]) < fill:
+                map[i].extend(['Z'] * (fill - len(map[i]) - 1))
 
 def check_locate(gate, qubit_loc, map, qubit_range, rows, active_qubit):
     if gate['type'] == 'S':
