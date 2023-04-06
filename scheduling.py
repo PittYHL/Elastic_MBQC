@@ -201,9 +201,9 @@ def placement2(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
                             map[qubit_loc[index][gate['t2']]].extend(pattern[2])
                             fill_length = len(map[qubit_loc[index][gate['t1']]])
                         else:
-                            map[qubit_loc[index][gate['t2']]].extend(pattern[0])
+                            map[qubit_loc[index][gate['t1']]].extend(pattern[0])
                             map[qubit_loc[index][gate['t2']] + 1].extend(pattern[1])
-                            map[qubit_loc[index][gate['t1']]].extend(pattern[2])
+                            map[qubit_loc[index][gate['t2']]].extend(pattern[2])
                             fill_length = len(map[qubit_loc[index][gate['t1']]])
                     else:
                         if gate['length'] == 6 and (i == 0 or gate['t1'] not in DAG[i - 1][0]['active']):
