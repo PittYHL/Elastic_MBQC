@@ -378,4 +378,9 @@ def check_down(elastic_map, current_loc, last):
             else:
                 return ok
 
-def resolve()
+def resolve_order(order):
+    increase = []
+    for i in len(order):
+        increase.append(i)
+    for i in increase:
+        
