@@ -383,4 +383,11 @@ def resolve_order(order):
     for i in len(order):
         increase.append(i)
     for i in increase:
-        
+        count = 0
+        for j in :
+            if j == i:
+                count += 1
+        while count != 1:
+            if i - 1 not in order:
+                order
+
