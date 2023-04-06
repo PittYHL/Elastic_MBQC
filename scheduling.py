@@ -32,7 +32,6 @@ def scheduling(n,DAG, rows):
     front_DAG = []
     middle_DAG = []
     back_DAG = []
-    two_qubits = [] #track physical qubits that with two_qubit_gate
     #create three DAG
     for i in range(len(DAG)):
         front_DAG.append([])
@@ -49,8 +48,9 @@ def scheduling(n,DAG, rows):
                 back_DAG[i].append(gate)
             elif gate['type'] == 'D':
                 middle_DAG[i].append(gate)
-    map = place_middle(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
+    map = placement2(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
     return map
+
 
 def placement(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     map = []
@@ -123,7 +123,7 @@ def placement(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
             row.pop(-1)
     return map
 
-def place_middle(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
+def placement2(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     widest_mid = 3 * (qubits - 1) #without single gate in the middle
     map = []
     for i in range(rows):

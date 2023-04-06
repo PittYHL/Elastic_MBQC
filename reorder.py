@@ -3,6 +3,7 @@ import math
 from gate_blocks import *
 from new_swap import *
 from scheduling import *
+from elastic import *
 import copy
 from dense import *
 def biuld_DAG(gates):
@@ -17,7 +18,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/iqp4b.txt') as f:
+with open('Benchmarks/bv4b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -222,11 +223,11 @@ fill_map(qubits,map)
 print(physical_gate[0]["gate"])
 DAG = dense(qubits, physical_gate)
 dense_map = cons_new_map(qubits,DAG)
-schedule = scheduling(qubits,DAG, rows)
+schedule = elastic(qubits,DAG, rows)
 #sc_map = np.array(schedule)
-#np.savetxt("iqp4_sche.csv", sc_map, fmt = '%s',delimiter=",")
+#np.savetxt("qft4_sche.csv", sc_map, fmt = '%s',delimiter=",")
 #de_map = np.array(dense_map)
-#np.savetxt("iqp4_de.csv", de_map, fmt = '%s',delimiter=",")
+#np.savetxt("qft4_de.csv", de_map, fmt = '%s',delimiter=",")
 new_map = new_eliminate_redundant(dense_map, qubits)
 #new_map = new_eliminate_redundant(map, qubits)
 redun2 = cal_utilization(map, qubits)
