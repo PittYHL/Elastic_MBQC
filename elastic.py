@@ -48,6 +48,7 @@ def elastic(n,DAG, rows):
             elif gate['type'] == 'D':
                 middle_DAG[i].append(gate)
     map, qubit_loc = place_mid(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
+    front_loc, back_loc = find_qubit_row(middle_DAG, qubit_loc, map)
     return map
 
 def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
@@ -76,16 +77,17 @@ def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     if rows >= widest_mid + 2:
         current = gate_list.pop(0)
         qubit_loc = init_qubit2(rows, qubits, current, mid_DAG, mid_length, front_length, back_length)
+        DAG = copy.deepcopy(mid_DAG)
         for i in range(front_length):
             qubit_loc.pop(0)
-            mid_DAG.pop(0)
+            DAG.pop(0)
         for i in range(back_length):
             qubit_loc.pop(-1)
-            mid_DAG.pop(-1)
+            DAG.pop(-1)
         index = 0  # for qubit loc
-        for i in range(len(mid_DAG)):
-            if mid_DAG[i] != []:
-                for gate in mid_DAG[i]:
+        for i in range(len(DAG)):
+            if DAG[i] != []:
+                for gate in DAG[i]:
                     pattern, _, _, _, _ = de_gate(gate['gate'] + ' 0 0 ')
                     if gate['type'] == 'D':
                         if gate['t1'] < gate['t2']:
@@ -124,3 +126,47 @@ def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
         if len(map[i]) < max:
             map[i].extend(['Z'] * (max - len(map[i])))
     return map, qubit_loc
+
+def find_qubit_row(middle_DAG, qubit_loc, map):
+    empty = 0
+    for layer in middle_DAG:
+        if layer == []:
+            empty += 1
+        else:
+            break
+    front_layer = [x - empty for x in middle_DAG[empty][0]['front']]
+    back_layer = [x - empty for x in middle_DAG[empty][0]['back']]
+    front_row = []
+    back_row = []
+    for i in range(len(front_layer)):
+        front_row.append(qubit_loc[front_layer[i]][i])
+        back_row.append(qubit_loc[back_layer[i]][i])
+    front_loc = []
+    back_loc = []
+    for row in front_row:
+        index = 0
+        if row != 0 and row != len(map) - 1:
+            while map[row][index] == 'Z' or (map[row-1][index] == 'Z' and map[row+1][index] == 'Z'):
+                index += 1
+        elif row != 0:
+            while map[row][index] == 'Z' or map[row-1][index] == 'Z':
+                index += 1
+        else:
+            while map[row][index] == 'Z' or map[row+1][index] == 'Z':
+                index += 1
+        loc = [row, index]
+        front_loc.append(loc)
+
+    for row in back_row:
+        index = len(map[0]) - 1
+        if row != 0 and row != len(map) - 1:
+            while map[row][index] == 'Z' or (map[row-1][index] == 'Z' and map[row+1][index] == 'Z'):
+                index -= 1
+        elif row != 0:
+            while map[row][index] == 'Z' or map[row-1][index] == 'Z':
+                index -= 1
+        else:
+            while map[row][index] == 'Z' or map[row+1][index] == 'Z':
+                index -= 1
+        loc = [row, index]
+        back_loc.append(loc)
