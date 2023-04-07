@@ -8,8 +8,8 @@ import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 4
-rows = 11
+qubits = 5
+rows = 15
 physical_gate = []
 tracker= []
 map = []
@@ -18,7 +18,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/bv4b.txt') as f:
+with open('Benchmarks/bv5b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -223,23 +223,25 @@ fill_map(qubits,map)
 print(physical_gate[0]["gate"])
 DAG = dense(qubits, physical_gate)
 dense_map = cons_new_map(qubits,DAG)
-#schedule = scheduling(qubits, DAG, rows)
-#sche_ela = sche_ela(qubits,DAG, rows)
+schedule = scheduling(qubits, DAG, rows)
+sche_ela = sche_ela(qubits,DAG, rows)
 ela_no = only_elastic(qubits,DAG, rows)
 #sc_map = np.array(schedule)
 #np.savetxt("qft4_sche.csv", sc_map, fmt = '%s',delimiter=",")
 #de_map = np.array(dense_map)
 #np.savetxt("qft4_de.csv", de_map, fmt = '%s',delimiter=",")
-new_map = new_eliminate_redundant(dense_map, qubits)
+#new_map = new_eliminate_redundant(dense_map, qubits)
 #new_map = new_eliminate_redundant(map, qubits)
 redun2 = cal_utilization(map, qubits)
 useful2 = len(map) * len(map[0]) - redun2
-old_uti2 = useful2/(len(map[0])*rows)
-old_uti1 = useful2/(len(new_map[0])*rows)
+old_uti0 = useful2/(len(dense_map[0])*rows)
+old_uti1 = useful2/(len(schedule[0])*rows)
+old_uti2 = useful2/(len(ela_no[0])*rows)
+old_uti3 = useful2/(len(sche_ela[0])*rows)
 uti0, use0 = cal_utilization2(dense_map, rows)
 uti1, use1 = cal_utilization2(schedule, rows)
-uti2, use2 = cal_utilization2(map, rows)
-uti3, use3 = cal_utilization2(new_map, rows)
+uti2, use2 = cal_utilization2(ela_no, rows)
+uti3, use3 = cal_utilization2(sche_ela, rows)
 #np.savetxt("result/iqp7_base.csv", np_map, fmt = '%s',delimiter=",")
 #np.savetxt("result/iqp7_base_el.csv", np_new_map, fmt = '%s',delimiter=",")
 #np_map.tofile('hlf4_base.csv', sep = ',')
