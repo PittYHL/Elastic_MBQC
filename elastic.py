@@ -74,6 +74,10 @@ def only_elastic(qubits,DAG, rows):
             elif gate['type'] == 'D':
                 middle_DAG[i].append(gate)
     map, qubit_loc = place_mid_normal(rows, qubits, DAG, front_DAG, middle_DAG)
+    front_loc, back_loc = find_qubit_row(middle_DAG, qubit_loc, map)
+    front_pattern, back_pattern, mid_map = combine(front_DAG, front_loc, back_DAG, back_loc, map)
+    elastic_map = greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DAG)
+    return elastic_map
 
 def place_mid_normal(rows, qubits, DAG, front_DAG, mid_DAG):
     qubit_loc = []
@@ -121,6 +125,13 @@ def place_mid_normal(rows, qubits, DAG, front_DAG, mid_DAG):
                 else:
                     map[gate['t2'] * 2 - 1].extend(pattern[1])
         normal_fill(map)
+    row_length = len(map[0])
+    for i in range(up_rows):
+        map.insert(0, ['Z'] * row_length)
+    for i in range(bot_rows):
+        map.append(['Z'] * row_length)
+    for i in range(len(map)):
+        map[i] = ['Z'] * front_length * 3 + map[i] + ['Z'] * back_length * 3
     return map, qubit_loc
 
 def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
