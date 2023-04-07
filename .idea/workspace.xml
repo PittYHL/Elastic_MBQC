@@ -78,29 +78,39 @@
           <option name="timeStamp" value="144" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>226</line>
-          <option name="timeStamp" value="168" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/scheduling.py</url>
           <line>202</line>
           <option name="timeStamp" value="176" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>572</line>
+          <line>639</line>
           <option name="timeStamp" value="205" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>232</line>
+          <line>299</line>
           <option name="timeStamp" value="208" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>235</line>
+          <line>302</line>
           <option name="timeStamp" value="209" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>227</line>
+          <option name="timeStamp" value="210" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/elastic.py</url>
+          <line>75</line>
+          <option name="timeStamp" value="211" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/elastic.py</url>
+          <line>123</line>
+          <option name="timeStamp" value="216" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -120,6 +130,7 @@
         <watch expression="schedule" />
         <watch expression="circuit" />
         <watch expression="i" />
+        <watch expression="middle_DAG" />
       </configuration>
     </watches-manager>
   </component>

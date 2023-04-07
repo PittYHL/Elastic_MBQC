@@ -54,7 +54,74 @@ def sche_ela(n,DAG, rows):
     return elastic_map
 
 def only_elastic(qubits,DAG, rows):
-    
+    front_DAG = []
+    middle_DAG = []
+    back_DAG = []
+    # create three DAG
+    for i in range(len(DAG)):
+        front_DAG.append([])
+        middle_DAG.append([])
+        back_DAG.append([])
+        for gate in DAG[i]:
+            if gate['gate'] == 'I1' or gate['gate'] == 'I2' or gate['gate'] == 'I3':
+                middle_DAG[i].append(gate)
+            elif gate['type'] == 'S' and i < gate['front'][gate['t1']]:
+                front_DAG[i].append(gate)
+            elif gate['type'] == 'S' and i > gate['front'][gate['t1']] and i < gate['back'][gate['t1']]:
+                middle_DAG[i].append(gate)
+            elif gate['type'] == 'S' and i > gate['back'][gate['t1']]:
+                back_DAG[i].append(gate)
+            elif gate['type'] == 'D':
+                middle_DAG[i].append(gate)
+    map, qubit_loc = place_mid_normal(rows, qubits, DAG, front_DAG, middle_DAG)
+
+def place_mid_normal(rows, qubits, DAG, front_DAG, mid_DAG):
+    qubit_loc = []
+    up_rows = math.floor((rows - 2*qubits + 1)/2)
+    bot_rows = math.ceil((rows - 2 * qubits + 1) / 2)
+    layout = [up_rows]
+    for i in range(1, qubits):
+        layout.append(layout[i - 1] + 2)
+    map = []
+    for i in range(2*qubits-1):
+        map.append(['Z'])
+    gate_list = [] #for all the mid gates
+    mid_length = 0 #count how long is mid
+    front_length = 0
+    back_length = 0
+    found_mid = 0
+    for i in range(len(mid_DAG)):
+        if mid_DAG[i] != []:
+            found_mid = 1
+            mid_length =mid_length + 1
+            for gate in mid_DAG[i]:
+                gate_list.append(gate)
+        elif found_mid == 1 and mid_DAG[i] == []:
+            back_length = back_length + 1
+    for i in range(len(mid_DAG)):
+        if mid_DAG[i] == []:
+            front_length = front_length + 1
+        elif mid_DAG[i] != []:
+            break
+    for i in range(len(mid_DAG)):
+        if mid_DAG[i] == []:
+            continue
+        qubit_loc.append(layout)
+        for gate in mid_DAG[i]:
+            length = gate['length']
+            pattern, t1, t2, t3, name = de_gate(gate['gate'] + ' 0 0 ')
+            if gate['type'] == 'S':
+                t1 = gate['t1']
+                map[gate['t1']*2] = map[gate['t1']*2] + pattern
+            elif gate['type'] == 'D':
+                map[gate['t1'] * 2].extend(pattern[0])
+                map[gate['t2'] * 2].extend(pattern[2])
+                if gate['t1'] - gate['t2'] > 0:
+                    map[gate['t1'] * 2 - 1].extend(pattern[1])
+                else:
+                    map[gate['t2'] * 2 - 1].extend(pattern[1])
+        normal_fill(map)
+    return map, qubit_loc
 
 def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     widest_mid = 3 * (qubits - 1) #without single gate in the middle
@@ -571,4 +638,13 @@ def clean_map(map):
         for i in range(len(map)):
             map[i].pop(col)
     return map
+
+def normal_fill(map):
+    max = 0
+    for row in map:
+        if len(row) > max:
+            max = len(row)
+    for i in range(len(map)):
+        if len(map[i]) != max:
+            map[i] = map[i] + ['Z'] * (max - len(map[i]))
 
