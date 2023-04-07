@@ -7,7 +7,7 @@ import copy
 from dense import *
 from scheduling import *
 
-def elastic(n,DAG, rows):
+def sche_ela(n,DAG, rows):
     extra_row = rows - 2 * n + 1
     print("widest width is:" + str((n-1) * 3 + 2))
     depth = 0
@@ -51,7 +51,10 @@ def elastic(n,DAG, rows):
     front_loc, back_loc = find_qubit_row(middle_DAG, qubit_loc, map)
     front_pattern, back_pattern, mid_map = combine(front_DAG, front_loc, back_DAG, back_loc, map)
     elastic_map = greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DAG)
-    return map
+    return elastic_map
+
+def only_elastic(qubits,DAG, rows):
+    
 
 def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     widest_mid = 3 * (qubits - 1) #without single gate in the middle
@@ -127,6 +130,8 @@ def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     for i in range(len(map)):
         if len(map[i]) < max:
             map[i].extend(['Z'] * (max - len(map[i])))
+    for i in range(len(map)):
+        map[i] = ['Z'] * front_length * 3 + map[i] + ['Z'] * back_length * 3
     return map, qubit_loc
 
 def find_qubit_row(middle_DAG, qubit_loc, map):
@@ -220,16 +225,22 @@ def greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DA
     for i in range(len(front_barrier_sort)):
         front_order.append(front_barrier.index(front_barrier_sort[i]))
         back_order.append(back_barrier.index(back_barrier_sort[i]))
+    resolve_order(front_order)
+    resolve_order(back_order)
     elastic_map = copy.deepcopy(mid_map)
     #place the front
     for i in front_order:
         elastic_map = greedy_place_front(elastic_map, front_loc[i], front_pattern[i])
+    #place the back
+    for i in back_order:
+        elastic_map = greedy_place_back(elastic_map, back_loc[i], back_pattern[i])
+    elastic_map = clean_map(elastic_map)
+    return elastic_map
 
 def greedy_place_front(elastic_map, front_loc, front_pattern):
     pattern = copy.deepcopy(front_pattern)
     current_loc = copy.deepcopy(front_loc)
 
-    length = 0
     while pattern != []:
         next = pattern.pop(-1)
         if pattern != []:
@@ -237,39 +248,118 @@ def greedy_place_front(elastic_map, front_loc, front_pattern):
         else:
             last = 1
         up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
-        if down == 1 :
-            current_loc = [current_loc[0] + 1, current_loc[1]]
-            i = current_loc[0]
-            j = current_loc[1]
-            elastic_map[i][j] = next
-        elif up == 1:
-            current_loc = [current_loc[0] - 1, current_loc[1]]
-            i = current_loc[0]
-            j = current_loc[1]
-            elastic_map[i][j] = next
+        if current_loc[0] < len(elastic_map) / 2:
+            if down == 1 :
+                current_loc = [current_loc[0] + 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            elif up == 1:
+                current_loc = [current_loc[0] - 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            else:
+                current_loc = [current_loc[0], current_loc[1] - 1]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
         else:
-            current_loc = [current_loc[0], current_loc[1] - 1]
-            i = current_loc[0]
-            j = current_loc[1]
-            elastic_map[i][j] = next
+            if up == 1:
+                current_loc = [current_loc[0] - 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            elif down == 1 :
+                current_loc = [current_loc[0] + 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            else:
+                current_loc = [current_loc[0], current_loc[1] - 1]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
     return elastic_map
 
+def greedy_place_back(elastic_map, back_loc, back_pattern):
+    pattern = copy.deepcopy(back_pattern)
+    current_loc = copy.deepcopy(back_loc)
+
+    while pattern != []:
+        next = pattern.pop(0)
+        if pattern != []:
+            last = 0
+        else:
+            last = 1
+        up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
+        if current_loc[0] < len(elastic_map)/2:
+            if down == 1:
+                current_loc = [current_loc[0] + 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            elif up == 1:
+                current_loc = [current_loc[0] - 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            else:
+                current_loc = [current_loc[0], current_loc[1] + 1]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+        else:
+            if up == 1:
+                current_loc = [current_loc[0] - 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            elif down == 1:
+                current_loc = [current_loc[0] + 1, current_loc[1]]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+            else:
+                current_loc = [current_loc[0], current_loc[1] + 1]
+                i = current_loc[0]
+                j = current_loc[1]
+                elastic_map[i][j] = next
+    return elastic_map
 def found_possible_loc_front(elastic_map, current_loc, last):
     up = 0
     left = 0
     down = 0
     if current_loc[0] == len(elastic_map) - 1: #last row
         left = check_left(elastic_map, current_loc, last)
-        up = check_up(elastic_map, current_loc, last)
+        up = check_up(elastic_map, current_loc, last, 'l')
     elif current_loc[0] == 0: #first row
         left = check_left(elastic_map, current_loc, last)
-        down = check_down(elastic_map, current_loc, last)
+        down = check_down(elastic_map, current_loc, last, 'l')
     else:
         left = check_left(elastic_map, current_loc, last)
-        down = check_down(elastic_map, current_loc, last)
-        up = check_up(elastic_map, current_loc, last)
+        down = check_down(elastic_map, current_loc, last, 'l')
+        up = check_up(elastic_map, current_loc, last, 'l')
     return up, left, down
-def check_up(elastic_map, current_loc, last):
+
+def found_possible_loc_back(elastic_map, current_loc, last):
+    up = 0
+    right = 0
+    down = 0
+    if current_loc[0] == len(elastic_map) - 1:  # last row
+        right = check_right(elastic_map, current_loc, last)
+        up = check_up(elastic_map, current_loc, last, 'r')
+    elif current_loc[0] == 0:  # first row
+        right = check_right(elastic_map, current_loc, last)
+        down = check_down(elastic_map, current_loc, last, 'r')
+    else:
+        right = check_right(elastic_map, current_loc, last)
+        down = check_down(elastic_map, current_loc, last, 'r')
+        up = check_up(elastic_map, current_loc, last, 'r')
+    return up, right, down
+
+
+def check_up(elastic_map, current_loc, last, direc):
     ok = 0
     row = current_loc[0]
     col = current_loc[1]
@@ -280,9 +370,16 @@ def check_up(elastic_map, current_loc, last):
                 return ok
             else:
                 return ok
-        else:
+        elif direc == 'l':
             if (elastic_map[row - 2][col] == 'Z' and elastic_map[row - 1][col - 1] == 'Z' and elastic_map[row - 1][col + 1] == 'Z'
                     and elastic_map[row - 2][col - 1] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+        elif direc == 'r':
+            if (elastic_map[row - 2][col] == 'Z' and elastic_map[row - 1][col - 1] == 'Z' and elastic_map[row - 1][col + 1] == 'Z'
+                    and elastic_map[row - 2][col + 1] == 'Z'):
                 ok = 1
                 return ok
             else:
@@ -294,8 +391,14 @@ def check_up(elastic_map, current_loc, last):
                 return ok
             else:
                 return ok
-        else:
+        elif direc == 'l':
             if (elastic_map[row-1][col - 1] == 'Z' and elastic_map[row-1][col + 1] == 'Z' and elastic_map[row-1][col - 2] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+        elif direc == 'r':
+            if (elastic_map[row-1][col - 1] == 'Z' and elastic_map[row-1][col + 1] == 'Z' and elastic_map[row-1][col + 2] == 'Z'):
                 ok = 1
                 return ok
             else:
@@ -346,7 +449,7 @@ def check_left(elastic_map, current_loc, last):
             else:
                 return ok
 
-def check_down(elastic_map, current_loc, last):
+def check_down(elastic_map, current_loc, last, direc):
     ok = 0
     row = current_loc[0]
     col = current_loc[1]
@@ -357,9 +460,16 @@ def check_down(elastic_map, current_loc, last):
                 return ok
             else:
                 return ok
-        else:
+        elif direc == 'l':
             if (elastic_map[row + 2][col] == 'Z' and elastic_map[row + 1][col - 1] == 'Z' and elastic_map[row + 1][col + 1] == 'Z'
             and elastic_map[row + 2][col - 1] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+        elif direc == 'r':
+            if (elastic_map[row + 2][col] == 'Z' and elastic_map[row + 1][col - 1] == 'Z' and elastic_map[row + 1][col + 1] == 'Z'
+            and elastic_map[row + 2][col + 1] == 'Z'):
                 ok = 1
                 return ok
             else:
@@ -371,8 +481,14 @@ def check_down(elastic_map, current_loc, last):
                 return ok
             else:
                 return ok
-        else:
+        elif direc == 'l':
             if (elastic_map[row + 1][col - 1] == 'Z' and elastic_map[row + 1][col + 1] == 'Z' and elastic_map[row + 1][col - 2] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+        elif direc == 'r':
+            if (elastic_map[row + 1][col - 1] == 'Z' and elastic_map[row + 1][col + 1] == 'Z' and elastic_map[row + 1][col + 2] == 'Z'):
                 ok = 1
                 return ok
             else:
@@ -380,14 +496,79 @@ def check_down(elastic_map, current_loc, last):
 
 def resolve_order(order):
     increase = []
-    for i in len(order):
+    for i in range(len(order)):
         increase.append(i)
     for i in increase:
         count = 0
-        for j in :
+        for j in order:
             if j == i:
                 count += 1
-        while count != 1:
-            if i - 1 not in order:
-                order
+        if count != 0:
+            while count != 1:
+                if i - 1 not in order and i - 1 >= 0:
+                    order[order.index(i)] = i - 1
+                    count = count - 1
+                elif i + 1 not in order:
+                    order[order.index(i)] = i + 1
+                    count = count - 1
+
+def check_right(elastic_map, current_loc, last):
+    ok = 0
+    row = current_loc[0]
+    col = current_loc[1]
+    if row != 0 and row != len(elastic_map) - 1:
+        if last == 1:
+            if (elastic_map[row - 1][col + 1] == 'Z' and elastic_map[row + 1][col + 1] == 'Z' and elastic_map[row][col + 2] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+        else:
+            if (elastic_map[row - 1][col + 1] == 'Z' and elastic_map[row + 1][col + 1] == 'Z' and elastic_map[row][col + 2] == 'Z'
+            and elastic_map[row - 1][col + 2] == 'Z' and elastic_map[row + 1][col + 2] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+    elif row == 0:
+        if last == 1:
+            if (elastic_map[row][col + 2] == 'Z' and elastic_map[row+1][col + 1] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+        else:
+            if (elastic_map[row][col + 2] == 'Z' and elastic_map[row+1][col + 1] == 'Z' and elastic_map[row+1][col + 2] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+    elif row == len(elastic_map) - 1:
+        if last == 1:
+            if (elastic_map[row][col + 2] == 'Z' and elastic_map[row-1][col + 1] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+        else:
+            if (elastic_map[row][col + 2] == 'Z' and elastic_map[row-1][col + 1] == 'Z' and elastic_map[row-1][col + 2] == 'Z'):
+                ok = 1
+                return ok
+            else:
+                return ok
+def clean_map(map):
+    z_col = []
+    for i in range(len(map[0])):
+        all_z = 1
+        for row in map:
+            if row[i] != 'Z':
+                all_z = 0
+                break
+        if all_z == 1:
+            z_col.append(i)
+    z_col.sort(reverse=True)
+    for col in z_col:
+        for i in range(len(map)):
+            map[i].pop(col)
+    return map
 
