@@ -48,19 +48,19 @@ def scheduling(n,DAG, rows):
                 back_DAG[i].append(gate)
             elif gate['type'] == 'D':
                 middle_DAG[i].append(gate)
-    if rows >= 3 * (n - 1) + 2:
-        map, front_loc, front_length = placement2(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
-    else:
-        map, front_loc, front_length =search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, True)
-        map = fill_front(map, front_loc, front_DAG, front_length)
+    #if rows >= 3 * (n - 1) + 2:
+    #    map = placement2(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
+    #else:
+    map, front_loc, front_length =search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, True, True)
+    fill_front(map, front_loc, front_DAG, front_length, qubit_range)
     return map
 
-def search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, sche):
+def search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, sche, full):
     front_loc = [] #record front layer location
     map = []
     qubit_loc = []
     for i in range(rows):
-        map.append(['Z']*(len(DAG)*3))
+        map.append(['Z']*(4))
     active_qubit = []
     gate_list = []  # for all the mid gates
     mid_length = 0  # count how long is mid
@@ -91,33 +91,7 @@ def search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, sche):
         for i in range(len(back_DAG)):
             if back_DAG[i] != []:
                 mid_DAG[i].extend(back_DAG[i])
-    init_gate = mid_DAG[front_length].pop(0)
-    pattern, _, _, _, _ = de_gate(init_gate['gate'] + ' 0 0 ')
-    if init_gate['t1'] < init_gate['t2']:
-        target = init_gate['t1']
-        first_row = first_loc(rows, target, qubits)
-        map[first_row][0:0] = init_gate[0]
-        map[first_row + 1][0:0] = init_gate[1]
-        map[first_row + 2][0:0] = init_gate[2]
-        active_qubit.append(init_gate['t1'])
-        active_qubit.append(init_gate['t2'])
-        active_qubit.sort()
-    else:
-        target = init_gate['t2']
-        first_row = first_loc(rows, target, qubits)
-        map[first_row][0:0] = pattern[2]
-        map[first_row + 1][0:0] = pattern[1]
-        map[first_row + 2][0:0] = pattern[0]
-        active_qubit.append(init_gate['t1'])
-        active_qubit.append(init_gate['t2'])
-        active_qubit.sort()
-    front_loc[target] = [first_row, 0]
-    front_loc[target + 1] = [first_row + 2, 0]
-    qubit_loc[target] = [first_row, len(pattern[0]) - 1]
-    qubit_loc[target+1] = [first_row + 2, len(pattern[0]) - 1]
-    current_two.append([target, target+1])
-    current_qubit.append(target)
-    current_qubit.append(target + 1)
+    initial_layer(mid_DAG, front_length, rows, qubits, full, active_qubit, front_loc, qubit_loc, current_two, current_qubit, map)
     for i in range(len(mid_DAG)):
         if mid_DAG[i] == []:
             continue
@@ -175,22 +149,24 @@ def search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, sche):
                         map[start[0]][start[1]:start[1]] = pattern[2]
                         map[start[0] + 1][start[1]:start[1]] = pattern[1]
                         map[start[0] + 2][start[1]:start[1]] = pattern[0]
-    min = 100000
+        align(map, qubit_loc, current_qubit)
+        map = fill_z(map)
+    max = 0
+    for i in range(len(map)):
+        last_point = -1
+        for j in reversed(range(len(map[i]))):
+            if map[i][j] != 'Z':
+                last_point = j
+                z_length = len(map[i]) - last_point - 1
+                break
+        for j in range(z_length):
+            map[i].pop(-1)
+        if len(map[i]) > max:
+            max = len(map[i])
     for row in map:
-        if len(row) < min:
-            min = len(row)
-    for i in range(min):
-        found = 1
-        for row in map:
-            if row[i] != 'Z':
-                found = 0
-        if found == 1:
-            end = i
-            break
-    for row in map:
-        delete_length = len(row) - end
-        for i in range(delete_length):
-            row.pop(-1)
+        if len(row) < max:
+            for i in range(max - len(row)):
+                row.append('Z')
     return map, front_loc, front_length
 
 def placement2(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
@@ -265,6 +241,10 @@ def placement2(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
                 for gate in DAG[i]:
                     pattern, _, _, _, _ = de_gate(gate['gate'] + ' 0 0 ')
                     if gate['type'] == 'D':
+                        if gate['gate'] == 'SW' and gate['length'] == 6:
+                            map[qubit_loc[index][gate['t1']]].extend(['X']*2)
+                            map[qubit_loc[index][gate['t1']] + 1].extend(['Z']*2)
+                            map[qubit_loc[index][gate['t2']]].extend(['X']*2)
                         if gate['t1'] < gate['t2']:
                             map[qubit_loc[index][gate['t1']]].extend(pattern[0])
                             map[qubit_loc[index][gate['t1']] + 1].extend(pattern[1])
@@ -399,9 +379,15 @@ def init_qubit2(rows, qubits, gate, mid_DAG, mid_length, front_length, back_leng
         index = index + 1
         current_2 = copy.deepcopy(next_2)
     for i in range(front_length):
-        qubit_loc.insert(0, qubit_loc[1])
+        if qubit_loc[0] == layout1:
+            qubit_loc.insert(0, layout2)
+        else:
+            qubit_loc.insert(0, layout1)
     for i in range(back_length):
-        qubit_loc.append(qubit_loc[len(qubit_loc) - 2])
+        if qubit_loc[-1] == layout1:
+            qubit_loc.append(layout2)
+        else:
+            qubit_loc.append(layout1)
     return qubit_loc
 def schedule_fill(map, fill, qubit_loc, index):
     max = 0
@@ -424,8 +410,13 @@ def check_locate(gate, qubit_loc, map, qubit_range, rows, active_qubit, front_lo
             qubit_loc[target] = [locate[0]-1, locate[1] + len(pattern) - 1]
             return start
         if target == 0 and locate[0] == 0:
-            qubit_loc[target] = [locate[0], locate[1] + len(pattern)]
-            return [locate[0], locate[1] + 1]
+            if map[locate[0] + 1][locate[1]] == 'Z' and map[locate[0] + 2][locate[1]] == 'Z':
+                qubit_loc[target] = [locate[0] + 1, locate[1] + len(pattern) - 1]
+                start = [locate[0] + 1, locate[1]]
+                return start
+            else:
+                qubit_loc[target] = [locate[0], locate[1] + len(pattern)]
+                return [locate[0], locate[1] + 1]
         elif target == len(qubit_range) - 1 and locate[0] != rows - 1:
             start = [locate[0] + 1, locate[1]]
             qubit_loc[target] = [locate[0] + 1, locate[1] + len(pattern) - 1]
@@ -509,16 +500,66 @@ def check_locate(gate, qubit_loc, map, qubit_range, rows, active_qubit, front_lo
                 qubit_loc[target] = [start[0], start[1] + 3]
             return start
 
-def first_loc(rows, target, qubits):
-    if target == 0:
-        row = 0
-    elif target == qubits - 1:
-        row = rows - 2
+def first_loc(rows, target, qubits, full):
+    if len(target) == 1:
+        if full == False:
+            if target[0] == 0:
+                row = 0
+            elif target[0] == qubits - 1:
+                row = rows - 2
+            else:
+                interval = (rows - 1)/(qubits - 1)
+                row = math.ceil(interval * target[0])
+        else:
+            layout1 = [0]
+            layout2 = [1]
+            for i in range(1, qubits):
+                if i % 2 == 1:
+                    layout1.append(layout1[i - 1] + 4)
+                else:
+                    layout1.append(layout1[i - 1] + 2)
+            for i in range(1, qubits):
+                if i % 2 == 1:
+                    layout2.append(layout2[i - 1] + 2)
+                else:
+                    layout2.append(layout2[i - 1] + 4)
+            if target[0] % 2 == 0:
+                row = layout2[target[0]]
+            else:
+                row = layout1[target[0]]
+        return row
     else:
-        interval = (rows - 1)/(qubits - 1)
-        row = math.ceil(interval * target)
-    return row
-
+        row = []
+        if full == False:
+            for tar in target:
+                if tar == 0:
+                    row.append(0)
+                elif tar == qubits - 1:
+                    row.append(rows - 2)
+                else:
+                    interval = (rows - 1)/(qubits - 1)
+                    row.append(math.ceil(interval * tar))
+        else:
+            first_tar = target[0]
+            layout1 = [0]
+            layout2 = [1]
+            for i in range(1, qubits):
+                if i % 2 == 1:
+                    layout1.append(layout1[i - 1] + 4)
+                else:
+                    layout1.append(layout1[i - 1] + 2)
+            for i in range(1, qubits):
+                if i % 2 == 1:
+                    layout2.append(layout2[i - 1] + 2)
+                else:
+                    layout2.append(layout2[i - 1] + 4)
+            if first_tar % 2 == 0:
+                layout = layout2
+            else:
+                layout = layout1
+            for tar in target:
+                row.append(layout[tar])
+        return row
 def check_two_qubit(current_two, layer):
     future_two = []
     constant =False
@@ -554,10 +595,12 @@ def add_qubit(gate, active_qubit, qubit_loc):
             active_qubit.sort()
             qubit_loc[gate['t2']] = [qubit_loc[gate['t1']][0] - 2, qubit_loc[gate['t2']][1]]
 
-def fill_front(map, front_loc, front_DAG, front_length):
+def fill_front(map, front_loc, front_DAG, front_length, qubit_range):
     active_qubit = []
     for i in range(len(map)):
         map[i] = ['Z'] * front_length * 4 + map[i]
+    for i in range(len(front_loc)):
+        front_loc[i][1] = front_loc[i][1] + 4 * front_length
     for layer in reversed(front_DAG):
         if layer != []:
             for gate in layer:
@@ -565,11 +608,137 @@ def fill_front(map, front_loc, front_DAG, front_length):
                     active_qubit.append(gate['t1'])
                 start = front_loc[gate['t1']]
                 pattern, _, _, _, _ = de_gate(gate['gate'] + ' 0 0 ')
-                if start[0] == len(map) - 1 or start[0] == 0:
-                    front_loc[gate['t1']][1] = front_loc[gate['t1']][1] - 4
-                    map[start[0]][start[1]-4:start[1]] = pattern
-                elif start[0] == len(map) - 2 and map[start[0] - 1][start[1]] == 'Z':
-                    front_loc[gate['t1']] = [front_loc[gate['t1']][0] + 1, front_loc[gate['t1']][1] - 3]
+                if start[0] == len(map) - 1:
+                    if map[start[0] - 2][start[1]] == 'Z':
+                        map[start[0] - 1][start[1] - 3:start[1] + 1] = pattern
+                        front_loc[gate['t1']][1] = front_loc[gate['t1']][1] - 3
+                        front_loc[gate['t1']][0] = front_loc[gate['t1']][0] - 1
+                    else:
+                        map[start[0]][start[1]-4:start[1]] = pattern
+                        front_loc[gate['t1']][1] = front_loc[gate['t1']][1] - 4
+                elif start[0] == 0:
+                    if map[start[0] + 2][start[1]] == 'Z':
+                        map[start[0] + 1][start[1] - 3:start[1] + 1] = pattern
+                        front_loc[gate['t1']][1] = front_loc[gate['t1']][1] - 3
+                        front_loc[gate['t1']][0] = front_loc[gate['t1']][0] + 1
+                    else:
+                        map[start[0]][start[1]-4:start[1]] = pattern
+                        front_loc[gate['t1']][1] = front_loc[gate['t1']][1] - 4
+                elif start[0] == len(map) - 2 and map[start[0] + 1][start[1]] == 'Z':
                     map[start[0] + 1][start[1] - 3:start[1] + 1] = pattern #need to consider up and down and also qubit range!
-                elif map[start[0] - 1][start[1]] == 'Z' == map[start[0] - 2][start[1]] == 'Z':
+                    front_loc[gate['t1']] = [front_loc[gate['t1']][0] + 1, front_loc[gate['t1']][1] - 3]
+                elif start[0] == 1 and map[start[0] - 1][start[1]] == 'Z':
+                    map[start[0] - 1][start[1] - 3:start[1] + 1] = pattern
+                    front_loc[gate['t1']] = [front_loc[gate['t1']][0] - 1, front_loc[gate['t1']][1] - 3]
+                elif map[start[0] - 1][start[1]] == map[start[0] - 2][start[1]] and map[start[0] - 2][start[1]] == 'Z' and start[0] - 1 in qubit_range[gate['t1']]:
+                    map[start[0] - 1][start[1] - 3:start[1] + 1] = pattern
+                    front_loc[gate['t1']] = [front_loc[gate['t1']][0] - 1, front_loc[gate['t1']][1] - 3]
+                elif map[start[0] + 1][start[1]] == map[start[0] + 2][start[1]] and map[start[0] + 2][start[1]] == 'Z' and start[0] + 1 in qubit_range[gate['t1']]:
+                    map[start[0] + 1][start[1] - 3:start[1] + 1] = pattern
+                    front_loc[gate['t1']] = [front_loc[gate['t1']][0] + 1, front_loc[gate['t1']][1] - 3]
+                else:
+                    map[start[0]][start[1] - 4:start[1]] = pattern
+                    front_loc[gate['t1']][1] = front_loc[gate['t1']][1] - 4
+    for i in range(len(map[0])):
+        all_z = True
+        for j in range(len(map)):
+            if map[j][0] != 'Z':
+                all_z = False
+                break
+        if all_z == True:
+            for row in map:
+                row.pop(0)
+        else:
+            break
 
+def fill_z(map):
+    max = 0
+    for row in map:
+        if len(row) > max:
+            max = len(row)
+    for i in range(len(map)):
+        map[i].extend(['Z'] * (max - len(map[i])))
+    return map
+
+def align(map, qubit_loc, current_qubit):
+    max = 0
+    min = 1000000
+    for i in current_qubit:
+        if qubit_loc[i][1] > max:
+            max = qubit_loc[i][1]
+        elif qubit_loc[i][1] < min:
+            min = qubit_loc[i][1]
+    if max - min == 2:
+        for i in current_qubit:
+            if qubit_loc[i][1] == min:
+                map[qubit_loc[i][0]][qubit_loc[i][1] + 1:qubit_loc[i][1] + 1] = ['X','X']
+                qubit_loc[i][1] = qubit_loc[i][1] + 2
+
+def initial_layer(mid_DAG, front_length, rows, qubits, full, active_qubit, front_loc, qubit_loc, current_two, current_qubit, map):
+    if len(mid_DAG[front_length]) == 1:
+        init_gate = mid_DAG[front_length].pop(0)
+        pattern, _, _, _, _ = de_gate(init_gate['gate'] + ' 0 0 ')
+        if init_gate['t1'] < init_gate['t2']:
+            target = [init_gate['t1']]
+            first_row = first_loc(rows, target, qubits, full)
+            map[first_row][0:0] = pattern[0]
+            map[first_row + 1][0:0] = pattern[1]
+            map[first_row + 2][0:0] = pattern[2]
+            active_qubit.append(init_gate['t1'])
+            active_qubit.append(init_gate['t2'])
+            active_qubit.sort()
+        else:
+            target = [init_gate['t2']]
+            first_row = first_loc(rows, target, qubits, full)
+            map[first_row][0:0] = pattern[2]
+            map[first_row + 1][0:0] = pattern[1]
+            map[first_row + 2][0:0] = pattern[0]
+            active_qubit.append(init_gate['t1'])
+            active_qubit.append(init_gate['t2'])
+            active_qubit.sort()
+        front_loc[target[0]] = [first_row, 0]
+        front_loc[target[0] + 1] = [first_row + 2, 0]
+        qubit_loc[target[0]] = [first_row, len(pattern[0]) - 1]
+        qubit_loc[target[0] + 1] = [first_row + 2, len(pattern[0]) - 1]
+        current_two.append([target[0], target[0] + 1])
+        current_qubit.append(target[0])
+        current_qubit.append(target[0] + 1)
+    else:
+        target = []
+        for gate in mid_DAG[front_length]:
+            if gate['t1'] < gate['t2']:
+                target.append(gate['t1'])
+            else:
+                target.append(gate['t2'])
+        target.sort()
+        first_row = first_loc(rows, target, qubits, full)
+        for i in range(len(mid_DAG[front_length])):
+            gate = mid_DAG[front_length][i]
+            pattern, _, _, _, _ = de_gate(mid_DAG[front_length][i]['gate'] + ' 0 0 ')
+            if gate['gate'] == 'SW' and gate['length'] == 6:
+                map[row][0:0] = ['X','X']
+                map[row + 1][0:0] = ['Z','Z']
+                map[row + 2][0:0] = ['X','X']
+            if gate['t1'] < gate['t2']:
+                row = first_row[i]
+                map[row][0:0] = pattern[0]
+                map[row + 1][0:0] = pattern[1]
+                map[row + 2][0:0] = pattern[2]
+                active_qubit.append(gate['t1'])
+                active_qubit.append(gate['t2'])
+                active_qubit.sort()
+            else:
+                row = first_row[i]
+                map[row][0:0] = pattern[2]
+                map[row + 1][0:0] = pattern[1]
+                map[row + 2][0:0] = pattern[0]
+                active_qubit.append(gate['t1'])
+                active_qubit.append(gate['t2'])
+                active_qubit.sort()
+            front_loc[target[i]] = [row, 0]
+            front_loc[target[i] + 1] = [row + 2, 0]
+            qubit_loc[target[i]] = [row, len(pattern[0]) - 1]
+            qubit_loc[target[i] + 1] = [row + 2, len(pattern[0]) - 1]
+            current_two.append([target[i], target[i] + 1])
+            current_qubit.append(target[i])
+            current_qubit.append(target[i] + 1)

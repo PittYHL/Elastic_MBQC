@@ -78,6 +78,9 @@ def dense(qubits, physical_gate):
     for i in range(len(DAG)):
         count1 = count1 + len(DAG[i])
         count2 = count2 + len(newDAG[i])
+    for i in range(len(newDAG)):
+        if newDAG[i] == []:
+            newDAG.pop(i)
     if count2 != count1:
         raise Exception('check why the two DAG do not have the same gate number')
     track = []
