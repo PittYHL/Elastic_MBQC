@@ -710,11 +710,12 @@ def initial_layer(mid_DAG, front_length, rows, qubits, full, active_qubit, front
                 target.append(gate['t1'])
             else:
                 target.append(gate['t2'])
-        target.sort()
+        #target.sort()
         first_row = first_loc(rows, target, qubits, full)
-        for i in range(len(mid_DAG[front_length])):
-            gate = mid_DAG[front_length][i]
-            pattern, _, _, _, _ = de_gate(mid_DAG[front_length][i]['gate'] + ' 0 0 ')
+        gate_num = len(mid_DAG[front_length])
+        for i in range(gate_num):
+            gate = mid_DAG[front_length].pop(0)
+            pattern, _, _, _, _ = de_gate(gate['gate'] + ' 0 0 ')
             length = 0
             if gate['gate'] == 'SW' and gate['length'] == 6:
                 row = first_row[i]

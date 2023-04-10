@@ -118,6 +118,13 @@ def place_mid_normal(rows, qubits, DAG, front_DAG, mid_DAG):
                 t1 = gate['t1']
                 map[gate['t1']*2] = map[gate['t1']*2] + pattern
             elif gate['type'] == 'D':
+                if gate['gate'] == 'SW' and gate['length'] == 6:
+                    map[gate['t1'] * 2].extend(['X', 'X'])
+                    map[gate['t2'] * 2].extend(['X', 'X'])
+                    if gate['t1'] - gate['t2'] > 0:
+                        map[gate['t1'] * 2 - 1].extend(['Z', 'Z'])
+                    else:
+                        map[gate['t2'] * 2 - 1].extend(['Z', 'Z'])
                 map[gate['t1'] * 2].extend(pattern[0])
                 map[gate['t2'] * 2].extend(pattern[2])
                 if gate['t1'] - gate['t2'] > 0:
