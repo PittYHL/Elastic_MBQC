@@ -721,7 +721,8 @@ def initial_layer(mid_DAG, front_length, rows, qubits, full, active_qubit, front
             gate = mid_DAG[front_length].pop(0)
             pattern, _, _, _, _ = de_gate(gate['gate'] + ' 0 0 ')
             length = 0
-            if gate['gate'] == 'SW' and gate['length'] == 6:
+            #index = 0
+            if (gate['gate'] == 'SW' or gate['gate'] == 'CP') and gate['length'] == 6:
                 row = first_row[i]
                 map[row][0:0] = ['X','X']
                 map[row + 1][0:0] = ['Z','Z']
@@ -729,9 +730,9 @@ def initial_layer(mid_DAG, front_length, rows, qubits, full, active_qubit, front
                 length = length + 2
             if gate['t1'] < gate['t2']:
                 row = first_row[i]
-                map[row][0:0] = pattern[0]
-                map[row + 1][0:0] = pattern[1]
-                map[row + 2][0:0] = pattern[2]
+                map[row][length:length] = pattern[0]
+                map[row + 1][length:length] = pattern[1]
+                map[row + 2][length:length] = pattern[2]
                 active_qubit.append(gate['t1'])
                 active_qubit.append(gate['t2'])
                 active_qubit.sort()

@@ -390,8 +390,12 @@ def greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DA
     front_order = []
     back_order = []
     for i in range(len(front_barrier_sort)):
-        front_order.append(front_barrier.index(front_barrier_sort[i]))
-        back_order.append(back_barrier.index(back_barrier_sort[i]))
+        front_ind = front_barrier.index(front_barrier_sort[i])
+        back_ind = back_barrier.index(back_barrier_sort[i])
+        front_order.append(front_ind)
+        back_order.append(back_ind)
+        front_barrier[front_ind] = -1
+        back_barrier[back_ind] = -1
     resolve_order(front_order)
     resolve_order(back_order)
     elastic_map = copy.deepcopy(mid_map)
@@ -409,6 +413,7 @@ def greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DA
 def greedy_place_front2(elastic_map, front_order, front_loc, front_pattern):
     patterns = copy.deepcopy(front_pattern)
     lists = [[] for _ in range(len(patterns))]
+    start_loc = copy.deepcopy(front_loc)
     while patterns != lists:
         for i in front_order:
             if patterns[i] != []:
@@ -419,7 +424,23 @@ def greedy_place_front2(elastic_map, front_order, front_loc, front_pattern):
                 else:
                     last = 1
                 up, left, down = found_possible_loc_front(elastic_map, front_loc[i], last)
-                if front_loc[i][0] < len(elastic_map) / 2:
+                if i != 0 and front_loc[i][0] > start_loc[i-1][0] and front_loc[i][1] > start_loc[i-1][1]:
+                    if left == 1:
+                        front_loc[i] = [front_loc[i][0], front_loc[i][1] - 1]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                    elif down == 1:
+                        front_loc[i] = [front_loc[i][0] + 1, front_loc[i][1]]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                    else:
+                        front_loc[i] = [front_loc[i][0] - 1, front_loc[i][1]]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                elif front_loc[i][0] < len(elastic_map) / 2:
                     if down == 1:
                         front_loc[i] = [front_loc[i][0] + 1, front_loc[i][1]]
                         k = front_loc[i][0]
@@ -778,6 +799,7 @@ def resolve_order(order):
                         order[found.pop(-1)] = j
                     if len(found) == 0:
                         break
+
             elif end >= len(order) - 1:
                 for j in range(first, len(order)):
                     if j not in order or j == i:
