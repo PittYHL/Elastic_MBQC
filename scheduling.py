@@ -51,7 +51,11 @@ def scheduling(n,DAG, rows):
     #if rows >= 3 * (n - 1) + 2:
     #    map = placement2(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
     #else:
-    map, front_loc, front_length =search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, True, True)
+    if rows >= 3 * (n - 1) + 2:
+        full = True
+    else:
+        full = False
+    map, front_loc, front_length, _ =search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, True, full)
     fill_front(map, front_loc, front_DAG, front_length, qubit_range)
     return map
 
@@ -167,7 +171,7 @@ def search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, sche, full):
         if len(row) < max:
             for i in range(max - len(row)):
                 row.append('Z')
-    return map, front_loc, front_length
+    return map, front_loc, front_length, back_length
 
 def placement2(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
     widest_mid = 3 * (qubits - 1) #without single gate in the middle

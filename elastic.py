@@ -17,9 +17,6 @@ def sche_ela(n,DAG, rows):
             if gate['gate'] == 'CNOT':
                 length = 6
         depth = depth + length
-    print("shortest depth is:" + str(depth - len(DAG) + 1))
-    if (extra_row < 0):
-        print("illegal row number")
     qubit_range = []
     for i in range(n):
         interval = [i*2, rows - (n - i - 1)*2 - 1]
@@ -47,8 +44,14 @@ def sche_ela(n,DAG, rows):
                 back_DAG[i].append(gate)
             elif gate['type'] == 'D':
                 middle_DAG[i].append(gate)
-    map, qubit_loc = place_mid(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
-    front_loc, back_loc = find_qubit_row(middle_DAG, qubit_loc, map)
+    if rows >= 3 * (n - 1) + 2:
+        full = True
+    else:
+        full = False
+    map, front_loc, front_length, back_length = search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, False, full)
+    #map, qubit_loc = place_mid(rows, n, DAG, front_DAG, middle_DAG, qubit_range)
+    #front_loc, back_loc = find_qubit_row(middle_DAG, qubit_loc, map)
+    front_loc, back_loc = find_qubit_row2(map, front_length, back_length)
     front_pattern, back_pattern, mid_map = combine(front_DAG, front_loc, back_DAG, back_loc, map)
     elastic_map = greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DAG)
     return elastic_map
@@ -219,6 +222,85 @@ def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
         map[i] = ['Z'] * front_length * 3 + map[i] + ['Z'] * back_length * 3
     return map, qubit_loc
 
+def find_qubit_row2(map, front_length, back_length):
+    front_loc = []
+    back_loc = []
+    for i in range(len(map)):
+        found = 0
+        for j in range(len(map[i])):
+            if i == 0 and map[i][j] != 'Z' and map[i+1][j] != 'Z':
+                break
+            elif i == len(map) - 1 and map[i-1][j] != 'Z':
+                break
+            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
+                break
+            elif i == 0 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i+1][j] == 'Z' \
+                    and map[i+1][j-1] != 'Z':
+                found = 1
+                index = j
+                break
+            elif i == len(map) - 1 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i-1][j] == 'Z'\
+                    and map[i+1][j-1] != 'Z':
+                found = 1
+                index = j
+                break
+            elif j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i-1][j] == 'Z' and map[i+1][j] == 'Z':
+                found = 1
+                index = j
+                break
+        if found == 1:
+            if i == 0:
+                while map[i][index] == 'Z' or map[i + 1][index] == 'Z':
+                    index += 1
+            elif i == len(map) - 1:
+                while map[i][index] == 'Z' or map[i - 1][index] == 'Z':
+                    index += 1
+            else:
+                while map[i][index] == 'Z' or (map[i - 1][index] == 'Z' and map[i + 1][index] == 'Z'):
+                    index += 1
+            loc = [i, index]
+            front_loc.append(loc)
+    for i in range(len(map)):
+        found = 0
+        for j in reversed(range(len(map[i]))):
+            if i == 0 and map[i][j] != 'Z' and map[i+1][j] != 'Z':
+                break
+            elif i == len(map) - 1 and map[i-1][j] != 'Z':
+                break
+            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
+                break
+            if i == 0 and j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i+1][j] == 'Z' and map[i+1][j+1] != 'Z':
+                found = 1
+                index = j
+                break
+            elif i == len(map) - 1 and j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i-1][j] == 'Z' and map[i+1][j+1] != 'Z':
+                found = 1
+                index = j
+                break
+            elif j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i-1][j] == 'Z' and map[i+1][j] == 'Z':
+                found = 1
+                index = j
+                break
+        if found == 1:
+            if i == 0:
+                while map[i][index] == 'Z' or map[i + 1][index] == 'Z':
+                    index -= 1
+            elif i == len(map) - 1:
+                while map[i][index] == 'Z' or map[i - 1][index] == 'Z':
+                    index -= 1
+            else:
+                while map[i][index] == 'Z' or (map[i - 1][index] == 'Z' and map[i + 1][index] == 'Z'):
+                    index -= 1
+            loc = [i, index]
+            back_loc.append(loc)
+    for i in range(len(map)):
+        map[i] = ['Z'] * front_length * 3 + map[i] + ['Z'] * back_length * 3
+    for i in range(len(front_loc)):
+        front_loc[i][1] += front_length * 3
+        back_loc[i][1] += front_length * 3
+    return front_loc, back_loc
+
+
 def find_qubit_row(middle_DAG, qubit_loc, map):
     empty = 0
     for layer in middle_DAG:
@@ -314,13 +396,107 @@ def greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DA
     resolve_order(back_order)
     elastic_map = copy.deepcopy(mid_map)
     #place the front
-    for i in front_order:
-        elastic_map = greedy_place_front(elastic_map, front_loc[i], front_pattern[i])
+    #for i in front_order:
+    #    elastic_map = greedy_place_front(elastic_map, front_loc[i], front_pattern[i])
+    greedy_place_front2(elastic_map, front_order, front_loc, front_pattern)
     #place the back
-    for i in back_order:
-        elastic_map = greedy_place_back(elastic_map, back_loc[i], back_pattern[i])
+    #for i in back_order:
+    #    elastic_map = greedy_place_back(elastic_map, back_loc[i], back_pattern[i])
+    greedy_place_back2(elastic_map, back_order, back_loc, back_pattern)
     elastic_map = clean_map(elastic_map)
     return elastic_map
+
+def greedy_place_front2(elastic_map, front_order, front_loc, front_pattern):
+    patterns = copy.deepcopy(front_pattern)
+    lists = [[] for _ in range(len(patterns))]
+    while patterns != lists:
+        for i in front_order:
+            if patterns[i] != []:
+                pattern = patterns[i]
+                next = pattern.pop(-1)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, left, down = found_possible_loc_front(elastic_map, front_loc[i], last)
+                if front_loc[i][0] < len(elastic_map) / 2:
+                    if down == 1:
+                        front_loc[i] = [front_loc[i][0] + 1, front_loc[i][1]]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                    elif up == 1:
+                        front_loc[i] = [front_loc[i][0] - 1, front_loc[i][1]]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                    else:
+                        front_loc[i] = [front_loc[i][0], front_loc[i][1] - 1]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                else:
+                    if up == 1:
+                        front_loc[i] = [front_loc[i][0] - 1, front_loc[i][1]]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                    elif down == 1:
+                        front_loc[i] = [front_loc[i][0] + 1, front_loc[i][1]]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+                    else:
+                        front_loc[i] = [front_loc[i][0], front_loc[i][1] - 1]
+                        k = front_loc[i][0]
+                        j = front_loc[i][1]
+                        elastic_map[k][j] = next
+
+def greedy_place_back2(elastic_map, back_order, back_loc, back_pattern):
+    patterns = copy.deepcopy(back_pattern)
+    lists = [[] for _ in range(len(patterns))]
+    while patterns != lists:
+        for i in back_order:
+            if patterns[i] != []:
+                pattern = patterns[i]
+                next = pattern.pop(0)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, right, down = found_possible_loc_back(elastic_map, back_loc[i], last)
+                if back_loc[i][0] < len(elastic_map) / 2:
+                    if down == 1:
+                        back_loc[i] = [back_loc[i][0] + 1, back_loc[i][1]]
+                        k = back_loc[i][0]
+                        j = back_loc[i][1]
+                        elastic_map[k][j] = next
+                    elif up == 1:
+                        back_loc[i] = [back_loc[i][0] - 1, back_loc[i][1]]
+                        k = back_loc[i][0]
+                        j = back_loc[i][1]
+                        elastic_map[k][j] = next
+                    else:
+                        back_loc[i] = [back_loc[i][0], back_loc[i][1] + 1]
+                        k = back_loc[i][0]
+                        j = back_loc[i][1]
+                        elastic_map[k][j] = next
+                else:
+                    if up == 1:
+                        back_loc[i] = [back_loc[i][0] - 1, back_loc[i][1]]
+                        k = back_loc[i][0]
+                        j = back_loc[i][1]
+                        elastic_map[k][j] = next
+                    elif down == 1:
+                        back_loc[i] = [back_loc[i][0] + 1, back_loc[i][1]]
+                        k = back_loc[i][0]
+                        j = back_loc[i][1]
+                        elastic_map[k][j] = next
+                    else:
+                        back_loc[i] = [back_loc[i][0], back_loc[i][1] + 1]
+                        k = back_loc[i][0]
+                        j = back_loc[i][1]
+                        elastic_map[k][j] = next
 
 def greedy_place_front(elastic_map, front_loc, front_pattern):
     pattern = copy.deepcopy(front_pattern)
@@ -585,18 +761,35 @@ def resolve_order(order):
         increase.append(i)
     for i in increase:
         count = 0
-        for j in order:
-            if j == i:
+        not_found = []
+        found = []
+        for j in range(len(order)):
+            if order[j] == i:
                 count += 1
-        if count != 0:
-            while count != 1:
-                if i - 1 not in order and i - 1 >= 0:
-                    order[order.index(i)] = i - 1
-                    count = count - 1
-                elif i + 1 not in order:
-                    order[order.index(i)] = i + 1
-                    count = count - 1
-
+                found.append(j)
+        if count == 0:
+            not_found.append(i)
+        if count > 1:
+            first = i - count + 1
+            end = i + count - 1
+            if first <= 0:
+                for j in range(end + 1):
+                    if j not in order or j == i:
+                        order[found.pop(-1)] = j
+                    if len(found) == 0:
+                        break
+            elif end >= len(order) - 1:
+                for j in range(first, len(order)):
+                    if j not in order or j == i:
+                        order[found.pop(-1)] = j
+                    if len(found) == 0:
+                        break
+            else:
+                for j in range(first, end + 1):
+                    if j not in order or j == i:
+                        order[found.pop(-1)] = j
+                    if len(found) == 0:
+                        break
 def check_right(elastic_map, current_loc, last):
     ok = 0
     row = current_loc[0]
