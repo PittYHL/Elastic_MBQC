@@ -6,7 +6,7 @@ from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
 direc = 'u'
-qubits = 7
+qubits = 5
 physical_gate = []
 rows = 11
 tracker= []

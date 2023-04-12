@@ -389,6 +389,12 @@ def greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DA
     back_barrier_sort.sort()
     front_order = []
     back_order = []
+    rows = len(mid_map)
+    front_loc_copy = copy.deepcopy(front_loc)
+    back_loc_copy = copy.deepcopy(back_loc)
+    front_order = find_front_order(front_loc, rows)
+    back_order = find_back_order(back_loc, rows)
+    """
     for i in range(len(front_barrier_sort)):
         front_ind = front_barrier.index(front_barrier_sort[i])
         back_ind = back_barrier.index(back_barrier_sort[i])
@@ -398,15 +404,16 @@ def greedy_elastic(front_pattern, back_pattern, mid_map, front_loc, back_loc, DA
         back_barrier[back_ind] = -1
     resolve_order(front_order)
     resolve_order(back_order)
+    """
     elastic_map = copy.deepcopy(mid_map)
     #place the front
-    #for i in front_order:
-    #    elastic_map = greedy_place_front(elastic_map, front_loc[i], front_pattern[i])
-    greedy_place_front2(elastic_map, front_order, front_loc, front_pattern)
+    for i in range(len(front_order)):
+        elastic_map = greedy_place_front(elastic_map, i, front_order, front_pattern,front_loc)
+    #greedy_place_front2(elastic_map, front_order, front_loc, front_pattern)
     #place the back
-    #for i in back_order:
-    #    elastic_map = greedy_place_back(elastic_map, back_loc[i], back_pattern[i])
-    greedy_place_back2(elastic_map, back_order, back_loc, back_pattern)
+    for i in range(len(back_order)):
+        elastic_map = greedy_place_back(elastic_map, i, back_order, back_pattern,back_loc)
+    #greedy_place_back2(elastic_map, back_order, back_loc, back_pattern)
     elastic_map = clean_map(elastic_map)
     return elastic_map
 
@@ -519,94 +526,211 @@ def greedy_place_back2(elastic_map, back_order, back_loc, back_pattern):
                         j = back_loc[i][1]
                         elastic_map[k][j] = next
 
-def greedy_place_front(elastic_map, front_loc, front_pattern):
+def greedy_place_front(elastic_map, index, front_order, patterns, locations):
+    front_pattern = patterns[front_order[index]]
+    front_loc = locations[front_order[index]]
     pattern = copy.deepcopy(front_pattern)
     current_loc = copy.deepcopy(front_loc)
-
-    while pattern != []:
-        next = pattern.pop(-1)
-        if pattern != []:
-            last = 0
-        else:
-            last = 1
-        up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
-        if current_loc[0] < len(elastic_map) / 2:
-            if down == 1 :
-                current_loc = [current_loc[0] + 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-            elif up == 1:
-                current_loc = [current_loc[0] - 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
+    if index == len(front_order) - 1:
+        last = True
+    else:
+        last = False
+    if last:
+        while pattern != []:
+            next = pattern.pop(-1)
+            if pattern != []:
+                last = 0
             else:
-                current_loc = [current_loc[0], current_loc[1] - 1]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-        else:
-            if up == 1:
-                current_loc = [current_loc[0] - 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-            elif down == 1 :
-                current_loc = [current_loc[0] + 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
+                last = 1
+            up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
+            if current_loc[0] < len(elastic_map) / 2:
+                if down == 1 :
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                else:
+                    current_loc = [current_loc[0], current_loc[1] - 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
             else:
-                current_loc = [current_loc[0], current_loc[1] - 1]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
+                if up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif down == 1 :
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                else:
+                    current_loc = [current_loc[0], current_loc[1] - 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+    else:
+        next_loc = find_close(index, front_order, locations)
+        if next_loc[0] < front_loc[0]: #should go down
+            while pattern != []:
+                next = pattern.pop(-1)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
+                if current_loc[0] - next_loc[0] <= 2:
+                    up = 0
+                if down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif left == 1:
+                    current_loc = [current_loc[0], current_loc[1] - 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+        elif next_loc[0] > front_loc[0]: #should go up
+            while pattern != []:
+                next = pattern.pop(-1)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
+                if next_loc[0] - current_loc[0] <= 2:
+                    down = 0
+                if up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif left == 1:
+                    current_loc = [current_loc[0], current_loc[1] - 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
     return elastic_map
 
-def greedy_place_back(elastic_map, back_loc, back_pattern):
+def greedy_place_back(elastic_map, index, back_order, patterns, locations):
+    back_pattern = patterns[back_order[index]]
+    back_loc = locations[back_order[index]]
     pattern = copy.deepcopy(back_pattern)
     current_loc = copy.deepcopy(back_loc)
+    if index == len(back_order) - 1:
+        last = True
+    else:
+        last = False
+    if last:
+        while pattern != []:
+            next = pattern.pop(0)
+            if pattern != []:
+                last = 0
+            else:
+                last = 1
+            up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
+            if current_loc[0] < len(elastic_map)/2:
+                if down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                else:
+                    current_loc = [current_loc[0], current_loc[1] + 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+            else:
+                if up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                else:
+                    current_loc = [current_loc[0], current_loc[1] + 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+    else:
+        next_loc = find_close(index, back_order, locations)
+        if next_loc[0] < back_loc[0]: #should go down
+            while pattern != []:
+                next = pattern.pop(0)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
+                if current_loc[0] - next_loc[0] <= 2:
+                    up = 0
+                if down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif right == 1:
+                    current_loc = [current_loc[0], current_loc[1] + 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+        elif next_loc[0] > back_loc[0]: #should go up
+            while pattern != []:
+                next = pattern.pop(0)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
+                if next_loc[0] - current_loc[0] <= 2:
+                    down = 0
+                if up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif right == 1:
+                    current_loc = [current_loc[0], current_loc[1] + 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
 
-    while pattern != []:
-        next = pattern.pop(0)
-        if pattern != []:
-            last = 0
-        else:
-            last = 1
-        up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
-        if current_loc[0] < len(elastic_map)/2:
-            if down == 1:
-                current_loc = [current_loc[0] + 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-            elif up == 1:
-                current_loc = [current_loc[0] - 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-            else:
-                current_loc = [current_loc[0], current_loc[1] + 1]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-        else:
-            if up == 1:
-                current_loc = [current_loc[0] - 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-            elif down == 1:
-                current_loc = [current_loc[0] + 1, current_loc[1]]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
-            else:
-                current_loc = [current_loc[0], current_loc[1] + 1]
-                i = current_loc[0]
-                j = current_loc[1]
-                elastic_map[i][j] = next
     return elastic_map
 def found_possible_loc_front(elastic_map, current_loc, last):
     up = 0
@@ -881,3 +1005,88 @@ def normal_fill(map):
         if len(map[i]) != max:
             map[i] = map[i] + ['Z'] * (max - len(map[i]))
 
+def find_front_order(front_loc, rows):
+    y_loc = []
+    front_or = []
+    for loc in front_loc:
+        if loc[1] not in y_loc:
+            y_loc.append(loc[1])
+    y_loc.sort()
+    for y in y_loc:
+        found = []
+        for i in range(len(front_loc)):
+            if front_loc[i][1] == y:
+                found.append(front_loc[i])
+        if len(found) == 1:
+            front_or.insert(0, front_loc.index(found[0]))
+        else:
+            x_loc = []
+            for loc in found:
+                x_loc.append(loc[0])
+            up = min(x_loc)
+            down = rows - max(x_loc) - 1
+            if up > down:
+                x_loc.sort(reverse=True)
+                for x in x_loc:
+                    for loc in found:
+                        if loc[0] == x:
+                            front_or.append(front_loc.index(loc))
+                            break
+            else:
+                x_loc.sort()
+                for x in x_loc:
+                    for loc in found:
+                        if loc[0] == x:
+                            front_or.insert(0, front_loc.index(loc))
+                            break
+    return front_or
+
+def find_back_order(back_loc, rows):
+    y_loc = []
+    front_or = []
+    for loc in back_loc:
+        if loc[1] not in y_loc:
+            y_loc.append(loc[1])
+    y_loc.sort(reverse=True)
+    for y in y_loc:
+        found = []
+        for i in range(len(back_loc)):
+            if back_loc[i][1] == y:
+                found.append(back_loc[i])
+        if len(found) == 1:
+            front_or.insert(0, back_loc.index(found[0]))
+        else:
+            x_loc = []
+            for loc in found:
+                x_loc.append(loc[0])
+            up = min(x_loc)
+            down = rows - max(x_loc) - 1
+            if up > down:
+                x_loc.sort(reverse=True)
+                for x in x_loc:
+                    for loc in found:
+                        if loc[0] == x:
+                            front_or.append(back_loc.index(loc))
+                            break
+            else:
+                x_loc.sort()
+                for x in x_loc:
+                    for loc in found:
+                        if loc[0] == x:
+                            front_or.insert(0, back_loc.index(loc))
+                            break
+    return front_or
+
+def find_close(index, front_order, locations):
+    distance = []
+    cur_loc = locations[front_order[index]]
+    for i in range(index + 1, len(front_order)):
+        distance.append(math.fabs(cur_loc[0] - locations[front_order[i]][0]))
+    min_dist = min(distance)
+    indx = index + distance.index(min_dist) + 1
+    return locations[front_order[indx]]
+
+def dist(loc1, loc2):
+    x = math.fabs(loc1[0] - loc2[0])
+    y = math.fabs(loc1[1] - loc2[1])
+    return math.sqrt(x**2 + y**2)

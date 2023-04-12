@@ -101,7 +101,7 @@ def search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, sche, full):
             continue
         active_qubit = copy.deepcopy(current_qubit)
         current_qubit = []
-        constant, current_two = check_two_qubit(current_two, mid_DAG[i])
+        constant, current_two = check_two_qubit(current_two, mid_DAG[i], i)
         if constant == True:
             for gate in mid_DAG[i]:
                 if gate['type'] == 'S':
@@ -158,19 +158,24 @@ def search_mid(rows, n, DAG, back_DAG, middle_DAG, qubit_range, sche, full):
     max = 0
     for i in range(len(map)):
         last_point = -1
+        z_length = -1
         for j in reversed(range(len(map[i]))):
             if map[i][j] != 'Z':
                 last_point = j
                 z_length = len(map[i]) - last_point - 1
                 break
-        for j in range(z_length):
-            map[i].pop(-1)
-        if len(map[i]) > max:
-            max = len(map[i])
+        if z_length != -1:
+            for j in range(z_length):
+                map[i].pop(-1)
+            if len(map[i]) > max:
+                max = len(map[i])
     for row in map:
         if len(row) < max:
             for i in range(max - len(row)):
                 row.append('Z')
+        elif len(row) > max:
+            for i in range(len(row) - max):
+                row.pop(-1)
     return map, front_loc, front_length, back_length
 
 def placement2(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
@@ -564,19 +569,24 @@ def first_loc(rows, target, qubits, full):
             for tar in target:
                 row.append(layout[tar])
         return row
-def check_two_qubit(current_two, layer):
+def check_two_qubit(current_two, layer, index):
     future_two = []
-    constant =False
+    constant = False
+    all_single = True
+    back = layer[0]['back']
     for gate in layer:
         if gate['type'] == 'D':
             if gate['t1'] < gate['t2']:
                 future_two.append([gate['t1'], gate['t2']])
             else:
                 future_two.append([gate['t2'], gate['t1']])
+            all_single = False
     for targets in future_two:
         if targets in current_two:
             constant = True
             break
+    if all_single and index <= max(back):
+        constant = True
     return constant, future_two
 
 def add_qubit(gate, active_qubit, qubit_loc):
@@ -752,3 +762,4 @@ def initial_layer(mid_DAG, front_length, rows, qubits, full, active_qubit, front
             current_two.append([target[i], target[i] + 1])
             current_qubit.append(target[i])
             current_qubit.append(target[i] + 1)
+    map = fill_z(map)
