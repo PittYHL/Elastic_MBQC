@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/elastic.py" beforeDir="false" afterPath="$PROJECT_DIR$/elastic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scheduling.py" beforeDir="false" afterPath="$PROJECT_DIR$/scheduling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bv7_sche.csv" beforeDir="false" afterPath="$PROJECT_DIR$/bv7_sche.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iqp7_sche.csv" beforeDir="false" afterPath="$PROJECT_DIR$/iqp7_sche.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
