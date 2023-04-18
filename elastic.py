@@ -141,7 +141,7 @@ def place_mid_normal(rows, qubits, DAG, front_DAG, mid_DAG):
     for i in range(bot_rows):
         map.append(['Z'] * row_length)
     for i in range(len(map)):
-        map[i] = ['Z'] * front_length * 3 + map[i] + ['Z'] * back_length * 3
+        map[i] = ['Z'] * front_length * 4 + map[i] + ['Z'] * back_length * 4
     return map, qubit_loc
 
 def place_mid(rows, qubits, DAG, front_DAG, mid_DAG, qubit_range):
@@ -232,14 +232,14 @@ def find_qubit_row2(map, front_length, back_length):
                 break
             elif i == len(map) - 1 and map[i-1][j] != 'Z':
                 break
-            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
-                break
-            elif i == 0 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i+1][j] == 'Z' \
-                    and map[i+1][j-1] != 'Z':
+            elif i == len(map) - 1 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j + 1] != 'Z' and map[i - 1][j] == 'Z' \
+                     and map[i + 1][j - 1] != 'Z':
                 found = 1
                 index = j
                 break
-            elif i == len(map) - 1 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i-1][j] == 'Z'\
+            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
+                break
+            elif i == 0 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i+1][j] == 'Z' \
                     and map[i+1][j-1] != 'Z':
                 found = 1
                 index = j
@@ -267,13 +267,13 @@ def find_qubit_row2(map, front_length, back_length):
                 break
             elif i == len(map) - 1 and map[i-1][j] != 'Z':
                 break
-            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
-                break
-            if i == 0 and j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i+1][j] == 'Z' and map[i+1][j+1] != 'Z':
+            elif i == len(map) - 1 and j != 0 and map[i][j] != 'Z' and map[i][j - 1] != 'Z' and map[i - 1][j] == 'Z' and map[i + 1][j + 1] != 'Z':
                 found = 1
                 index = j
                 break
-            elif i == len(map) - 1 and j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i-1][j] == 'Z' and map[i+1][j+1] != 'Z':
+            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
+                break
+            if i == 0 and j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i+1][j] == 'Z' and map[i+1][j+1] != 'Z':
                 found = 1
                 index = j
                 break
@@ -592,13 +592,13 @@ def greedy_place_front(elastic_map, index, front_order, patterns, locations):
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
-                elif left == 1:
-                    current_loc = [current_loc[0], current_loc[1] - 1]
+                elif up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
-                elif up == 1:
-                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                elif left == 1:
+                    current_loc = [current_loc[0], current_loc[1] - 1]
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
@@ -617,13 +617,13 @@ def greedy_place_front(elastic_map, index, front_order, patterns, locations):
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
-                elif left == 1:
-                    current_loc = [current_loc[0], current_loc[1] - 1]
+                elif down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
-                elif down == 1:
-                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                elif left == 1:
+                    current_loc = [current_loc[0], current_loc[1] - 1]
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
@@ -1066,7 +1066,7 @@ def find_back_order(back_loc, rows):
                 for x in x_loc:
                     for loc in found:
                         if loc[0] == x:
-                            front_or.append(back_loc.index(loc))
+                            front_or.insert(0, back_loc.index(loc))
                             break
             else:
                 x_loc.sort()
