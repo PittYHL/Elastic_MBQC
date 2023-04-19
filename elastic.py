@@ -1062,9 +1062,12 @@ def normal_fill(map):
 def find_front_order(front_loc, rows):
     y_loc = []
     front_or = []
+    rank_y = []
     for loc in front_loc:
+        rank_y.append(loc[0])
         if loc[1] not in y_loc:
             y_loc.append(loc[1])
+    rank_y.sort()
     y_loc.sort()
     for y in y_loc:
         found = []
@@ -1074,61 +1077,92 @@ def find_front_order(front_loc, rows):
         if len(found) == 1:
             front_or.insert(0, front_loc.index(found[0]))
         else:
-            x_loc = []
-            for loc in found:
-                x_loc.append(loc[0])
-            up = min(x_loc)
-            down = rows - max(x_loc) - 1
-            if up > down:
-                x_loc.sort(reverse=True)
-                for x in x_loc:
-                    for loc in found:
-                        if loc[0] == x:
-                            front_or.append(front_loc.index(loc))
+            temp = []
+            area = []
+            for loc in found: #rank the loc with the same column
+                index = rank_y.index(loc[0])
+                bot = rows - 1
+                up = 0
+                if index == 0:
+                    up = 0
+                    for j in range(index + 1, len(front_loc)):
+                        if front_loc[j][1] <= loc[1]:
+                            bot = front_loc[j][0]
                             break
-            else:
-                x_loc.sort()
-                for x in x_loc:
-                    for loc in found:
-                        if loc[0] == x:
-                            front_or.insert(0, front_loc.index(loc))
+                elif index == len(front_loc) - 1:
+                    bot = rows - 1
+                    for j in reversed(range(0, index)):
+                        if front_loc[j][1] <= loc[1]:
+                            up = front_loc[j][0]
                             break
+                else:
+                    for j in range(index + 1, len(front_loc)):
+                        if front_loc[j][1] <= loc[1]:
+                            bot = front_loc[j][0]
+                            break
+                    for j in reversed(range(0, index)):
+                        if front_loc[j][1] <= loc[1]:
+                            up = front_loc[j][0]
+                            break
+                area.append(bot - up)
+            area = rank_area(area)
+            temp_area = copy.deepcopy(area)
+            for i in range(len(area)):
+                max_area = temp_area.pop(temp_area.index(max(temp_area)))
+                temp.append(front_loc.index(found[area.index(max_area)]))
+            front_or = temp + front_or
     return front_or
 
 def find_back_order(back_loc, rows):
     y_loc = []
     front_or = []
+    rank_y = []
     for loc in back_loc:
+        rank_y.append(loc[0])
         if loc[1] not in y_loc:
             y_loc.append(loc[1])
-    y_loc.sort(reverse=True)
+    y_loc.sort()
+    rank_y.sort()
     for y in y_loc:
         found = []
         for i in range(len(back_loc)):
             if back_loc[i][1] == y:
                 found.append(back_loc[i])
         if len(found) == 1:
-            front_or.insert(0, back_loc.index(found[0]))
+            front_or.append(back_loc.index(found[0]))
         else:
-            x_loc = []
-            for loc in found:
-                x_loc.append(loc[0])
-            up = min(x_loc)
-            down = rows - max(x_loc) - 1
-            if up > down:
-                x_loc.sort(reverse=True)
-                for x in x_loc:
-                    for loc in found:
-                        if loc[0] == x:
-                            front_or.insert(0, back_loc.index(loc))
+            area = []
+            for loc in found:  # rank the loc with the same column
+                index = rank_y.index(loc[0])
+                bot = rows - 1
+                up = 0
+                if index == 0:
+                    up = 0
+                    for j in range(index + 1, len(back_loc)):
+                        if back_loc[j][1] >= loc[1]:
+                            bot = back_loc[j][0]
                             break
-            else:
-                x_loc.sort()
-                for x in x_loc:
-                    for loc in found:
-                        if loc[0] == x:
-                            front_or.insert(0, back_loc.index(loc))
+                elif index == len(back_loc) - 1:
+                    bot = rows - 1
+                    for j in reversed(range(0, index)):
+                        if back_loc[j][1] >= loc[1]:
+                            up = back_loc[j][0]
                             break
+                else:
+                    for j in range(index + 1, len(back_loc)):
+                        if back_loc[j][1] >= loc[1]:
+                            bot = back_loc[j][0]
+                            break
+                    for j in reversed(range(0, index)):
+                        if back_loc[j][1] >= loc[1]:
+                            up = back_loc[j][0]
+                            break
+                area.append(bot - up)
+            area = rank_area(area)
+            temp_area = copy.deepcopy(area)
+            for i in range(len(area)):
+                max_area = temp_area.pop(temp_area.index(max(temp_area)))
+                front_or.append(back_loc.index(found[area.index(max_area)]))
     return front_or
 
 def find_close(index, front_order, locations):
@@ -1174,3 +1208,32 @@ def dist(loc1, loc2):
     x = math.fabs(loc1[0] - loc2[0])
     y = math.fabs(loc1[1] - loc2[1])
     return math.sqrt(x**2 + y**2)
+
+def rank_area(area):
+    temp_area = copy.deepcopy(area)
+    temp_area = [*set(temp_area)]
+    temp_area.sort()
+    bias = []
+    for i in range(len(area)):
+        if i == 0:
+            plus = max(temp_area.index(area[i]), temp_area.index(area[i+1]))
+            bias.append(plus)
+        elif i == len(area) - 1:
+            plus = max(temp_area.index(area[i]), temp_area.index(area[i - 1]))
+            bias.append(plus)
+        else:
+            plus = max(temp_area.index(area[i]), temp_area.index(area[i - 1]), temp_area.index(area[i + 1]))
+            bias.append(plus)
+    for i in range(len(area)):
+        area[i] = area[i] + bias[i]
+    res_area = [*set(area)]
+    while len(res_area) != len(area):
+        for dist in res_area:
+            num = 0
+            for dist2 in area:
+                if dist == dist2:
+                    num += 1
+            if num != 1:
+                area[area.index(dist)] = area[area.index(dist)] + 1
+        res_area = [*set(area)]
+    return area
