@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/hlf7b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/hlf7b.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/elastic.py" beforeDir="false" afterPath="$PROJECT_DIR$/elastic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gate_blocks.py" beforeDir="false" afterPath="$PROJECT_DIR$/gate_blocks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,11 +102,6 @@
           <line>226</line>
           <option name="timeStamp" value="391" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>414</line>
-          <option name="timeStamp" value="395" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -133,6 +125,7 @@
         <watch expression="middle_DAG" />
         <watch expression="DAG[16]" />
         <watch expression="mid_map" />
+        <watch expression="ela_no[11]" />
       </configuration>
     </watches-manager>
   </component>

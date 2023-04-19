@@ -232,8 +232,7 @@ def find_qubit_row2(map, front_length, back_length):
                 break
             elif i == len(map) - 1 and map[i-1][j] != 'Z':
                 break
-            elif i == len(map) - 1 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j + 1] != 'Z' and map[i - 1][j] == 'Z' \
-                     and map[i + 1][j - 1] != 'Z':
+            elif i == len(map) - 1 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j + 1] != 'Z' and map[i - 1][j] == 'Z':
                 found = 1
                 index = j
                 break
@@ -267,7 +266,7 @@ def find_qubit_row2(map, front_length, back_length):
                 break
             elif i == len(map) - 1 and map[i-1][j] != 'Z':
                 break
-            elif i == len(map) - 1 and j != 0 and map[i][j] != 'Z' and map[i][j - 1] != 'Z' and map[i - 1][j] == 'Z' and map[i + 1][j + 1] != 'Z':
+            elif i == len(map) - 1 and j != 0 and map[i][j] != 'Z' and map[i][j - 1] != 'Z' and map[i - 1][j] == 'Z':
                 found = 1
                 index = j
                 break
@@ -576,8 +575,9 @@ def greedy_place_front(elastic_map, index, front_order, patterns, locations):
                     j = current_loc[1]
                     elastic_map[i][j] = next
     else:
-        next_loc = find_close(index, front_order, locations)
-        if next_loc[0] < front_loc[0]: #should go down
+        #next_loc = find_close(index, front_order, locations)
+        low_loc, high_loc = find_close_two(index, front_order, locations)
+        if high_loc == []: #should go down
             while pattern != []:
                 next = pattern.pop(-1)
                 if pattern != []:
@@ -585,7 +585,7 @@ def greedy_place_front(elastic_map, index, front_order, patterns, locations):
                 else:
                     last = 1
                 up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
-                if current_loc[0] - next_loc[0] <= 2:
+                if current_loc[0] - low_loc[0] <= 2:
                     up = 0
                 if down == 1:
                     current_loc = [current_loc[0] + 1, current_loc[1]]
@@ -602,7 +602,7 @@ def greedy_place_front(elastic_map, index, front_order, patterns, locations):
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
-        elif next_loc[0] > front_loc[0]: #should go up
+        elif low_loc == []: #should go up
             while pattern != []:
                 next = pattern.pop(-1)
                 if pattern != []:
@@ -610,8 +610,35 @@ def greedy_place_front(elastic_map, index, front_order, patterns, locations):
                 else:
                     last = 1
                 up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
-                if next_loc[0] - current_loc[0] <= 2:
+                if high_loc[0] - current_loc[0] <= 2:
                     down = 0
+                if up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif left == 1:
+                    current_loc = [current_loc[0], current_loc[1] - 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+        elif low_loc != [] and high_loc != []:
+            while pattern != []:
+                next = pattern.pop(-1)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, left, down = found_possible_loc_front(elastic_map, current_loc, last)
+                if high_loc[0] - current_loc[0] <= 2:
+                    down = 0
+                if current_loc[0] - low_loc[0] <= 2:
+                    up = 0
                 if up == 1:
                     current_loc = [current_loc[0] - 1, current_loc[1]]
                     i = current_loc[0]
@@ -679,8 +706,9 @@ def greedy_place_back(elastic_map, index, back_order, patterns, locations):
                     j = current_loc[1]
                     elastic_map[i][j] = next
     else:
-        next_loc = find_close(index, back_order, locations)
-        if next_loc[0] < back_loc[0]: #should go down
+        #next_loc = find_close(index, back_order, locations)
+        low_loc, high_loc = find_close_two(index, back_order, locations)
+        if high_loc == []: #should go down
             while pattern != []:
                 next = pattern.pop(0)
                 if pattern != []:
@@ -688,7 +716,7 @@ def greedy_place_back(elastic_map, index, back_order, patterns, locations):
                 else:
                     last = 1
                 up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
-                if current_loc[0] - next_loc[0] <= 2:
+                if current_loc[0] - low_loc[0] <= 2:
                     up = 0
                 if down == 1:
                     current_loc = [current_loc[0] + 1, current_loc[1]]
@@ -705,7 +733,7 @@ def greedy_place_back(elastic_map, index, back_order, patterns, locations):
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
-        elif next_loc[0] > back_loc[0]: #should go up
+        elif low_loc == []: #should go up
             while pattern != []:
                 next = pattern.pop(0)
                 if pattern != []:
@@ -713,7 +741,7 @@ def greedy_place_back(elastic_map, index, back_order, patterns, locations):
                 else:
                     last = 1
                 up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
-                if next_loc[0] - current_loc[0] <= 2:
+                if high_loc[0] - current_loc[0] <= 2:
                     down = 0
                 if up == 1:
                     current_loc = [current_loc[0] - 1, current_loc[1]]
@@ -730,7 +758,33 @@ def greedy_place_back(elastic_map, index, back_order, patterns, locations):
                     i = current_loc[0]
                     j = current_loc[1]
                     elastic_map[i][j] = next
-
+        elif low_loc != [] and high_loc != []:
+            while pattern != []:
+                next = pattern.pop(0)
+                if pattern != []:
+                    last = 0
+                else:
+                    last = 1
+                up, right, down = found_possible_loc_back(elastic_map, current_loc, last)
+                if high_loc[0] - current_loc[0] <= 2:
+                    down = 0
+                if current_loc[0] - low_loc[0] <= 2:
+                    up = 0
+                if up == 1:
+                    current_loc = [current_loc[0] - 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif down == 1:
+                    current_loc = [current_loc[0] + 1, current_loc[1]]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
+                elif right == 1:
+                    current_loc = [current_loc[0], current_loc[1] + 1]
+                    i = current_loc[0]
+                    j = current_loc[1]
+                    elastic_map[i][j] = next
     return elastic_map
 def found_possible_loc_front(elastic_map, current_loc, last):
     up = 0
@@ -1085,6 +1139,36 @@ def find_close(index, front_order, locations):
     min_dist = min(distance)
     indx = index + distance.index(min_dist) + 1
     return locations[front_order[indx]]
+
+def find_close_two(index, front_order, locations):
+    low = []
+    high = []
+    cur_loc = locations[front_order[index]]
+    for i in range(index + 1, len(front_order)):
+        if cur_loc[0] < locations[front_order[i]][0]:
+            high.append(locations[front_order[i]][0])
+        else:
+            low.append(locations[front_order[i]][0])
+    if high != [] and low != []:
+        min_high = min(high)
+        max_low = max(low)
+        for loc in locations:
+            if loc[0] == min_high:
+                indx_h = loc
+            if loc[0] == max_low:
+                indx_l = loc
+        return indx_l, indx_h
+    elif high != []:
+        min_high = min(high)
+        for loc in locations:
+            if loc[0] == min_high:
+                indx_h = loc
+                break
+        return [], indx_h
+    elif low != []:
+        max_low = max(low)
+        indx_l = index + low.index(max_low) + 1
+        return locations[front_order[indx_l]], []
 
 def dist(loc1, loc2):
     x = math.fabs(loc1[0] - loc2[0])
