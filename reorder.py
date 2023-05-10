@@ -8,8 +8,8 @@ import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 7
-rows = 20
+qubits = 5
+rows = 15
 physical_gate = []
 tracker= []
 map = []
@@ -18,7 +18,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/hlf7b.txt') as f:
+with open('Benchmarks/qft5.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -77,7 +77,7 @@ while math.fabs(tracker[t3] - tracker[t4]) != 1:
 new_circuit = []
 for gate in circuit:
     X = gate.split()
-    if X[0] == 'H' or X[0] == 'P' or X[0] == 'S' or X[0] == 'Z' or X[0] == 'RX' or X[0] == 'RZ' or X[0] == 'X' or X[0] == 'T':
+    if X[0] == 'H' or X[0] == 'P' or X[0] == 'S' or X[0] == 'Z' or X[0] == 'RX' or X[0] == 'RZ' or X[0] == 'X' or X[0] == 'T' or X[0] == 'A':
         t1 = str(tracker[int(X[1])])
         new_circuit.append(X[0] + ' ' + t1)
     else:
@@ -91,7 +91,7 @@ for i in range(qubits):
 while(new_circuit!=[]):
     current = new_circuit.pop(0)
     gate, t1, t2, _, name = de_gate(current)
-    if (gate == H or gate == P or gate == S or gate == T or gate == Z or gate == RX or gate == A):
+    if (gate == H or gate == P or gate == S or gate == T or gate == Z or gate == RX or gate == A or gate == RZ):
         if t1 in layer:
             layer = []
             layer.append(t1)
@@ -223,35 +223,45 @@ fill_map(qubits,map)
 print(physical_gate[0]["gate"])
 DAG = dense(qubits, physical_gate)
 dense_map = cons_new_map(qubits,DAG)
-schedule = scheduling(qubits, DAG, rows)
-sche_ela = sche_ela(qubits,DAG, rows)
-ela_no = only_elastic(qubits,DAG, rows)
+uti0, use0 = cal_utilization2(dense_map, rows)
+de_map = np.array(dense_map)
+#np.savetxt("hlf4_de.csv", de_map, fmt = '%s',delimiter=",")
+#schedule = scheduling(qubits, DAG, rows)
+#sche_ela = sche_ela(qubits,DAG, rows)
+#ela_no = only_elastic(qubits,DAG, rows)
 #sc_map = np.array(schedule)
 #np.savetxt("qft4_sche.csv", sc_map, fmt = '%s',delimiter=",")
 #de_map = np.array(dense_map)
 #np.savetxt("qft4_de.csv", de_map, fmt = '%s',delimiter=",")
-#new_map = new_eliminate_redundant(dense_map, qubits)
-#new_map = new_eliminate_redundant(map, qubits)
+new_map = new_eliminate_redundant(dense_map, qubits)
+n_map = np.array(new_map)
+np.savetxt("qft5el.csv", n_map, fmt = '%s',delimiter=",")
+new_map = new_eliminate_redundant(map, qubits)
 redun2 = cal_utilization(map, qubits)
 useful2 = len(map) * len(map[0]) - redun2
 old_uti0 = useful2/(len(dense_map[0])*rows)
-old_uti1 = useful2/(len(schedule[0])*rows)
-old_uti2 = useful2/(len(ela_no[0])*rows)
-old_uti3 = useful2/(len(sche_ela[0])*rows)
+old_uti1 = useful2/(len(new_map[0])*rows)
+#old_uti2 = useful2/(len(ela_no[0])*rows)
+#old_uti3 = useful2/(len(sche_ela[0])*rows)
 uti0, use0 = cal_utilization2(dense_map, rows)
-uti1 = use0 / (len(schedule[0])*rows)
-uti2 = use0 / (len(ela_no[0])*rows)
-uti3 = use0 / (len(sche_ela[0])*rows)
+uti1, use1 = cal_utilization2(new_map, rows)
+uti1 = use0 / (len(new_map[0])*rows)
+uti2 = use1 / (len(new_map[0])*rows)
+#uti3 = use0 / (len(sche_ela[0])*rows)
 #np.savetxt("result/iqp7_base.csv", np_map, fmt = '%s',delimiter=",")
 #np.savetxt("result/iqp7_base_el.csv", np_new_map, fmt = '%s',delimiter=",")
 #np_map.tofile('hlf4_base.csv', sep = ',')
 print(str(len(dense_map[0])))
 print(str(uti0))
-print(num_photons(dense_map))
 #print(str(len(schedule[0])))
 #print(str(uti1))
 #print(num_photons(schedule))
-print(str(len(map[0])))
-print(str(old_uti2))
+print(str(len(schedule[0])))
+print(str(uti1))
+print(str(len(ela_no[0])))
 print(str(uti2))
-print(num_photons(map))
+print(str(len(sche_ela[0])))
+print(str(uti3))
+print(num_photons(dense_map))
+print(use0)
+#print(num_photons(map))

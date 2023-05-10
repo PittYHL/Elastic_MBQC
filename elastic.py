@@ -236,12 +236,11 @@ def find_qubit_row2(map, front_length, back_length):
                 found = 1
                 index = j
                 break
-            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
-                break
-            elif i == 0 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i+1][j] == 'Z' \
-                    and map[i+1][j-1] != 'Z':
+            elif i == 0 and j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i+1][j] == 'Z':
                 found = 1
                 index = j
+                break
+            elif i != 0 and map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
                 break
             elif j != len(map[i]) - 1 and map[i][j] != 'Z' and map[i][j+1] != 'Z' and map[i-1][j] == 'Z' and map[i+1][j] == 'Z':
                 found = 1
@@ -270,9 +269,9 @@ def find_qubit_row2(map, front_length, back_length):
                 found = 1
                 index = j
                 break
-            elif map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
+            elif i!= 0 and map[i][j] != 'Z' and (map[i-1][j] != 'Z' or map[i+1][j] != 'Z'):
                 break
-            if i == 0 and j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i+1][j] == 'Z' and map[i+1][j+1] != 'Z':
+            if i == 0 and j != 0 and map[i][j] != 'Z' and map[i][j-1] != 'Z' and map[i+1][j] == 'Z':
                 found = 1
                 index = j
                 break
