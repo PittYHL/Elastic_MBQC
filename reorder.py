@@ -4,11 +4,12 @@ from gate_blocks import *
 from new_swap import *
 from scheduling import *
 from elastic import *
+from DP import *
 import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 4
+qubits = 5
 rows = 11
 physical_gate = []
 tracker= []
@@ -18,7 +19,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/bv4b.txt') as f:
+with open('Benchmarks/bv5b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -234,6 +235,7 @@ de_map = np.array(dense_map)
 #de_map = np.array(dense_map)
 #np.savetxt("qft4_de.csv", de_map, fmt = '%s',delimiter=",")
 new_map = new_eliminate_redundant(dense_map, qubits)
+DP(new_map)
 n_map = np.array(new_map)
 np.savetxt("example/bv4el.csv", n_map, fmt = '%s',delimiter=",")
 new_map = new_eliminate_redundant(map, qubits)
