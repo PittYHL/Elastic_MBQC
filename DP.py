@@ -5,8 +5,10 @@ def DP(ori_map):
     for rows in ori_map:
         new_map.append([])
         for item in rows:
-            if item != 'Z':
+            if item != 'Z' and item != 'X':
                 new_map[-1].append(1)
+            elif item == 'X':
+                new_map[-1].append(2)
             else:
                 new_map[-1].append(0)
     gen_index(new_map)
@@ -18,7 +20,7 @@ def gen_index(map):
         rowcut = []
         j = 0
         while j < len(map[0]):
-            if map[i][j] == 1:
+            if map[i][j] != 0:
                 rowcut.append(j)
                 # if j + 1 < len(map[0]):
                 #     if map[i][j+1] == 1:
