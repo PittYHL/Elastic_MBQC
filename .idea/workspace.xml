@@ -4,6 +4,7 @@
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,22 +79,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>1112</line>
+          <line>1111</line>
           <option name="timeStamp" value="431" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>1106</line>
+          <line>1105</line>
           <option name="timeStamp" value="433" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>405</line>
+          <line>404</line>
           <option name="timeStamp" value="435" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>412</line>
+          <line>411</line>
           <option name="timeStamp" value="436" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -118,8 +119,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>37</line>
+          <line>52</line>
           <option name="timeStamp" value="455" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>84</line>
+          <option name="timeStamp" value="457" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
