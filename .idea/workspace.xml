@@ -4,6 +4,7 @@
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv4el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv4el.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -108,24 +109,9 @@
           <option name="timeStamp" value="449" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>240</line>
-          <option name="timeStamp" value="451" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>238</line>
-          <option name="timeStamp" value="453" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>52</line>
-          <option name="timeStamp" value="455" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>84</line>
-          <option name="timeStamp" value="457" />
+          <line>60</line>
+          <option name="timeStamp" value="463" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

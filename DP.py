@@ -1,5 +1,6 @@
 import copy
-
+import networkx as nx
+from matplotlib import pyplot as plt
 def DP(ori_map, qubits):
     new_map = []
     for rows in ori_map:
@@ -49,7 +50,14 @@ def gen_index(map):
         qubit = qubit + 1
         first.append(front)
         last.append(back)
-        gen_DAG(map,s_row)
+    nodes, C_len, W_len = gen_DAG(map,s_row)
+    graph = nx.DiGraph()
+    for node in nodes:
+        for i in range(len(node) - 1):
+            graph.add_edge(node[i], node[i+1])
+    nx.draw_networkx(graph)
+    order = list(nx.topological_sort(graph))
+    next = list(graph.successors('A.0'))
     print('g')
 
 def gen_DAG(map, s_row):
@@ -59,28 +67,58 @@ def gen_DAG(map, s_row):
     indexes = [*set(indexes)]
     indexes.sort()
     nodes = []
+    node_loc = []
     for i in range(len(s_row)):
         nodes.append([])
+        node_loc.append([])
     A = 0
     B = 0
     C = 0
     W = 0
+    A_loc = []
+    B_loc = []
+    C_len = []
+    W_len = []
     index = 0
     while index < len(indexes):
         for i in range(1, len(map)-1, 2):
             if map[i][indexes[index]] != 0:
                 if map[i][indexes[index] + 1] != 0:
-                    node = 'B' + str(B)
+                    node = 'B.' + str(B)
                     loc = int((i-1)/2)
                     nodes[loc].append(node)
                     nodes[loc + 1].append(node)
+                    node_loc[loc].append(indexes[index] + 1)
+                    node_loc[loc + 1].append(indexes[index] + 1)
+                    B_loc.append(indexes[index])
                     B = B + 1
                 elif map[i][indexes[index] - 1] == 0:
-                    node = 'A' + str(A)
+                    node = 'A.' + str(A)
                     loc = int((i - 1) / 2)
                     nodes[loc].append(node)
                     nodes[loc + 1].append(node)
+                    node_loc[loc].append(indexes[index])
+                    node_loc[loc + 1].append(indexes[index])
+                    A_loc.append(indexes[index])
                     A =  A + 1
         index = index + 1
-    print('g')
+    for i in range(len(s_row)):
+        add = 1
+        for j in range(len(s_row[i]) - 1):
+            if s_row[i][j + 1] -  s_row[i][j] > 1:
+                if map[i * 2][s_row[i][j] + 1] == 2:
+                    node = 'W.' + str(W)
+                    W = W + 1
+                    loc = node_loc[i].index(s_row[i][j])
+                    nodes[i].insert(loc + add, node)
+                    add = add + 1
+                    W_len.append(s_row[i][j + 1] - s_row[i][j] - 1)
+                elif map[i * 2][s_row[i][j] + 1] != 2:
+                    node = 'C.' + str(C)
+                    C = C + 1
+                    loc = node_loc[i].index(s_row[i][j])
+                    nodes[i].insert(loc + add, node)
+                    add = add + 1
+                    C_len.append(s_row[i][j + 1] -  s_row[i][j] - 1)
+    return nodes, C_len, W_len
 
