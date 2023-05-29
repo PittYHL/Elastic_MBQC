@@ -1,7 +1,7 @@
 import copy
 import networkx as nx
 from matplotlib import pyplot as plt
-def DP(ori_map, qubits):
+def DP(ori_map, qubits, rows):
     new_map = []
     for rows in ori_map:
         new_map.append([])
@@ -12,7 +12,8 @@ def DP(ori_map, qubits):
                 new_map[-1].append(2)
             else:
                 new_map[-1].append(0)
-    gen_index(new_map)
+    graph, nodes, C_len, W_len, first, last = gen_index(new_map)
+    place_core(graph, nodes, C_len, W_len, rows)
 
 def gen_index(map):
     cut = []
@@ -34,7 +35,7 @@ def gen_index(map):
         temp_row.sort()
         s_row.append(copy.deepcopy(temp_row))
     s_row.insert(0, cut[0])
-    s_row.append(cut[-1])
+    s_row.append(cut[-1]) #the two qubit gate location for each row
     first = []
     last = []
     qubit = 0
@@ -48,17 +49,17 @@ def gen_index(map):
                 back = j - s_row[qubit][-1]
                 break
         qubit = qubit + 1
-        first.append(front)
-        last.append(back)
+        first.append(front) #length for the patterns in the front
+        last.append(back) #length for the patterns in the back
     nodes, C_len, W_len = gen_DAG(map,s_row)
     graph = nx.DiGraph()
     for node in nodes:
         for i in range(len(node) - 1):
             graph.add_edge(node[i], node[i+1])
     nx.draw_networkx(graph)
-    order = list(nx.topological_sort(graph))
-    next = list(graph.successors('A.0'))
-    print('g')
+    #order = list(nx.topological_sort(graph))
+    #next = list(graph.successors('A.0'))
+    return graph, nodes, C_len, W_len, first, last
 
 def gen_DAG(map, s_row):
     indexes = []
@@ -66,7 +67,7 @@ def gen_DAG(map, s_row):
         indexes = indexes + index
     indexes = [*set(indexes)]
     indexes.sort()
-    nodes = []
+    nodes = [] #graph nodes
     node_loc = []
     for i in range(len(s_row)):
         nodes.append([])
@@ -77,8 +78,8 @@ def gen_DAG(map, s_row):
     W = 0
     A_loc = []
     B_loc = []
-    C_len = []
-    W_len = []
+    C_len = [] #none wire single row length
+    W_len = [] #wire single row length
     index = 0
     while index < len(indexes):
         for i in range(1, len(map)-1, 2):
@@ -122,3 +123,6 @@ def gen_DAG(map, s_row):
                     C_len.append(s_row[i][j + 1] -  s_row[i][j] - 1)
     return nodes, C_len, W_len
 
+def place_core(graph, nodes, C_len, W_len, rows):
+    order = list(nx.topological_sort(graph))
+    print('g')
