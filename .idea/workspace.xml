@@ -4,7 +4,6 @@
     <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="keep doing DP">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,8 +120,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>61</line>
-          <option name="timeStamp" value="463" />
+          <line>192</line>
+          <option name="timeStamp" value="465" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
