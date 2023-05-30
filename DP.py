@@ -7,9 +7,9 @@ keep = 3
 long = 3
 def DP(ori_map, qubits, rows):
     new_map = []
-    for rows in ori_map:
+    for row in ori_map:
         new_map.append([])
-        for item in rows:
+        for item in row:
             if item != 'Z' and item != 'X':
                 new_map[-1].append(1)
             elif item == 'X':
@@ -164,7 +164,7 @@ def place_core(graph, nodes, W_len, rows):
     #         LD = dep + 1
     #     else:
     #         LD = dep
-    table[0].append({'Parent':'NA', 'P':'NA', 'row':3, 'S':0, 'D':dep, 'Q':2, 'front':[[2,0], [0,0]]})
+    table[0].append({'Parent':'NA', 'P':'NA', 'row':3, 'S':0, 'D':dep, 'Q':2, 'front':[[0,0], [2,0]]})
     shape[0].append(temp_shape)
     chose[0].append(0)
     previous = current
@@ -190,7 +190,7 @@ def place_core(graph, nodes, W_len, rows):
         else: # only has wire
             current = next[0]
             loc = check_loc(nodes, previous, current)
-        place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index)
+        place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
         print('g')
 
 def check_loc(nodes, previous, current):
@@ -220,28 +220,105 @@ def check_loc(nodes, previous, current):
         loc = 'r'
     return loc
 
-def place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index):
+def place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order):
     c_gate, _ = current.split('.')
     for index in parent_node:
-        c_shape = shape[p_index][index]
+        p_shape = shape[p_index][index]
         c_table = table[p_index][index]
+        c_row = c_table['row']
+        parent = [p_index, index]
         if loc == 'd':
             base = c_table['front'][1]
         else:
             base = c_table['front'][0]
         if c_gate == 'C':
-            new_shape = place_C(c_shape, c_gate, base)
+            new_shapes, position, fronts, spaces = place_C(p_shape, base, loc, rows, c_row)
+            c_index = order.index(current)
+            qubit = c_table['Q']
+            update(new_shapes, table, shape, c_index, position, fronts, parent, qubit, spaces)
         elif c_gate == 'A':
-            new_shape = place_A(c_shape, c_gate, base)
+            new_shape , p = place_A(p_shape, base, loc, rows, c_row)
         elif c_gate == 'B':
-            new_shape = place_B(c_shape, c_gate, base)
+            new_shape, p = place_B(p_shape, base, loc, rows, c_row)
 
-def place_C(c_shape, c_gate, base): #place single node
+def place_C(c_shape, base, loc, rows, c_row): #place single node
+    new_shape1 = copy.deepcopy(c_shape)
+    new_shape2 = copy.deepcopy(c_shape)
+    new_shape3 = copy.deepcopy(c_shape)
+    spaces = []
+    new_shapes = []
+    fronts = []
+    position = []
+    if base[1] == len(c_shape[0]) - 1:
+        new_shape1[base[0]].append(1)
+    else:
+        new_shape1[base[0]][base[1] + 1] = 1
+    new_shape1, space = fill_shape(new_shape1)
+    spaces.append(space)
+    new_shapes.append(new_shape1)
+    position.append(0)
+    fronts.append([[base[0], base[1] + 1]])
+    if loc == 'u' or loc == 'r':
+        if base[0] == 0 and c_row < rows:
+            new_row = [0]*len(c_shape[0])
+            new_shape2.insert(0, new_row)
+            new_shape2[base[0]][base[1]] = 1
+            fronts.append([[base[0], base[1]]])
+        elif base[0] < len(c_shape) - 1:
+            new_shape2[base[0] - 1][base[1]] = 1
+            fronts.append([[base[0] - 1, base[1]]])
+        new_shape2, space = fill_shape(new_shape2)
+        spaces.append(space)
+        new_shapes.append(new_shape2)
+        position.append(1)
+    elif loc == 'd' or loc == 'r':
+        if base[0] == len(c_shape) - 1 and c_row < rows:
+            new_row = [0]*len(c_shape[0])
+            new_shape3.append(new_row)
+            new_shape3[base[0] + 1][base[1]] = 1
+            fronts.append([[base[0] + 1, base[1]]])
+        elif base[0] < len(c_shape) - 1:
+            new_shape3[base[0] + 1][base[1]] = 1
+            fronts.append([[base[0] + 1, base[1]]])
+        new_shape3, space = fill_shape(new_shape3)
+        spaces.append(space)
+        new_shapes.append(new_shape3)
+        position.append(2)
+    return new_shapes, position, fronts, spaces
 
+def place_B(c_shape, base, loc, rows, c_row): #place B node
     print('g')
 
-def place_B(c_shape, c_gate, base): #place B node
+def place_A(c_shape, base, loc, rows, c_row): #place A node
     print('g')
 
-def place_A(c_shape, c_gate, base): #place A node
-    print('g')
+def update(new_shapes, table, shape, c_index, position, fronts, parent, qubit, spaces):
+    for i in range(len(position)):
+        p = position[i]
+        front = fronts[i]
+        row = len(new_shapes[i])
+        dep = len(new_shapes[i][0])
+        space = spaces[i]
+        new_table = {'Parent':parent, 'P':p, 'row':row, 'S':space, 'D':dep, 'Q':qubit, 'front':front}
+        table[c_index].append(new_table)
+        shape[c_index].append(new_shapes[i])
+
+def fill_shape(shape):
+    total = 0
+    longest = 0
+    for row in shape:
+        if longest < len(row):
+            longest = len(row)
+    for row in shape:
+        if len(row) < longest:
+            distance = longest - len(row)
+            for i in range(distance):
+                row.append(0)
+    for row in shape:
+        for i in reversed(range(longest)):
+            if row[i] != 0:
+                total = total + longest - i - 1
+                break
+    p = total/len(shape)
+    return shape, p
+
