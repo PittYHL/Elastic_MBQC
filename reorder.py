@@ -19,7 +19,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/bv5b.txt') as f:
+with open('Benchmarks/qft5.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []

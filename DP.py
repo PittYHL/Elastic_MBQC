@@ -153,18 +153,19 @@ def place_core(graph, nodes, W_len, rows):
         temp_shape.append([1])
         temp_shape.append([1])
         temp_shape.append([1])
+        table[0].append({'Parent': 'NA', 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0], [2, 0]]})
     else:
         dep = 2
         temp_shape.append([1,1])
         temp_shape.append([1,1])
         temp_shape.append([1,1])
+        table[0].append({'Parent': 'NA', 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1], [2, 1]]})
     # for pat in next:
     #     gate, _ = pat.split('.')
     #     if gate == 'B':
     #         LD = dep + 1
     #     else:
     #         LD = dep
-    table[0].append({'Parent':'NA', 'P':'NA', 'row':3, 'S':0, 'D':dep, 'Q':2, 'front':[[0,0], [2,0]]})
     shape[0].append(temp_shape)
     chose[0].append(0)
     previous = current
@@ -174,7 +175,7 @@ def place_core(graph, nodes, W_len, rows):
         parent_node = chose[p_index]
         if len(next) == 2: #first priorize two-qubit gate, than c
             gate1, _ = next[0].split('.')
-            gate2, _ = next[0].split('.')
+            gate2, _ = next[1].split('.')
             if gate1 == 'A' or gate1 == 'B':
                 current = next[0]
                 loc = 'u'
@@ -187,10 +188,22 @@ def place_core(graph, nodes, W_len, rows):
             elif gate2 == 'C':
                 current = next[1]
                 loc = 'd'
+            else:  # only has wire
+                current = next[0]
+                loc = check_loc(nodes, previous, current)
+            place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
+            next.remove(current)
+            gate1, _ = next[0].split('.')
+            if gate1 == 'W':
+                previous = current
+                next = list(graph.successors(current))
         else: # only has wire
             current = next[0]
             loc = check_loc(nodes, previous, current)
-        place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
+            place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
+        nodes_left.remove(current)
+        placed.append(current)
+        #if
         print('g')
 
 def check_loc(nodes, previous, current):
