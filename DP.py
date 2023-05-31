@@ -145,21 +145,21 @@ def place_core(graph, nodes, W_len, rows):
     nodes_left = copy.deepcopy(order)
     current = nodes_left.pop(0)
     placed.append(current)
-    next = list(graph.successors(current))
     gate, _ = current.split('.')
     temp_shape = []
+    succ = list(graph.successors(current))
     if gate == 'A':
         dep = 1
         temp_shape.append([1])
         temp_shape.append([1])
         temp_shape.append([1])
-        table[0].append({'Parent': 'NA', 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0], [2, 0]]})
+        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0], [2, 0]], 'successor':[succ[0], succ[1]], 'locate':['u', 'd']})
     else:
         dep = 2
         temp_shape.append([1,1])
         temp_shape.append([1,1])
         temp_shape.append([1,1])
-        table[0].append({'Parent': 'NA', 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1], [2, 1]]})
+        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1], [2, 1]], 'successor':[succ[0], succ[1]], 'locate':['u', 'd']})
     # for pat in next:
     #     gate, _ = pat.split('.')
     #     if gate == 'B':
@@ -169,38 +169,48 @@ def place_core(graph, nodes, W_len, rows):
     shape[0].append(temp_shape)
     chose[0].append(0)
     previous = current
+    i = 0
     while nodes_left != []:
         #current version, the wires are added at the end
         p_index = order.index(previous) # the index of the previous pattern
         parent_node = chose[p_index]
-        if len(next) == 2: #first priorize two-qubit gate, than c
-            gate1, _ = next[0].split('.')
-            gate2, _ = next[1].split('.')
-            if gate1 == 'A' or gate1 == 'B':
-                current = next[0]
-                loc = 'u'
-            elif gate2 == 'A' or gate2 == 'B':
-                current = next[1]
-                loc = 'd'
-            elif gate1 == 'C':
-                current = next[0]
-                loc = 'u'
-            elif gate2 == 'C':
-                current = next[1]
-                loc = 'd'
-            else:  # only has wire
-                current = next[0]
-                loc = check_loc(nodes, previous, current)
-            place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
-            next.remove(current)
-            gate1, _ = next[0].split('.')
-            if gate1 == 'W':
-                previous = current
-                next = list(graph.successors(current))
-        else: # only has wire
-            current = next[0]
-            loc = check_loc(nodes, previous, current)
-            place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
+        next = choose_next(nodes_left, placed, graph, order) #chose the next
+        for j in range(len(table[0])): #may need to change
+            successors = table[i][j]['successor']
+            locs = table[i][j]['locate']
+            front = table[i][j]['front']
+            index = successors.index(next)
+            loc = locs[index]
+            base = front[index]
+            place_next(parent_node, loc, current, table, shape, p_index, rows, order, base)
+        # if len(next) == 2: #first priorize two-qubit gate, than c
+        #     gate1, _ = next[0].split('.')
+        #     gate2, _ = next[1].split('.')
+        #     if gate1 == 'A' or gate1 == 'B':
+        #         current = next[0]
+        #         loc = 'u'
+        #     elif gate2 == 'A' or gate2 == 'B':
+        #         current = next[1]
+        #         loc = 'd'
+        #     elif gate1 == 'C':
+        #         current = next[0]
+        #         loc = 'u'
+        #     elif gate2 == 'C':
+        #         current = next[1]
+        #         loc = 'd'
+        #     else:  # only has wire
+        #         current = next[0]
+        #         loc = check_loc(nodes, previous, current)
+        #     place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
+        #     next.remove(current)
+        #     gate1, _ = next[0].split('.')
+        #     if gate1 == 'W':
+        #         previous = current
+        #         next = list(graph.successors(current))
+        # else: # only has wire
+        #     current = next[0]
+        #     loc = check_loc(nodes, previous, current)
+        #     place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order)
         nodes_left.remove(current)
         placed.append(current)
         #if
@@ -233,17 +243,17 @@ def check_loc(nodes, previous, current):
         loc = 'r'
     return loc
 
-def place_next(parent_node, loc, previous, current, table, shape, chose, nodes, p_index, rows, order):
+def place_next(parent_node, loc, current, table, shape, p_index, rows, order, base):
     c_gate, _ = current.split('.')
     for index in parent_node:
         p_shape = shape[p_index][index]
         c_table = table[p_index][index]
         c_row = c_table['row']
         parent = [p_index, index]
-        if loc == 'd':
-            base = c_table['front'][1]
-        else:
-            base = c_table['front'][0]
+        # if loc == 'd':
+        #     base = c_table['front'][1]
+        # else:
+        #     base = c_table['front'][0]
         if c_gate == 'C':
             new_shapes, position, fronts, spaces = place_C(p_shape, base, loc, rows, c_row)
             c_index = order.index(current)
@@ -334,4 +344,34 @@ def fill_shape(shape):
                 break
     p = total/len(shape)
     return shape, p
+
+def choose_next(nodes_left, placed, graph, order):
+    next = []
+    parent_index = [] #the parent of the chosen
+    found_wire = 0 #choose the wire
+    for node in nodes_left: #found all the nodes that don't have predecessors
+        before = list(graph.predecessors(node))
+        solved = 1
+        p_index = 100000
+        for pred in before:
+            gate1, _ = pred.split('.')
+            if pred in placed:
+                index = placed.index(pred)
+            elif pred not in placed and gate1 != 'W': #if one of the predecessor is wire
+                solved = 0
+            if pred in placed and p_index > index:
+                p_index = index
+        if solved:
+            gate1, _ = node.split('.')
+            if gate1 == 'W':
+                succ = list(graph.successors(node)) #choose the wire whose succesor has been placed
+                if succ[0] in placed:
+                    found_wire = 1
+                    next_node = node
+                    break
+            else:
+                next.append(node)
+                parent_index.append(p_index)
+    next_node = next[parent_index.index(min(parent_index))]
+    return next_node
 

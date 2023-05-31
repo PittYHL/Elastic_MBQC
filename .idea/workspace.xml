@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="need to finish place and update">
+    <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="finish how to choose order">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/qft5ela.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/qft5ela.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +59,14 @@
       <option name="project" value="LOCAL" />
       <updated>1685395826305</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="finish how to choose order">
+      <created>1685479985738</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1685479985738</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -78,7 +83,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="keep doing DP" />
     <MESSAGE value="need to finish place and update" />
-    <option name="LAST_COMMIT_MESSAGE" value="need to finish place and update" />
+    <MESSAGE value="finish how to choose order" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish how to choose order" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -130,23 +136,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>237</line>
+          <line>247</line>
           <option name="timeStamp" value="466" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>308</line>
+          <line>318</line>
           <option name="timeStamp" value="481" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>250</line>
+          <line>260</line>
           <option name="timeStamp" value="482" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>175</line>
-          <option name="timeStamp" value="483" />
+          <line>374</line>
+          <option name="timeStamp" value="486" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>184</line>
+          <option name="timeStamp" value="487" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
