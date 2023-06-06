@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="finish how to choose order">
+    <list default="true" id="cd8c12b9-c0dd-410c-984d-293de64ff632" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/iqp5ela.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/iqp5ela.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/qft5ela.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/qft5ela.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,6 +144,26 @@
           <line>19</line>
           <option name="timeStamp" value="557" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>300</line>
+          <option name="timeStamp" value="558" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>282</line>
+          <option name="timeStamp" value="559" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>186</line>
+          <option name="timeStamp" value="560" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>302</line>
+          <option name="timeStamp" value="561" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -172,9 +189,6 @@
         <watch expression="mid_map" />
         <watch expression="order" />
         <watch expression="order" />
-        <watch expression="shapes[0]" />
-        <watch expression="shapes[13][0]" />
-        <watch expression="shapes[9][1]" />
       </configuration>
     </watches-manager>
   </component>

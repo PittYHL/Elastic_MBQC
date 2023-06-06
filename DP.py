@@ -327,7 +327,7 @@ def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
 
     if loc == 'u' or loc == 'r': #up
         placed = 0
-        if base[0] == 0 and p_row + 1 - base[0] + extra_qubits * 2 <= rows:
+        if base[0] == 0 and p_row + 1 + extra_qubits * 2 <= rows:
             new = new + 1
             placed = 1
             new_row = [0]*len(p_shape[0])
@@ -348,14 +348,14 @@ def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             fronts.append(new_front2)
     if loc == 'd' or loc == 'r': #down
         placed = 0
-        if base[0] == len(p_shape) - 1 and p_row + 1 - base[0] + extra_qubits * 2 <= rows:
+        if base[0] == len(p_shape) - 1 and p_row + 1 + extra_qubits * 2 <= rows:
             new = new + 1
             placed = 1
             new_row = [0]*len(p_shape[0])
             new_shape3.append(new_row)
             new_shape3[base[0] + 1][base[1]] = 1
             new_front3.insert(c_index, [base[0] + 1, base[1]])
-        elif feasible_placement(base, [base[0] + 1, base[1]], p_shape, 'C'):
+        elif base[0] != len(p_shape) - 1 and feasible_placement(base, [base[0] + 1, base[1]], p_shape, 'C'):
             new = new + 1
             placed = 1
             new_shape3[base[0] + 1][base[1]] = 1
@@ -607,13 +607,16 @@ def rank_result(row_collect_num, c_depths, c_spaces):
         for i in range(len(c_depths)):
             if c_depths[i] == dep:
                 c_dep_group.append(i)
-                c_spaces_group.append(c_spaces[i])
+                if c_spaces[i] in c_spaces_group:
+                    c_spaces_group.append(c_spaces[i] + 0.01)
+                else:
+                    c_spaces_group.append(c_spaces[i])
         temp_spaces_group = copy.deepcopy(c_spaces_group)
         temp_spaces_group.sort(reverse=True)
         for i in range(len(temp_spaces_group)):
             temp_dep_group.append(c_dep_group[c_spaces_group.index(temp_spaces_group[i])])
         dep_group = dep_group + temp_dep_group
-    while(len(selected)!=2):
+    while(len(selected)!=keep):
         selected.append(row_collect_num[dep_group.pop(0)])
     selected.sort()
     return selected
