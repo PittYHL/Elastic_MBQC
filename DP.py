@@ -3,7 +3,7 @@ import networkx as nx
 from matplotlib import pyplot as plt
 
 la_win = 1
-keep = 2
+keep = 3
 long = 3
 def DP(ori_map, qubits, rows):
     new_map = []
@@ -16,8 +16,8 @@ def DP(ori_map, qubits, rows):
                 new_map[-1].append(2)
             else:
                 new_map[-1].append(0)
-    graph, nodes, W_len, first, last = gen_index(new_map)
-    table, shapes, index = place_core(graph, nodes, W_len, rows, qubits)
+    graph, nodes, W_len, first, last, A_loc, B_loc, C_loc = gen_index(new_map)
+    table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc)
     print('g')
 
 def gen_index(map):
@@ -56,7 +56,7 @@ def gen_index(map):
         qubit = qubit + 1
         first.append(front) #length for the patterns in the front
         last.append(back) #length for the patterns in the back
-    nodes, W_len = gen_DAG(map,s_row)
+    nodes, W_len, A_loc, B_loc, C_loc = gen_DAG(map,s_row)
     graph = nx.DiGraph()
     for node in nodes:
         for i in range(len(node) - 1):
@@ -64,7 +64,7 @@ def gen_index(map):
     nx.draw_networkx(graph)
     #order = list(nx.topological_sort(graph))
     #next = list(graph.successors('A.0'))
-    return graph, nodes, W_len, first, last
+    return graph, nodes, W_len, first, last, A_loc, B_loc, C_loc
 
 def gen_DAG(map, s_row):
     indexes = []
@@ -83,12 +83,14 @@ def gen_DAG(map, s_row):
     W = 0
     A_loc = []
     B_loc = []
-    #C_len = [] #none wire single row length
+    C_loc = [] #none wire single row length
+    W_loc = []
     W_len = [] #wire single row length
     index = 0
     while index < len(indexes):
         for i in range(1, len(map)-1, 2):
-            if map[i][indexes[index]] != 0:
+            next_0 = check_next_0(map, i, indexes[index])
+            if map[i][indexes[index]] != 0 and next_0 % 2 == 0:
                 if map[i][indexes[index] + 1] != 0:
                     node = 'B.' + str(B)
                     loc = int((i-1)/2)
@@ -112,24 +114,31 @@ def gen_DAG(map, s_row):
         add = 1
         for j in range(len(s_row[i]) - 1):
             if s_row[i][j + 1] - s_row[i][j] > 1:
-                if map[i * 2][s_row[i][j] + 1] == 2:
+                if map[i * 2][s_row[i][j] + 1] == 2 and s_row[i][j + 1] - s_row[i][j] > 3:
                     node = 'W.' + str(W)
                     W = W + 1
                     loc = node_loc[i].index(s_row[i][j])
                     nodes[i].insert(loc + add, node)
                     add = add + 1
                     W_len.append(s_row[i][j + 1] - s_row[i][j] - 1)
-                elif map[i * 2][s_row[i][j] + 1] != 2:
+                #elif map[i * 2][s_row[i][j] + 1] != 2:
+                else:
                     for k in range(s_row[i][j + 1] - s_row[i][j] - 1):
+                        C_loc.append(k + s_row[i][j] + 1)
                         node = 'C.' + str(C)
                         C = C + 1
                         loc = node_loc[i].index(s_row[i][j])
                         nodes[i].insert(loc + add, node)
                         add = add + 1
                     #C_len.append(s_row[i][j + 1] -  s_row[i][j] - 1)
-    return nodes, W_len
+    return nodes, W_len, A_loc, B_loc, C_loc
 
-def place_core(graph, nodes, W_len, rows, qubits):
+def check_next_0(map, i, start):
+    index = copy.deepcopy(start)
+    while(map[i][index] != 0):
+        index = index + 1
+    return index - start
+def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
     qubits = len(nodes)
     order = list(nx.topological_sort(graph))
     placed = []
@@ -170,7 +179,7 @@ def place_core(graph, nodes, W_len, rows, qubits):
     i = 0
     while nodes_left != []:
         #current version, the wires are added at the end
-        next = choose_next(nodes_left, placed, graph, nodes) #chose the next
+        next = choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc) #chose the next
         c_qubit = find_qubits(nodes, placed, next)
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph)
@@ -238,6 +247,16 @@ def check_loc(nodes, placed, next, graph):
             loc = 'd'
         else:
             loc = 'u'
+    elif p_gate == 'C' and (c_gate == 'B' or c_gate == 'A'):
+        qubit1 = 0
+        for i in range(len(nodes)):
+            if previous in nodes[i]:
+                qubit1 = i
+                break
+        if qubit1 == len(nodes) - 1 or next in nodes[qubit1 - 1]:
+            loc = 'u'
+        else:
+            loc = 'd'
     else:
         loc = 'r'
     return loc
@@ -275,10 +294,11 @@ def place_next(current, next, table, shape, valid, p_index, rows, new_sucessors,
         if succ in successors:
             nextnext = succ
         successors.insert(c_index, succ)
+    same_qubit = 0
     while nextnext != 0:
         next = nextnext
         newnew_sucessors = list(graph.successors(nextnext))
-        shapes, fronts, spaces, successors, nextnext, parents = fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents, nodes)
+        shapes, fronts, spaces, successors, nextnext, parents, same_qubit = fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents, nodes, same_qubit)
         next_list.append(next)
     update(next, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index)
     return next_list
@@ -295,7 +315,9 @@ def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
     if base[1] == len(p_shape[0]) - 1:
         new_shape1[base[0]].append(1)
     else:
-        new_shape1[base[0]][base[1] + 1] = 1
+        x = base[0]
+        y = base[1] + 1
+        new_shape1[x][y] = 1
     new = new + 1
     new_shape1, space = fill_shape(new_shape1)
     spaces.append(space)
@@ -308,9 +330,11 @@ def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
         if base[0] == 0 and p_row + 1 - base[0] + extra_qubits * 2 <= rows:
             new = new + 1
             placed = 1
-            new_row = [0]*len(p_row[0])
+            new_row = [0]*len(p_shape[0])
             new_shape2.insert(0, new_row)
             new_shape2[base[0]][base[1]] = 1
+            for element in new_front2:  # change exsisting element
+                element[0] = element[0] + 1
             new_front2.insert(c_index, [base[0], base[1]])
         elif feasible_placement(base, [base[0] - 1, base[1]], p_shape, 'C'):
             new = new + 1
@@ -398,6 +422,53 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             shapes.append(new_shape1)
             fronts.append(new_front1)
             spaces.append(space)
+    if loc == 'd':
+        if base[0] + 3 >= len(p_shape) and p_row + 2 - base[0] + extra_qubits * 2 <= rows: # place the one to the right
+            new = new + 1
+            new_shape1 = copy.deepcopy(p_shape)
+            new_front1 = copy.deepcopy(front)
+            extra_column = 3 - len(new_shape1[0]) + base[1]
+            extra_row = base[0] + 3 - len(p_shape)
+            for i in range(len(new_shape1)):  # place extra columns
+                new_shape1[i] = new_shape1[i] + [0] * extra_column
+            new_row = [0] * len(new_shape1[0])
+            for i in range(extra_row):  # insert extra rows
+                new_shape1.append(copy.deepcopy(new_row))
+            for i in range(base[0], base[0] + 3):
+                for j in range(base[1] + 1, base[1] + 3):
+                    new_shape1[i][j] = 1
+            new_front1.insert(c_index, [base[0] + 2, base[1] + 2])  # add two base
+            new_front1.insert(c_index, [base[0], base[1] + 2])
+            for i in range(2 - num_succ):
+                new_front1.pop(-1)
+            new_shape1, space = fill_shape(new_shape1)
+            shapes.append(new_shape1)
+            fronts.append(new_front1)
+            spaces.append(space)
+        if base[0] + 4 >= len(p_shape) and p_row + 3 - base[0] + extra_qubits * 2 <= rows: #first case: on bot
+            new = new + 1
+            new_shape1 = copy.deepcopy(p_shape)
+            new_front1 = copy.deepcopy(front)
+            # place the one to the top
+            extra_row = base[0] + 4 - len(p_shape)
+            #base[0] = base[0] + extra_row
+            if base[1] == len(new_shape1[0]) - 1: #if need extra 1 column
+                for row in new_shape1:
+                    row.append(0)
+            new_row = [0] * len(new_shape1[0])
+            for i in range(extra_row): #insert extra rows
+                new_shape1.append(copy.deepcopy(new_row))
+            for i in range(base[0]+1, base[0] + 4):
+                for j in range(base[1], base[1] + 2):
+                    new_shape1[i][j] = 1
+            new_front1.insert(c_index, [base[0] + 3, base[1] + 1])  # add two base
+            new_front1.insert(c_index, [base[0] + 1, base[1] + 1])
+            for i in range(2 - num_succ):
+                new_front1.pop(0)
+            new_shape1, space = fill_shape(new_shape1)
+            shapes.append(new_shape1)
+            fronts.append(new_front1)
+            spaces.append(space)
     return shapes, fronts, spaces, new
 
 
@@ -433,7 +504,7 @@ def fill_shape(shape):
     p = total/len(shape)
     return shape, p
 
-def choose_next(nodes_left, placed, graph, nodes):
+def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc):
     next = []
     parent_index = [] #the parent of the chosen
     found_wire = 0 #choose the wire
@@ -451,9 +522,15 @@ def choose_next(nodes_left, placed, graph, nodes):
             if pred in placed and p_index > index:
                 p_index = index
         if solved:
-            gate1, _ = node.split('.')
+            gate1, num = node.split('.')
             pred = list(graph.predecessors(node))
             gate2, _ = pred[0].split('.')
+            if gate1 == 'B':
+                loc = B_loc[int(num)]
+            elif gate1 == 'A':
+                loc = A_loc[int(num)]
+            elif gate1 == 'C':
+                loc = C_loc[int(num)]
             if gate1 == 'W':
                 succ = list(graph.successors(node)) #choose the wire whose succesor has been placed
                 if succ[0] in placed:
@@ -466,7 +543,7 @@ def choose_next(nodes_left, placed, graph, nodes):
                 break
             else:
                 next.append(node)
-                parent_index.append(p_index)
+                parent_index.append(loc)
     if found_wire != 1 and found_C != 1:
         next_node = next[parent_index.index(min(parent_index))]
     return next_node
@@ -556,17 +633,19 @@ def feasible_placement(ori_loc, new_loc, p_shape, gate):
                     break
     return legal
 
-def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents, nodes):
+def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents, nodes, same_qubit):
     locs = []
     new_parents = []
     gate, _ = nextnext.split('.')
+    #same_qubit = 0 #found node on the same qbits
     for i in range(len(successors)):
         if successors[i] == nextnext:
             locs.append(i)
     if gate == 'A':
-        shapes, fronts, spaces, valid = fill_A(shapes, fronts, spaces, locs)
+        shapes, fronts, spaces, valid = fill_A(shapes, fronts, spaces, locs, same_qubit)
     elif gate == 'B':
-        shapes, fronts, spaces, valid = fill_B(shapes, fronts, spaces, locs)
+        shapes, fronts, spaces, valid = fill_B(shapes, fronts, spaces, locs, same_qubit)
+    same_qubit = 0
     if len(newnew_sucessors) == 1: #remove one front
         first_qubit = 0
         second_qubit = 0
@@ -578,9 +657,11 @@ def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors
         if second_qubit - first_qubit > 0:
             for front in fronts:
                 front.pop(locs[0])
-        else:
+        elif second_qubit - first_qubit < 0:
             for front in fronts:
                 front.pop(locs[1])
+        else:
+            same_qubit = 1
     elif len(newnew_sucessors) == 0:
         for front in fronts:
             front.pop(locs[0])
@@ -591,15 +672,18 @@ def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors
     for succ in reversed(newnew_sucessors):
         if succ in successors:
             nextnext = succ
+        elif same_qubit:
+            nextnext = succ
+            successors.insert(locs[0], succ)
         successors.insert(locs[0], succ)
     for index in valid:
         new_parents.append(parents[index])
-    return shapes, fronts, spaces, successors, nextnext, new_parents
+    return shapes, fronts, spaces, successors, nextnext, new_parents, same_qubit
 
 def fill_A(shapes, fronts, spaces, locs):
     print('g')
 
-def fill_B(shapes, fronts, spaces, locs): #may need to add more cases
+def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more cases
     valid = [] #valid shpae after fill B
     new_shapes = []
     new_Spaces = []
@@ -610,7 +694,7 @@ def fill_B(shapes, fronts, spaces, locs): #may need to add more cases
         first_base = front[locs[0]]
         second_base = front[locs[1]]
         if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]: #rr
-            if shapes[i][first_base[0] + 1][first_base[1]] == 0: #constraints for rr
+            if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit: #constraints for rr
                 valid.append(i)
                 extra_column = first_base[1] + 3 - len(shape[0])
                 for j in range(len(shape)):

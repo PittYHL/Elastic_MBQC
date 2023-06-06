@@ -10,7 +10,7 @@ from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
 qubits = 5
-rows = 13
+rows = 10
 physical_gate = []
 tracker= []
 map = []
