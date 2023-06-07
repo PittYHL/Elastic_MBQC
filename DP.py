@@ -280,15 +280,15 @@ def place_next(current, next, table, shape, valid, p_index, rows, new_sucessors,
         p_table = table[p_index][j]
         p_row = p_table['row']
         if c_gate == 'C':
-            shapes, fronts, spaces, new = place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit)
-            for i in range(new):
-                parents.append([p_index, j])
+            shapes, fronts, spaces, new = place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces)
         elif c_gate == 'A':
-            new_shapes, position, fronts, spaces = place_A(p_shape, base, loc, rows, c_row)
+            new_shapes, position, fronts, spaces = place_A(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit, new_sucessors)
         elif c_gate == 'B':
             shapes, fronts, spaces, new = place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit, new_sucessors)
-            for i in range(new):
-                parents.append([p_index, j])
+        elif c_gate == 'W':
+            print('g')
+        for i in range(new):
+            parents.append([p_index, j])
     nextnext = 0
     for succ in reversed(new_sucessors):
         if succ in successors:
@@ -303,7 +303,7 @@ def place_next(current, next, table, shape, valid, p_index, rows, new_sucessors,
     update(next, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index)
     return next_list
 
-def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, extra_qubits): #place single node
+def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces): #place single node
     new = 0 #how many new node
     new_shape1 = copy.deepcopy(p_shape)
     new_shape2 = copy.deepcopy(p_shape)
@@ -327,7 +327,7 @@ def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
 
     if loc == 'u' or loc == 'r': #up
         placed = 0
-        if base[0] == 0 and p_row + 1 + extra_qubits * 2 <= rows:
+        if base[0] == 0 and p_row + 1 <= rows:
             new = new + 1
             placed = 1
             new_row = [0]*len(p_shape[0])
@@ -348,7 +348,7 @@ def place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             fronts.append(new_front2)
     if loc == 'd' or loc == 'r': #down
         placed = 0
-        if base[0] == len(p_shape) - 1 and p_row + 1 + extra_qubits * 2 <= rows:
+        if base[0] == len(p_shape) - 1 and p_row + 1<= rows:
             new = new + 1
             placed = 1
             new_row = [0]*len(p_shape[0])
@@ -423,7 +423,7 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             fronts.append(new_front1)
             spaces.append(space)
     if loc == 'd':
-        if base[0] + 3 >= len(p_shape) and p_row + 2 - base[0] + extra_qubits * 2 <= rows: # place the one to the right
+        if base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows: # place the one to the right
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
             new_front1 = copy.deepcopy(front)
@@ -445,7 +445,7 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             shapes.append(new_shape1)
             fronts.append(new_front1)
             spaces.append(space)
-        if base[0] + 4 >= len(p_shape) and p_row + 3 - base[0] + extra_qubits * 2 <= rows: #first case: on bot
+        if base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows: #first case: on bot
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
             new_front1 = copy.deepcopy(front)
@@ -521,7 +521,7 @@ def place_A(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             fronts.append(new_front1)
             spaces.append(space)
     if loc == 'd':
-        if base[0] + 3 >= len(p_shape) and p_row + 2 - base[0] + extra_qubits * 2 <= rows:  # place the one to the right
+        if base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows:  # place the one to the right
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
             new_front1 = copy.deepcopy(front)
@@ -542,7 +542,7 @@ def place_A(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             shapes.append(new_shape1)
             fronts.append(new_front1)
             spaces.append(space)
-        if base[0] + 4 >= len(p_shape) and p_row + 3 - base[0] + extra_qubits * 2 <= rows:  # first case: on bot
+        if base[0] + 4 >= len(p_shape) and p_row +base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows:  # first case: on bot
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
             new_front1 = copy.deepcopy(front)

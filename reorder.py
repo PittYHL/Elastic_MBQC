@@ -10,7 +10,7 @@ from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
 qubits = 5
-rows = 11
+rows = 10
 physical_gate = []
 tracker= []
 map = []
@@ -19,7 +19,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/qft5.txt') as f:
+with open('Benchmarks/iqp5b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
