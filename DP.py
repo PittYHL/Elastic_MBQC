@@ -382,7 +382,7 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
                 new_shape1[i] = new_shape1[i] + [0] * extra_column
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row):  # insert extra rows
-                new_shape1.insert(0, new_row)
+                new_shape1.insert(0, copy.deepcopy(new_row))
             for i in range(3):
                 for j in range(base[1] + 1, base[1] + 3):
                     new_shape1[i][j] = 1
@@ -408,7 +408,7 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
                     row.append(0)
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row): #insert extra rows
-                new_shape1.insert(0, new_row)
+                new_shape1.insert(0, copy.deepcopy(new_row))
             for i in range(3):
                 for j in range(base[1], base[1] + 2):
                     new_shape1[i][j] = 1
@@ -433,7 +433,7 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
                 new_shape1[i] = new_shape1[i] + [0] * extra_column
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row):  # insert extra rows
-                new_shape1.append(copy.deepcopy(new_row))
+                new_shape1.append(copy.deepcopy(copy.deepcopy(new_row)))
             for i in range(base[0], base[0] + 3):
                 for j in range(base[1] + 1, base[1] + 3):
                     new_shape1[i][j] = 1
@@ -472,8 +472,97 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
     return shapes, fronts, spaces, new
 
 
-def place_A(c_shape, base, loc, rows, c_row): #place A node
-    print('g')
+def place_A(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, extra_qubits, new_sucessors): #place A node
+    new = 0  # how many new node
+    num_succ = len(new_sucessors)
+    if loc == 'u':
+        if base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows:  # place the one to the right
+            new = new + 1
+            new_shape1 = copy.deepcopy(p_shape)
+            new_front1 = copy.deepcopy(front)
+            extra_column = 2 - len(new_shape1[0]) + base[1]
+            extra_row = 2 - base[0]
+            for i in range(len(new_shape1)):  # place extra columns
+                new_shape1[i] = new_shape1[i] + [0] * extra_column
+            new_row = [0] * len(new_shape1[0])
+            for i in range(extra_row):  # insert extra rows
+                new_shape1.insert(0, copy.deepcopy(new_row))
+            for i in range(3):
+                new_shape1[i][base[1] + 1] = 1
+            for element in new_front1:  # change exsisting element
+                element[0] = element[0] + extra_row
+            new_front1.insert(c_index, [base[0] + extra_row, base[1] + 1])  # add two base
+            new_front1.insert(c_index, [0, base[1] + 1])
+            for i in range(2 - num_succ):
+                new_front1.pop(0)
+            new_shape1, space = fill_shape(new_shape1)
+            shapes.append(new_shape1)
+            fronts.append(new_front1)
+            spaces.append(space)
+        if base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows:  # first case: on top
+            new = new + 1
+            new_shape1 = copy.deepcopy(p_shape)
+            new_front1 = copy.deepcopy(front)
+            # place the one to the top
+            extra_row = 3 - base[0]
+            new_row = [0] * len(new_shape1[0])
+            for i in range(extra_row):  # insert extra rows
+                new_shape1.insert(0, copy.deepcopy(new_row))
+            for i in range(3):
+                new_shape1[i][base[1]] = 1
+            for element in new_front1:  # change exsisting element
+                element[0] = element[0] + extra_row
+            new_front1.insert(c_index, [base[0] + extra_row - 1, base[1]])  # add two base
+            new_front1.insert(c_index, [0, base[1]])
+            for i in range(2 - num_succ):
+                new_front1.pop(0)
+            new_shape1, space = fill_shape(new_shape1)
+            shapes.append(new_shape1)
+            fronts.append(new_front1)
+            spaces.append(space)
+    if loc == 'd':
+        if base[0] + 3 >= len(p_shape) and p_row + 2 - base[0] + extra_qubits * 2 <= rows:  # place the one to the right
+            new = new + 1
+            new_shape1 = copy.deepcopy(p_shape)
+            new_front1 = copy.deepcopy(front)
+            extra_column = 2 - len(new_shape1[0]) + base[1]
+            extra_row = base[0] + 3 - len(p_shape)
+            for i in range(len(new_shape1)):  # place extra columns
+                new_shape1[i] = new_shape1[i] + [0] * extra_column
+            new_row = [0] * len(new_shape1[0])
+            for i in range(extra_row):  # insert extra rows
+                new_shape1.append(copy.deepcopy(new_row))
+            for i in range(base[0], base[0] + 3):
+                new_shape1[i][base[1] + 1] = 1
+            new_front1.insert(c_index, [base[0] + 2, base[1] + 1])  # add two base
+            new_front1.insert(c_index, [base[0], base[1] + 1])
+            for i in range(2 - num_succ):
+                new_front1.pop(-1)
+            new_shape1, space = fill_shape(new_shape1)
+            shapes.append(new_shape1)
+            fronts.append(new_front1)
+            spaces.append(space)
+        if base[0] + 4 >= len(p_shape) and p_row + 3 - base[0] + extra_qubits * 2 <= rows:  # first case: on bot
+            new = new + 1
+            new_shape1 = copy.deepcopy(p_shape)
+            new_front1 = copy.deepcopy(front)
+            # place the one to the top
+            extra_row = base[0] + 4 - len(p_shape)
+            # base[0] = base[0] + extra_row
+            new_row = [0] * len(new_shape1[0])
+            for i in range(extra_row):  # insert extra rows
+                new_shape1.append(copy.deepcopy(new_row))
+            for i in range(base[0] + 1, base[0] + 4):
+                new_shape1[i][base[1]] = 1
+            new_front1.insert(c_index, [base[0] + 3, base[1]])  # add two base
+            new_front1.insert(c_index, [base[0] + 1, base[1]])
+            for i in range(2 - num_succ):
+                new_front1.pop(0)
+            new_shape1, space = fill_shape(new_shape1)
+            shapes.append(new_shape1)
+            fronts.append(new_front1)
+            spaces.append(space)
+    return shapes, fronts, spaces, new
 
 def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index):
     rows = []
@@ -683,7 +772,81 @@ def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors
         new_parents.append(parents[index])
     return shapes, fronts, spaces, successors, nextnext, new_parents, same_qubit
 
-def fill_A(shapes, fronts, spaces, locs):
+def fill_A(shapes, fronts, spaces, locs, same_qubit):
+    valid = []  # valid shpae after fill A
+    new_shapes = []
+    new_Spaces = []
+    new_fronts = []
+    for i in range(len(shapes)):
+        shape = shapes[i]
+        front = fronts[i]
+        first_base = front[locs[0]]
+        second_base = front[locs[1]]
+        if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]:  # rr
+            if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit:  # constraints for rr
+                valid.append(i)
+                extra_column = first_base[1] + 2 - len(shape[0])
+                for j in range(len(shape)):
+                    shape[j] = shape[j] + [0] * extra_column
+                shape[first_base[0]][first_base[1] + 1] = 1
+                shape[first_base[0] + 1][first_base[1] + 1] = 1
+                shape[first_base[0] + 2][first_base[1] + 1] = 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                front[locs[0]][1] = front[locs[0]][1] + 1
+                front[locs[1]][1] = front[locs[1]][1] + 1
+                new_fronts.append(front)
+        elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]:  # ru
+            if shapes[i][first_base[0] + 1][first_base[1]] == 0:  # constraints for ru
+                valid.append(i)
+                extra_column = first_base[1] + 2 - len(shape[0])
+                for j in range(len(shape)):
+                    shape[j] = shape[j] + [0] * extra_column
+                shape[first_base[0]][first_base[1] + 1] = 1
+                shape[first_base[0] + 1][first_base[1] + 1] = 1
+                shape[first_base[0] + 2][first_base[1] + 1] = 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                #front[locs[0]][1] = front[locs[0]][1] + 1
+                front[locs[1]][0] = front[locs[1]][0] - 1
+                #front[locs[1]][1] = front[locs[1]][1] + 1
+                new_fronts.append(front)
+        elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]:  # dr
+            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
+                valid.append(i)
+                # extra_column = first_base[1] + 1 - len(shape[0])
+                # for j in range(len(shape)):
+                #     shape[j] = shape[j] + [0] * extra_column
+                shape[first_base[0] + 1][first_base[1]] = 1
+                shape[first_base[0] + 2][first_base[1]] = 1
+                shape[first_base[0] + 3][first_base[1]] = 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                #front[locs[0]][1] = front[locs[0]][1] + 1
+                front[locs[0]][0] = front[locs[0]][0] + 1
+                #front[locs[1]][1] = front[locs[1]][1] + 2
+                new_fronts.append(front)
+        elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]:  # du
+            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
+                valid.append(i)
+                # extra_column = first_base[1] + 2 - len(shape[0])
+                # for j in range(len(shape)):
+                #     shape[j] = shape[j] + [0] * extra_column
+                shape[first_base[0] + 1][first_base[1]] = 1
+                shape[first_base[0] + 2][first_base[1]] = 1
+                shape[first_base[0] + 3][first_base[1]:] = 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                # front[locs[0]][1] = front[locs[0]][1] + 1
+                front[locs[0]][0] = front[locs[0]][0] + 1
+                # front[locs[1]][1] = front[locs[1]][1] + 1
+                front[locs[1]][0] = front[locs[1]][0] - 1
+                new_fronts.append(front)
+    return new_shapes, new_fronts, new_Spaces, valid
     print('g')
 
 def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more cases
