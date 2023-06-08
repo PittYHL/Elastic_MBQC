@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="">
+    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="finish how to choose order">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
@@ -153,22 +153,17 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
           <line>186</line>
-          <option name="timeStamp" value="590" />
+          <option name="timeStamp" value="639" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>312</line>
-          <option name="timeStamp" value="594" />
+          <line>313</line>
+          <option name="timeStamp" value="641" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>277</line>
-          <option name="timeStamp" value="597" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>298</line>
-          <option name="timeStamp" value="599" />
+          <line>922</line>
+          <option name="timeStamp" value="642" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -197,7 +192,8 @@
         <watch expression="order" />
         <watch expression="shapes[4]" />
         <watch expression="shapes[13]" />
-        <watch expression="shapes[3]" />
+        <watch expression="shape[8]" />
+        <watch expression="table[9]" />
         <watch expression="shape[10]" />
       </configuration>
     </watches-manager>
