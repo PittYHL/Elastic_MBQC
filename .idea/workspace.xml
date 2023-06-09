@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="finish how to choose order">
+    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="finish debugging bv5">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv5ela.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv5ela.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/iqp5ela.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/iqp5ela.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,7 +69,14 @@
       <option name="project" value="LOCAL" />
       <updated>1685479985738</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="finish debugging bv5">
+      <created>1686257886658</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1686257886658</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -85,7 +94,8 @@
     <MESSAGE value="keep doing DP" />
     <MESSAGE value="need to finish place and update" />
     <MESSAGE value="finish how to choose order" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish how to choose order" />
+    <MESSAGE value="finish debugging bv5" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish debugging bv5" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -150,21 +160,6 @@
           <line>237</line>
           <option name="timeStamp" value="581" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>186</line>
-          <option name="timeStamp" value="639" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>313</line>
-          <option name="timeStamp" value="641" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>922</line>
-          <option name="timeStamp" value="642" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -195,6 +190,12 @@
         <watch expression="shape[8]" />
         <watch expression="table[9]" />
         <watch expression="shape[10]" />
+        <watch expression="shape[6]" />
+        <watch expression="shape[9][13]" />
+        <watch expression="shapes[9]" />
+        <watch expression="shape[6]" />
+        <watch expression="shape[5][1]" />
+        <watch expression="shape[10][11]" />
       </configuration>
     </watches-manager>
   </component>
