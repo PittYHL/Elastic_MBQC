@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="finish debugging bv5">
+    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv5ela.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv5ela.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/iqp5ela.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/iqp5ela.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -160,6 +159,11 @@
           <line>237</line>
           <option name="timeStamp" value="581" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>185</line>
+          <option name="timeStamp" value="658" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -196,6 +200,7 @@
         <watch expression="shape[6]" />
         <watch expression="shape[5][1]" />
         <watch expression="shape[10][11]" />
+        <watch expression="shape[16][1]" />
       </configuration>
     </watches-manager>
   </component>

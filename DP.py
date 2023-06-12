@@ -147,6 +147,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
     shape = []
     valid = [] #for chosen patterns
     c_layer = [] #record the current layer
+    two_wire = [] #record the node with two wire predecessors
     current_row = 3
     current_d = 0
     for i in range(len(order)):
@@ -179,7 +180,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
     i = 0
     while nodes_left != []:
         #current version, the wires are added at the end
-        next = choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc) #chose the next
+        next = choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire) #chose the next
         c_qubit = find_qubits(nodes, placed, next)
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph)
@@ -264,10 +265,6 @@ def check_loc(nodes, placed, next, graph):
 def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed):
     next_list = [next]
     c_gate, _ = next.split('.')
-    if c_gate != 'W':
-        parent_node = valid[p_index]
-    elif c_gate == 'W':
-        parent_node = list(range(len(shape[p_index])))
     parents = [] #record parents
     fronts = []#record the new fronts
     spaces = []#record the new spaces
@@ -281,13 +278,24 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
             wire_not_placed = True
     if (c_gate == 'A' or c_gate == 'B') and len(new_sucessors) == 1:
         end = detec_end(next, new_sucessors[0], nodes)
+    parent = copy.deepcopy(table[p_index][0])
+    successors = parent['successor']
+    c_index = successors.index(next)  # remove the next node from the table
+    successors.pop(c_index)
+    nextnext = 0
+    if c_gate != 'W':
+        for succ in reversed(new_sucessors):
+            if succ in successors:
+                nextnext = succ
+            successors.insert(c_index, succ)
+    if c_gate != 'W' and nextnext == 0:
+        parent_node = valid[p_index]
+    elif c_gate == 'W' or nextnext != 0:
+        parent_node = list(range(len(shape[p_index])))
     for j in parent_node: #iterate all the feasible node of the parents and create new table
         parent = copy.deepcopy(table[p_index][j])
-        successors = parent['successor']
         front = parent['front']
-        c_index = successors.index(next) #remove the next node from the table
         base = front.pop(c_index) #start base
-        successors.pop(c_index)
         p_shape = shape[p_index][j] #parent shape
         p_table = table[p_index][j]
         p_row = p_table['row']
@@ -302,12 +310,6 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
             shapes, fronts, spaces, new = place_W(p_shape, base, c_index, rows, p_row, front, shapes, fronts, spaces, target, W_len)
         for i in range(new):
             parents.append([p_index, j])
-    nextnext = 0
-    if c_gate != 'W':
-        for succ in reversed(new_sucessors):
-            if succ in successors:
-                nextnext = succ
-            successors.insert(c_index, succ)
     same_qubit = 0
     while nextnext != 0:
         next = nextnext
@@ -401,9 +403,9 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row):  # insert extra rows
                 new_shape1.insert(0, copy.deepcopy(new_row))
-            for i in range(3):
-                for j in range(base[1] + 1, base[1] + 3):
-                    new_shape1[i][j] = 1
+            # for i in range(3):
+            #     for j in range(base[1] + 1, base[1] + 3):
+            #         new_shape1[i][j] = 1
             if base[0] < 2:  #place the B
                 for i in range(3):
                     for j in range(base[1] + 1, base[1] + 3):
@@ -435,7 +437,7 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             shapes.append(new_shape1)
             fronts.append(new_front1)
             spaces.append(space)
-        if (base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3: #first case: on top
+        if base[0] == 0 or (p_shape[base[0] - 1][base[1] - 1] == 0 and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3)): #first case: on top
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -443,15 +445,17 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             # place the one to the top
             if base[0] < 3:
                 extra_row = 3 - base[0]
+            else:
+                extra_row = 0
             if base[1] == len(new_shape1[0]) - 1: #if need extra 1 column
                 for row in new_shape1:
                     row.append(0)
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row): #insert extra rows
                 new_shape1.insert(0, copy.deepcopy(new_row))
-            for i in range(3):
-                for j in range(base[1], base[1] + 2):
-                    new_shape1[i][j] = 1
+            # for i in range(3):
+            #     for j in range(base[1], base[1] + 2):
+            #         new_shape1[i][j] = 1
             if base[0] < 3:  #place the B
                 for i in range(3):
                     for j in range(base[1], base[1] + 2):
@@ -492,6 +496,8 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             extra_column = 3 - len(new_shape1[0]) + base[1]
             if base[0] + 3 >= len(p_shape):
                 extra_row = base[0] + 3 - len(p_shape)
+            else:
+                extra_row = 0
             for i in range(len(new_shape1)):  # place extra columns
                 new_shape1[i] = new_shape1[i] + [0] * extra_column
             new_row = [0] * len(new_shape1[0])
@@ -515,7 +521,7 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             shapes.append(new_shape1)
             fronts.append(new_front1)
             spaces.append(space)
-        if (base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape): #first case: on bot
+        if base[0] == len(p_shape) - 1 or (p_shape[base[0] + 1][base[1] - 1] == 0 and ((base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape))): #first case: on bot
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -523,6 +529,8 @@ def place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             # place the one to the top
             if base[0] + 4 >= len(p_shape):
                 extra_row = base[0] + 4 - len(p_shape)
+            else:
+                extra_row = 0
             #base[0] = base[0] + extra_row
             if base[1] == len(new_shape1[0]) - 1: #if need extra 1 column
                 for row in new_shape1:
@@ -599,7 +607,7 @@ def place_A(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             shapes.append(new_shape1)
             fronts.append(new_front1)
             spaces.append(space)
-        if (base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3:  # first case: on top
+        if base[0] == 0 or (p_shape[base[0] - 1][base[1] - 1] == 0 and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3)):  # first case: on top
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -674,7 +682,7 @@ def place_A(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spa
             shapes.append(new_shape1)
             fronts.append(new_front1)
             spaces.append(space)
-        if (base[0] + 4 >= len(p_shape) and p_row +base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape):  # first case: on bot
+        if base[0] == len(p_shape) - 1 or (p_shape[base[0] + 1][base[1] - 1] == 0 and ((base[0] + 4 >= len(p_shape) and p_row +base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape))):  # first case: on bot
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -721,7 +729,7 @@ def place_W(p_shape, base, c_index, rows, p_row, front, shapes, fronts, spaces, 
     if direc == 'f':
         found = 1
         for j in range(base[1] + 1, target[1]):
-            shape[base[0]][j] = 1
+            shape[base[0]][j] = 2
             count = count + 1
     else:
         if shape[target[0]][target[1] - 2] == 0:
@@ -827,14 +835,14 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
                 [next[0] - 1, next[1]] == tar_loc):  # prorize up
                     current = copy.deepcopy(next)
                     next[0] = next[0] - 1
-                    shape1[next[0]][next[1]] = 1
+                    shape1[next[0]][next[1]] = 2
                     loc = 'u'
                     dead_end = 0
             elif (next[0] < len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
             (next[0] == len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or [next[0], next[1] + 1] == tar_loc:
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
-                shape1[next[0]][next[1]] = 1
+                shape1[next[0]][next[1]] = 2
                 loc = 'r'
                 dead_end = 0
             if dead_end:
@@ -849,7 +857,7 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
             (next[0] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0], next[1] + 1] == tar_loc: #prorize right
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
-                shape1[next[0]][next[1]] = 1
+                shape1[next[0]][next[1]] = 2
                 loc = 'r'
                 dead_end = 0
             elif next[0] > tar_loc[0] and next[0] > 1:
@@ -857,7 +865,7 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
                 [next[0] - 1, next[1]] == tar_loc:
                     current = copy.deepcopy(next)
                     next[0] = next[0] - 1
-                    shape1[next[0]][next[1]] = 1
+                    shape1[next[0]][next[1]] = 2
                     loc = 'u'
                     dead_end = 0
             elif next[0] > tar_loc[0] and next[0] == 1:
@@ -865,7 +873,7 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
                 (next[1] == 0 and shape[next[0] - 1][next[1] + 1] == 0) or [next[0] - 1, next[1]] == tar_loc:
                     current = copy.deepcopy(next)
                     next[0] = next[0] - 1
-                    shape1[next[0]][next[1]] = 1
+                    shape1[next[0]][next[1]] = 2
                     loc = 'u'
                     dead_end = 0
             if dead_end:
@@ -879,14 +887,14 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
                 [next[0] + 1,next[1]] == tar_loc): #prorize down
                     current = copy.deepcopy(next)
                     next[0] = next[0] + 1
-                    shape1[next[0]][next[1]] = 1
+                    shape1[next[0]][next[1]] = 2
                     loc = 'd'
                     dead_end = 0
             elif (next[0] > 0 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
             (next[0] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0], next[1] + 1] == tar_loc:
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
-                shape1[next[0]][next[1]] = 1
+                shape1[next[0]][next[1]] = 2
                 loc = 'r'
                 dead_end = 0
             if dead_end:
@@ -900,7 +908,7 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
             (next[0] == len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or [next[0], next[1] + 1] == tar_loc: #priorize right
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
-                shape1[next[0]][next[1]] = 1
+                shape1[next[0]][next[1]] = 2
                 loc = 'r'
                 dead_end = 0
             elif next[0] < tar_loc[0] and next[0] + 2 < len(shape1):
@@ -908,7 +916,7 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
                 [next[0] + 1,next[1]] == tar_loc:
                     current = copy.deepcopy(next)
                     next[0] = next[0] + 1
-                    shape1[next[0]][next[1]] = 1
+                    shape1[next[0]][next[1]] = 2
                     loc = 'd'
                     dead_end = 0
             elif next[0] < tar_loc[0] and next[0] + 2 == len(shape1): #when reeach the end of the shape
@@ -916,7 +924,7 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton):
                 (next[1] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0] + 1, next[1]] == tar_loc:
                     current = copy.deepcopy(next)
                     next[0] = next[0] + 1
-                    shape1[next[0]][next[1]] = 1
+                    shape1[next[0]][next[1]] = 2
                     loc = 'd'
                     dead_end = 0
             if dead_end:
@@ -972,24 +980,42 @@ def fill_shape(shape):
     p = total/len(shape)
     return shape, p
 
-def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc):
+def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire):
     next = []
     parent_index = [] #the parent of the chosen
     found_wire = 0 #choose the wire
     found_C = 0 #choose the C
-    for node in nodes_left: #found all the nodes that don't have predecessors
+    for node in nodes_left: #found all the nodes that predecessors have been resolved
+        succ = list(graph.successors(node))
         before = list(graph.predecessors(node))
         solved = 1
         p_index = 100000
+        wires = 0
         for pred in before:
             gate1, _ = pred.split('.')
             if pred in placed:
                 index = placed.index(pred)
-            elif pred not in placed and gate1 != 'W': #if one of the predecessor is wire
+            elif pred not in placed and gate1 != 'W' and pred not in two_wire: #if one of the predecessor is wire
                 solved = 0
+            elif gate1 == 'W':
+                wires = wires + 1
             if pred in placed and p_index > index:
                 p_index = index
-        if solved:
+        if wires == len(before):
+            solved = 0
+            if node not in two_wire:
+                two_wire.append(node)
+            elif len(succ) == 1:
+                if wires == len(before) and succ[0] in placed:
+                    found_wire = 1
+                    next_node = node
+                    break
+            elif len(succ) == 2:
+                if wires == len(before) and (succ[0] in placed or succ[0] in placed):
+                    found_wire = 1
+                    next_node = node
+                    break
+        elif solved:
             gate1, num = node.split('.')
             pred = list(graph.predecessors(node))
             gate2, _ = pred[0].split('.')
