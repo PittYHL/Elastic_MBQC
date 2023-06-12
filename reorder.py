@@ -19,7 +19,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/iqp7b.txt') as f:
+with open('Benchmarks/qft7.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -233,8 +233,9 @@ de_map = np.array(dense_map)
 #sc_map = np.array(schedule)
 #np.savetxt("qft4_sche.csv", sc_map, fmt = '%s',delimiter=",")
 #de_map = np.array(dense_map)
-#np.savetxt("qft4_de.csv", de_map, fmt = '%s',delimiter=",")
 new_map = new_eliminate_redundant(dense_map, qubits)
+n_map = np.array(new_map)
+# np.savetxt("example/qft7el.csv", n_map, fmt = '%s',delimiter=",")
 DP(new_map, qubits, rows)
 # n_map = np.array(new_map)
 # np.savetxt("example/bv4el.csv", n_map, fmt = '%s',delimiter=",")

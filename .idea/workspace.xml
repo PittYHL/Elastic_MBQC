@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="">
+    <list default="true" id="7598f555-1ce1-4251-ba33-419251b9ad4a" name="Changes" comment="doing 7 qubits">
+      <change afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,13 +31,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/YIL392/Anaconda3/envs/qiskit_env&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/YIL392/Anaconda3/envs/qiskit_env",
+    "settings.editor.selected.configurable": "debugger.dataViews.python.type.renderers"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -75,7 +76,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686257886658</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="doing 7 qubits">
+      <created>1686342973975</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1686342973975</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -94,7 +102,8 @@
     <MESSAGE value="need to finish place and update" />
     <MESSAGE value="finish how to choose order" />
     <MESSAGE value="finish debugging bv5" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish debugging bv5" />
+    <MESSAGE value="doing 7 qubits" />
+    <option name="LAST_COMMIT_MESSAGE" value="doing 7 qubits" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -106,12 +115,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>261</line>
+          <line>262</line>
           <option name="timeStamp" value="144" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>255</line>
+          <line>256</line>
           <option name="timeStamp" value="319" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -146,23 +155,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>20</line>
+          <line>21</line>
           <option name="timeStamp" value="554" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>19</line>
+          <line>20</line>
           <option name="timeStamp" value="557" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>237</line>
+          <line>238</line>
           <option name="timeStamp" value="581" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>185</line>
-          <option name="timeStamp" value="658" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -200,7 +204,18 @@
         <watch expression="shape[6]" />
         <watch expression="shape[5][1]" />
         <watch expression="shape[10][11]" />
-        <watch expression="shape[16][1]" />
+        <watch expression="shape" />
+        <watch expression="valid" />
+        <watch expression="shape[20][2]" />
+        <watch expression="shape[26]" />
+        <watch expression="table[25][1]" />
+        <watch expression="shape[28][13]" />
+        <watch expression="shape[29]" />
+        <watch expression="shape[29]" />
+        <watch expression="shapes[31]" />
+        <watch expression="shapes[31][9]" />
+        <watch expression="shapes[31][0]" />
+        <watch expression="new_map[12]" />
       </configuration>
     </watches-manager>
   </component>
