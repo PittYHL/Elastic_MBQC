@@ -374,20 +374,23 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
     for node in nodes_left: #found all the nodes that predecessors have been resolved
         succ = list(graph.successors(node))
         before = list(graph.predecessors(node))
-        solved = 1
         p_index = 100000
         wires = 0
-        for pred in before:
-            gate1, _ = pred.split('.')
-            if pred in placed:
-                index = placed.index(pred)
-            elif pred not in placed and gate1 != 'W' and pred not in two_wire: #if one of the predecessor is wire
-                solved = 0
-            elif gate1 == 'W':
-                wires = wires + 1
-            if pred in placed and p_index > index:
-                p_index = index
-        if wires == len(before):
+        if before != []:
+            solved = 1
+            for pred in before:
+                gate1, _ = pred.split('.')
+                if pred in placed:
+                    index = placed.index(pred)
+                elif pred not in placed and gate1 != 'W' and pred not in two_wire: #if one of the predecessor is wire
+                    solved = 0
+                elif gate1 == 'W':
+                    wires = wires + 1
+                if pred in placed and p_index > index:
+                    p_index = index
+        else:
+            solved = 0
+        if wires == len(before) and before != []: #both predecessors are wires and one of the sucessors is placed
             solved = 0
             if node not in two_wire:
                 two_wire.append(node)
@@ -425,7 +428,10 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
                 next.append(node)
                 parent_index.append(loc)
     if found_wire != 1 and found_C != 1:
-        next_node = next[parent_index.index(min(parent_index))]
+        if parent_index != []:
+            next_node = next[parent_index.index(min(parent_index))]
+        else: # cannot find node with both predecessors resolved or wires or
+
     return next_node
 
 def find_qubits(nodes, placed, next):

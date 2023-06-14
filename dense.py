@@ -217,7 +217,11 @@ def new_eliminate_redundant(map, qubits):
             else:
                 end = end + 1
     # prune the Z
-    new_map = prune_Z(new_map)
+    # new_map = prune_Z(new_map)
+
+    row_len = int(len(map[0]) / 4)
+    for i in range(len(new_map)):
+        new_map[i] = ['Z'] * row_len + new_map[i] + ['Z'] * row_len
     #update two qubit gate
     two_qubit_gate = []
     wires = [[] for _ in range(qubits)]
@@ -262,6 +266,8 @@ def new_eliminate_redundant(map, qubits):
                 if start >= wires[j][k] and end <= wires[j][k + 1]:
                     portion.append([wires[j][k], wires[j][k + 1]])
         wire_group.append(portion)
+    wire_group = update_wire_group(wire_group)
+    starts, ends = check_start_end(two_qubit_gate)
     for i in range(len(wire_group)):
         start = -1
         end = 10000000000
@@ -303,36 +309,37 @@ def new_eliminate_redundant(map, qubits):
                 min_row = ind
             ind = ind + 1
         if (all(ele == 1 for ele in indication)): #found wire in all rows
-            if row[-1] != qubits - 1:
-                if len(x_loc) == 2 and x_loc[1][0] > wires[row[-1] + 1][-1]:
-                    shift = 0
-                elif len(x_loc) == 1 and x_loc[0][0] > wires[row[-1] + 1][-1]:
-                    shift = 0
-                else:
-                    shift = 1
-            else:
-                shift = 1
+            # if row[-1] != qubits - 1:
+            #     if len(x_loc) == 2 and x_loc[1][0] > wires[row[-1] + 1][-1]:
+            #         shift = 0
+            #     elif len(x_loc) == 1 and x_loc[0][0] > wires[row[-1] + 1][-1]:
+            #         shift = 0
+            #     else:
+            #         shift = 1
+            # else:
+            #     shift = 1
             for j in range(len(row)):
                 to_be_remove = []
-                loc = x_loc[j].pop(0)
+                # loc = x_loc[j].pop(0)
                 for k in range(min_x):
+                    loc = x_loc[j].pop(0)
                     del new_map[row[j] * 2][loc]
                     del new_map[row[j] * 2][loc]
-                    if shift:
-                        new_map[row[j] * 2].insert(0, 'Z')
-                        new_map[row[j] * 2].insert(0, 'Z')
-                    # if len(x_loc[j]) != 0:
-                    #     for element in x_loc[j]:
-                    #         element = element - 2
-                    # for l in range(len(wires[row[j]])):
-                    #     if wires[row[j]][l] > start + 1:
-                    #         wires[row[j]][l] = wires[row[j]][l] - 2
-                    # for l in range(len(wire_group)):
-                    #     if wire_group[l][row[j]] != []:
-                    #         if wire_group[l][row[j]][0] > start + 1:
-                    #             wire_group[l][row[j]][0] = wire_group[l][row[j]][0] - 2
-                    #         if wire_group[l][row[j]][1] > start + 1:
-                    #             wire_group[l][row[j]][1] = wire_group[l][row[j]][1] - 2
+                    # if shift:
+                    #     new_map[row[j] * 2].insert(0, 'Z')
+                    #     new_map[row[j] * 2].insert(0, 'Z')
+                    if len(x_loc[j]) != 0:
+                        for element in x_loc[j]:
+                            element = element - 2
+                    for l in range(len(wires[row[j]])):
+                        if wires[row[j]][l] > start + 1:
+                            wires[row[j]][l] = wires[row[j]][l] - 2
+                    for l in range(len(wire_group)):
+                        if wire_group[l][row[j]] != []:
+                            if wire_group[l][row[j]][0] > start + 1:
+                                wire_group[l][row[j]][0] = wire_group[l][row[j]][0] - 2
+                            if wire_group[l][row[j]][1] > start + 1:
+                                wire_group[l][row[j]][1] = wire_group[l][row[j]][1] - 2
                     if j > 0:
                         if new_map[row[j] * 2 - 1][loc - 1] == new_map[row[j] * 2 - 1][loc] == 'Z':
                             del new_map[row[j] * 2 - 1][loc - 1]
@@ -340,60 +347,75 @@ def new_eliminate_redundant(map, qubits):
                         elif new_map[row[j] * 2 - 1][loc] == new_map[row[j] * 2 - 1][loc + 1] == 'Z':
                             del new_map[row[j] * 2 - 1][loc]
                             del new_map[row[j] * 2 - 1][loc]
-                        if shift:
-                            new_map[row[j] * 2 - 1].insert(0, 'Z')
-                            new_map[row[j] * 2 - 1].insert(0, 'Z')
-            if row[0] > 0 and shift:
-                for j in range(0, row[0]):
-                    extra = ['Z'] * (2 * min_x)
-                    new_map[j * 2] = extra + new_map[j * 2]
-                    new_map[j * 2 + 1] = extra + new_map[j * 2 + 1]
-            #remove the upper part
-            # if row[0] != 0:
+                        # if shift:
+                        #     new_map[row[j] * 2 - 1].insert(0, 'Z')
+                        #     new_map[row[j] * 2 - 1].insert(0, 'Z')
+            # if row[0] > 0 and shift:
             #     for j in range(0, row[0]):
-            #         if start + 1 < wires[j][0]:
-            #             for k in range(min_x):
-            #                 new_map[j*2].pop(0)
-            #                 new_map[j * 2].pop(0)
-            #                 new_map[j * 2 + 1].pop(0)
-            #                 new_map[j * 2 + 1].pop(0)
-            #                 for l in range(len(wires[j])):
-            #                     wires[j][l] = wires[j][l] - 2
-            #                 for l in range(len(wire_group)):
-            #                     if wire_group[l][j]!=[]:
-            #                         if wire_group[l][j][0] > start + 1:
-            #                             wire_group[l][j][0] = wire_group[l][j][0] - 2
-            #                         if wire_group[l][j][1] > start + 1:
-            #                             wire_group[l][j][1] = wire_group[l][j][1] - 2
-            #         elif start + 1 > wires[j][0]:
-            #             for k in range(min_x):
-            #                 new_map[j*2].pop(-1)
-            #                 new_map[j * 2].pop(-1)
-            #                 new_map[j * 2 + 1].pop(-1)
-            #                 new_map[j * 2 + 1].pop(-1)
-            # # remove the lower part
-            # if row[-1] != qubits - 1:
-            #     for j in range(row[-1] + 1, qubits):
-            #         if start + 1 <= wires[j][0]:
-            #             for k in range(min_x):
-            #                 new_map[j*2].pop(0)
-            #                 new_map[j * 2].pop(0)
-            #                 new_map[j * 2 - 1].pop(0)
-            #                 new_map[j * 2 - 1].pop(0)
-            #                 for l in range(len(wires[j])):
-            #                     wires[j][l] = wires[j][l] - 2
-            #                 for l in range(len(wire_group)):
-            #                     if wire_group[l][j]!=[]:
-            #                         if wire_group[l][j][0] > start + 1:
-            #                             wire_group[l][j][0] = wire_group[l][j][0] - 2
-            #                         if wire_group[l][j][1] > start + 1:
-            #                             wire_group[l][j][1] = wire_group[l][j][1] - 2
-            #         elif start + 1 > wires[j][0]:
-            #             for k in range(min_x):
-            #                 new_map[j*2].pop(-1)
-            #                 new_map[j * 2].pop(-1)
-            #                 new_map[j * 2 - 1].pop(-1)
-            #                 new_map[j * 2 - 1].pop(-1)
+            #         if start + 1 >= wires[j][0]:
+            #             extra = ['Z'] * (2 * min_x)
+            #             new_map[j * 2] = extra + new_map[j * 2]
+            #             new_map[j * 2 + 1] = extra + new_map[j * 2 + 1]
+            #update starts and ends
+            for j in range(len(row) - 1):
+                if starts[row[j]] > start:
+                    starts[row[j]] = starts[row[j]] - 2 * min_x
+                if ends[row[j]] > start:
+                    ends[row[j]] = ends[row[j]] - 2 * min_x
+            if row[0] != 0 and start < starts[row[0] - 1]:
+                for j in range(row[0]):
+                    starts[j] = starts[j] - 2 * min_x
+                    ends[j] = ends[j] - 2 * min_x
+            if row[-1] != qubits - 1 and start < starts[row[-1]]:
+                for j in range(row[-1], len(starts)):
+                    starts[j] = starts[j] - 2 * min_x
+                    ends[j] = ends[j] - 2 * min_x
+            # remove the upper part
+            if row[0] != 0:
+                for j in range(0, row[0]):
+                    if start < starts[row[0] - 1]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(0)
+                            new_map[j * 2].pop(0)
+                            new_map[j * 2 + 1].pop(0)
+                            new_map[j * 2 + 1].pop(0)
+                            for l in range(len(wires[j])):
+                                wires[j][l] = wires[j][l] - 2
+                            for l in range(i + 1, len(wire_group)):
+                                if wire_group[l][j]!=[]:
+                                    # if wire_group[l][j][0] > start + 1:
+                                    wire_group[l][j][0] = wire_group[l][j][0] - 2
+                                    # if wire_group[l][j][1] > start + 1:
+                                    wire_group[l][j][1] = wire_group[l][j][1] - 2
+                    elif start >= ends[row[0] - 1]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(-1)
+                            new_map[j * 2].pop(-1)
+                            new_map[j * 2 + 1].pop(-1)
+                            new_map[j * 2 + 1].pop(-1)
+            # remove the lower part
+            if row[-1] != qubits - 1:
+                for j in range(row[-1] + 1, qubits):
+                    if start < starts[row[-1]]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(0)
+                            new_map[j * 2].pop(0)
+                            new_map[j * 2 - 1].pop(0)
+                            new_map[j * 2 - 1].pop(0)
+                            for l in range(len(wires[j])):
+                                wires[j][l] = wires[j][l] - 2
+                            for l in range(i + 1, len(wire_group)):
+                                if wire_group[l][j]!=[]:
+                                    # if wire_group[l][j][0] > start + 1:
+                                    wire_group[l][j][0] = wire_group[l][j][0] - 2
+                                    # if wire_group[l][j][1] > start + 1:
+                                    wire_group[l][j][1] = wire_group[l][j][1] - 2
+                    elif start >= ends[row[-1]]:
+                        for k in range(min_x):
+                            new_map[j*2].pop(-1)
+                            new_map[j * 2].pop(-1)
+                            new_map[j * 2 - 1].pop(-1)
+                            new_map[j * 2 - 1].pop(-1)
     new_map = prune_Z(new_map)
     return new_map
 
@@ -418,4 +440,29 @@ def prune_Z(map):
         else:
             end = end + 1
     return map
+
+def update_wire_group(wire_group):
+    temp_wire_group = copy.deepcopy(wire_group)
+    for i in range(len(temp_wire_group)):
+        for j in range(i + 1, len(temp_wire_group)):
+            exist = 1
+            loc = []
+            for k in range(len(temp_wire_group[i])):
+                if temp_wire_group[i][k] != [] and temp_wire_group[i][k] != temp_wire_group[j][k]:
+                    exist = 0
+                elif temp_wire_group[i][k] == temp_wire_group[j][k]:
+                    loc.append(k)
+            if exist:
+                for index in loc:
+                    temp_wire_group[j][index] = []
+    return temp_wire_group
+
+def check_start_end(two_qubit_gate):
+    starts = []
+    ends = []
+    index = 0
+    for gate in two_qubit_gate:
+        starts.append(gate[0])
+        ends.append(gate[-1])
+    return starts, ends
 
