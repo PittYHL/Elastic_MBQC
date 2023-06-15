@@ -166,13 +166,13 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
         temp_shape.append([1])
         temp_shape.append([1])
         temp_shape.append([1])
-        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0], [2, 0]], 'successor':[succ[0], succ[1]]})
+        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0], [2, 0]], 'successor':[succ[0], succ[1]], 'targets':[], 'preds':[]})
     else:
         dep = 2
         temp_shape.append([1,1])
         temp_shape.append([1,1])
         temp_shape.append([1,1])
-        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1], [2, 1]], 'successor':[succ[0], succ[1]]})
+        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1], [2, 1]], 'successor':[succ[0], succ[1]], 'targets':[], 'preds':[]})
     c_layer.append(current)
     f_layer = copy.deepcopy(succ) #future layer
     shape[0].append(temp_shape)
@@ -195,6 +195,9 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
     return table, shape, i
 def check_loc(nodes, placed, next, graph, two_wire):
     newnext = 0
+    preds = list(graph.predecessors(next))
+    previous = 0
+    no_pred = 0
     if next in two_wire:    #put back
         previous = next
         succs = list(graph.successors(next))
@@ -203,11 +206,18 @@ def check_loc(nodes, placed, next, graph, two_wire):
                 newnext = succ
                 break
     else:
-        preds = list(graph.predecessors(next))
         newnext = next
         for pred in preds:
             if pred in placed:
                 previous = pred
+                break
+    if previous == 0: #no preds have been placed
+        no_pred = 1 #no previous indication
+        previous = next
+        succs = list(graph.successors(next))
+        for succ in succs:
+            if succ in placed:
+                newnext = succ
                 break
     p_gate, _ = previous.split('.')
     c_gate, _ = newnext.split('.')
@@ -243,9 +253,9 @@ def check_loc(nodes, placed, next, graph, two_wire):
             loc = 'd'
     else:
         loc = 'r'
-    if next in two_wire and loc == 'd':
+    if (next in two_wire or no_pred) and loc == 'd':
         loc = 'u'
-    elif next in two_wire and loc == 'u':
+    elif (next in two_wire or no_pred) and loc == 'u':
         loc = 'd'
     return loc
 
@@ -256,20 +266,24 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
     fronts = []#record the new fronts
     spaces = []#record the new spaces
     shapes = [] #record the new shapes
-    wire_target = [] #for recording the current wire target
     wire_targets = [] #for the target of wires
+    new_preds = [] #for the new preds
+    old_wire_targets = [] #for the old target
+    old_preds = [] #for the old predecessors
+    not_placed_preds = [] #for current unplaced predecessors
     end = 0
     wire_not_placed = False #check if there is wire for the previous
     preds = list(graph.predecessors(next))
     for pred in preds:
         if pred not in placed:
             wire_not_placed = True
+            not_placed_preds.append(pred)
     if (c_gate == 'A' or c_gate == 'B') and len(new_sucessors) == 1:
         end = detec_end(next, new_sucessors[0], nodes)
     parent = copy.deepcopy(table[p_index][0])
     successors = parent['successor']
+    succs = list(graph.successors(next))  # need to change it, change to based on row number
     if next in two_wire and loc == 'd':
-        succs = list(graph.successors(next)) #need to change it, change to based on row number
         for succ in succs:
             if succ in placed and loc == 'd':
                 next_succs = list(graph.successors(succ))
@@ -294,7 +308,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
                     break
                 elif next_succs == [] or next_succs[0] not in successors:
                     c_index = 0
-    else:
+    elif not_placed_preds != preds:
         c_index = successors.index(next)  # remove the next node from the table
         successors.pop(c_index)
     nextnext = 0
@@ -303,7 +317,8 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
             if succ in successors:
                 nextnext = succ
             if succ not in placed:
-                successors.insert(c_index, succ)
+                # successors.insert(c_index, succ)
+                successors.append(succ)
     if c_gate != 'W' and nextnext == 0:
         parent_node = valid[p_index]
     elif c_gate == 'W' or nextnext != 0: #two cases: fill wire and fill the nextnext
@@ -314,54 +329,71 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         p_shape = shape[p_index][j]  # parent shape
         p_table = table[p_index][j]
         p_row = p_table['row']
-        if next not in two_wire:
+        wire_target = parent['targets']  # for recording the current wire target
+        wire_pred = parent['preds']  # recording the current preds
+        if next not in two_wire and not_placed_preds != preds:
             base = front.pop(c_index) #start base
             if c_gate == 'C':
-                shapes, fronts, spaces, new = place_C(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit)
+                shapes, fronts, spaces, new, old_wire_targets = place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit, wire_target, old_wire_targets)
             elif c_gate == 'A':
-                shapes, fronts, spaces, new, wire_targets = place_A(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit, new_sucessors, end, wire_not_placed, wire_targets)
+                shapes, fronts, spaces, new, wire_targets, old_wire_targets = place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
+                qubits - c_qubit, new_sucessors, end, wire_not_placed, wire_targets, wire_target, old_wire_targets)
             elif c_gate == 'B':
-                shapes, fronts, spaces, new, wire_targets = place_B(p_shape, base, loc, c_index, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit, new_sucessors, end, wire_not_placed, wire_targets)
+                shapes, fronts, spaces, new, wire_targets, old_wire_targets = place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
+                qubits - c_qubit, new_sucessors, end, wire_not_placed, wire_targets, wire_target, old_wire_targets)
             elif c_gate == 'W':
                 wire_len = W_len[int(gate_index)]
-                wire_target = parent['wire_target']
-                target = wire_target.pop(0)
-                shapes, fronts, spaces, new = place_W(p_shape, base, c_index, rows, p_row, front, shapes, fronts, spaces, target, wire_len, wire_target)
+                t_index = wire_pred.index(next)
+                wire_pred.remove(next)
+                target = wire_target.pop(t_index)
+                shapes, fronts, spaces, new, old_wire_targets = place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, wire_len, wire_target, old_wire_targets)
         else:
-            base = parent['wire_target'].pop(0)
+            wire_target = parent['targets']
+            wire_pred = parent['preds']
+            t_index = wire_pred.index(next)
+            wire_pred.remove(next)
+            base = wire_target.pop(t_index)
             if c_gate == 'A':
-                shapes, fronts, spaces, new, wire_targets = reversed_place_A(p_shape, base, loc, c_index, rows, p_row, front,
+                shapes, fronts, spaces, new, wire_targets, old_wire_targets = reversed_place_A(p_shape, base, loc, rows, p_row, front,
                                                                     shapes, fronts, spaces, qubits - c_qubit,
-                                                                    new_sucessors, end, wire_not_placed, wire_targets)
+                                                                    new_sucessors, wire_targets, wire_target, old_wire_targets)
             elif c_gate == 'B':
-                shapes, fronts, spaces, new, wire_targets = reversed_place_B(p_shape, base, loc, c_index, rows, p_row, front,
+                shapes, fronts, spaces, new, wire_targets, old_wire_targets = reversed_place_B(p_shape, base, loc, rows, p_row, front,
                                                                     shapes, fronts, spaces, qubits - c_qubit,
-                                                                    new_sucessors, end, wire_not_placed, wire_targets, preds)
+                                                                    new_sucessors, wire_targets, wire_target, old_wire_targets)
         for i in range(new):
             parents.append([p_index, j])
-            if wire_target != []:
-                wire_targets.append(wire_target)
+            old_preds.append(wire_pred)
+            if wire_not_placed == 0: #if no new preds
+                new_preds.append([])
+                wire_targets.append([])
+            elif wire_not_placed: #if placed additional wires
+                new_preds.append(not_placed_preds)
+            elif wire_target != []: #if wires have been placed
+                wire_targets.append([]) #no new target after placing wire
+                new_preds.append([])
     same_qubit = 0
     while nextnext != 0:
         next = nextnext
         newnew_sucessors = list(graph.successors(nextnext))
-        shapes, fronts, spaces, successors, nextnext, parents, same_qubit, wire_targets = fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents, nodes, same_qubit, wire_targets)
+        shapes, fronts, spaces, successors, nextnext, parents, same_qubit, wire_targets, old_wire_targets = fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents,
+            nodes, same_qubit, wire_targets, old_wire_targets)
         next_list.append(next)
-    update(next, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, wire_not_placed, wire_targets, rows)
+    update(next, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, rows, wire_targets, new_preds,
+           old_wire_targets, old_preds)
     return next_list
 
-def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, wire_not_placed, wire_targets, row_limit):
+def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, row_limit, wire_targets, new_preds, old_wire_targets, old_preds):
     rows = []
     depths = []
     for i in range(len(shapes)):
         rows.append(len(shapes[i]))
         depths.append(len(shapes[i][0]))
-        if wire_targets != []:
-            table[p_index + 1].append(
-                {'New': current, 'P': parents[i], 'row': len(shapes[i]), 'S': spaces[i], 'D': depths[i], 'Q': c_qubit,
-                 'front': fronts[i], 'successor': successors, 'wire_target':wire_targets[i]})
-        else:
-            table[p_index + 1].append({'New': current, 'P': parents[i], 'row': len(shapes[i]), 'S': spaces[i], 'D': depths[i], 'Q': c_qubit, 'front': fronts[i], 'successor':successors})
+        current_wire_target = copy.deepcopy(old_wire_targets[i])
+        if wire_targets[i] != []:
+            current_wire_target.append(wire_targets[i])
+        table[p_index + 1].append({'New': current, 'P': parents[i], 'row': len(shapes[i]), 'S': spaces[i], 'D': depths[i], 'Q': c_qubit,
+        'front': fronts[i], 'successor': successors, 'targets':current_wire_target, 'preds': old_preds[i] + new_preds[i]})
         shape[p_index + 1].append(shapes[i])
     new_valid = check_valid(rows, depths, spaces, row_limit)
     valid[p_index + 1] = new_valid
@@ -371,36 +403,47 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
     parent_index = [] #the parent of the chosen
     found_wire = 0 #choose the wire
     found_C = 0 #choose the C
+    only_one = [] #the node that only one preds have been placed
+    succ_placed = [] #the node that succs have been placed
     for node in nodes_left: #found all the nodes that predecessors have been resolved
-        succ = list(graph.successors(node))
+        succs = list(graph.successors(node))
         before = list(graph.predecessors(node))
         p_index = 100000
         wires = 0
+        gate, _ = node.split('.')
         if before != []:
             solved = 1
+            pred_placed = []
             for pred in before:
                 gate1, _ = pred.split('.')
                 if pred in placed:
                     index = placed.index(pred)
+                    pred_placed.append(pred)
                 elif pred not in placed and gate1 != 'W' and pred not in two_wire: #if one of the predecessor is wire
                     solved = 0
                 elif gate1 == 'W':
                     wires = wires + 1
                 if pred in placed and p_index > index:
                     p_index = index
+            if len(pred_placed) == 1 and len(before) == 2:
+                only_one.append(node)
+            elif len(pred_placed) == 0 and gate != 'W':#if none of the predecessors have been placed, look for succesor
+                for succ in succs:
+                    if succ in placed:
+                        succ_placed.append(node)
         else:
             solved = 0
         if wires == len(before) and before != []: #both predecessors are wires and one of the sucessors is placed
             solved = 0
             if node not in two_wire:
                 two_wire.append(node)
-            elif len(succ) == 1:
-                if wires == len(before) and succ[0] in placed:
+            elif len(succs) == 1:
+                if wires == len(before) and succs[0] in placed:
                     found_wire = 1
                     next_node = node
                     break
-            elif len(succ) == 2:
-                if wires == len(before) and (succ[0] in placed or succ[0] in placed):
+            elif len(succs) == 2:
+                if wires == len(before) and (succs[0] in placed or succs[0] in placed):
                     found_wire = 1
                     next_node = node
                     break
@@ -430,8 +473,10 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
     if found_wire != 1 and found_C != 1:
         if parent_index != []:
             next_node = next[parent_index.index(min(parent_index))]
-        else: # cannot find node with both predecessors resolved or wires or
-
+        elif only_one != []: # cannot find node with both predecessors resolved or wires or
+            next_node = only_one[-1]
+        elif succ_placed != []:
+            next_node = succ_placed[-1]
     return next_node
 
 def find_qubits(nodes, placed, next):
@@ -516,10 +561,11 @@ def rank_result(row_collect_num, c_depths, c_spaces, keep_more):
     selected.sort()
     return selected
 
-def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents, nodes, same_qubit, wire_targets):
+def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents, nodes, same_qubit, wire_targets, old_wire_targets):
     locs = []
     new_parents = []
     new_wire_target = []
+    new_old_wire_target = []
     gate, _ = nextnext.split('.')
     #same_qubit = 0 #found node on the same qbits
     for i in range(len(successors)):
@@ -564,7 +610,8 @@ def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors
         new_parents.append(parents[index])
         if wire_targets != []:
             new_wire_target.append(wire_targets[index])
-    return shapes, fronts, spaces, successors, nextnext, new_parents, same_qubit, new_wire_target
+            new_old_wire_target.append(old_wire_targets[index])
+    return shapes, fronts, spaces, successors, nextnext, new_parents, same_qubit, new_wire_target, new_old_wire_target
 
 def fill_A(shapes, fronts, spaces, locs, same_qubit):
     valid = []  # valid shpae after fill A

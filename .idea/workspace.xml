@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="00bafeeb-c120-4f6c-8850-62d409b5d5bb" name="Changes" comment="finish qft 7">
+    <list default="true" id="00bafeeb-c120-4f6c-8850-62d409b5d5bb" name="Changes" comment="finish bv7">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv7el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv7el.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +89,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686630204855</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="finish bv7">
+      <created>1686773947721</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1686773947721</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -112,7 +117,8 @@
     <MESSAGE value="finish debugging bv5" />
     <MESSAGE value="doing 7 qubits" />
     <MESSAGE value="finish eliminate" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish eliminate" />
+    <MESSAGE value="finish bv7" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish bv7" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -185,22 +191,22 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
           <line>188</line>
-          <option name="timeStamp" value="746" />
+          <option name="timeStamp" value="778" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>183</line>
-          <option name="timeStamp" value="748" />
+          <line>356</line>
+          <option name="timeStamp" value="785" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>360</line>
+          <option name="timeStamp" value="786" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
           <line>186</line>
-          <option name="timeStamp" value="749" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>429</line>
-          <option name="timeStamp" value="751" />
+          <option name="timeStamp" value="788" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -253,6 +259,18 @@
         <watch expression="new_map[5]" />
         <watch expression="new_map" />
         <watch expression="new_map[4]" />
+        <watch expression="shape[5][0][1]" />
+        <watch expression="shape[12]" />
+        <watch expression="nodes_left" />
+        <watch expression="nodes_left" />
+        <watch expression="nodes_left" />
+        <watch expression="base" />
+        <watch expression="shape[5][0]" />
+        <watch expression="p_shape" />
+        <watch expression="target" />
+        <watch expression="target" />
+        <watch expression="shape[21][0]" />
+        <watch expression="table[2][3]" />
       </configuration>
     </watches-manager>
   </component>
