@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="00bafeeb-c120-4f6c-8850-62d409b5d5bb" name="Changes" comment="">
+    <list default="true" id="802d548a-b8c7-44b7-99e2-b24a0ccbbe39" name="Changes" comment="finish bv7">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/bv10.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/bv10.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp10b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp10b.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
@@ -42,7 +45,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="00bafeeb-c120-4f6c-8850-62d409b5d5bb" name="Changes" comment="finish eliminate" />
+      <changelist id="802d548a-b8c7-44b7-99e2-b24a0ccbbe39" name="Changes" comment="" />
       <created>1680010207783</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -105,7 +108,13 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -131,12 +140,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>262</line>
+          <line>264</line>
           <option name="timeStamp" value="144" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>256</line>
+          <line>258</line>
           <option name="timeStamp" value="319" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -171,33 +180,38 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>21</line>
-          <option name="timeStamp" value="554" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
           <line>20</line>
           <option name="timeStamp" value="557" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>238</line>
+          <line>240</line>
           <option name="timeStamp" value="581" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>235</line>
-          <option name="timeStamp" value="661" />
+          <line>237</line>
+          <option name="timeStamp" value="847" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>188</line>
-          <option name="timeStamp" value="778" />
+          <line>21</line>
+          <option name="timeStamp" value="848" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>236</line>
+          <option name="timeStamp" value="862" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>225</line>
+          <option name="timeStamp" value="881" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>186</line>
-          <option name="timeStamp" value="788" />
+          <line>193</line>
+          <option name="timeStamp" value="884" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -223,49 +237,30 @@
         <watch expression="DAG[16]" />
         <watch expression="mid_map" />
         <watch expression="order" />
-        <watch expression="order" />
-        <watch expression="shapes[4]" />
-        <watch expression="shapes[13]" />
-        <watch expression="shape[8]" />
-        <watch expression="table[9]" />
-        <watch expression="shape[10]" />
-        <watch expression="shape[6]" />
-        <watch expression="shape[9][13]" />
-        <watch expression="shapes[9]" />
-        <watch expression="shape[6]" />
-        <watch expression="shape[5][1]" />
-        <watch expression="shape[10][11]" />
         <watch expression="shape" />
         <watch expression="valid" />
-        <watch expression="shape[20][2]" />
-        <watch expression="shape[26]" />
-        <watch expression="table[25][1]" />
-        <watch expression="shape[28][13]" />
-        <watch expression="shape[29]" />
-        <watch expression="shape[29]" />
         <watch expression="shapes[31]" />
-        <watch expression="shapes[31][9]" />
-        <watch expression="shapes[31][0]" />
-        <watch expression="new_map[12]" />
-        <watch expression="new_map[5]" />
-        <watch expression="new_map" />
-        <watch expression="new_map[4]" />
-        <watch expression="shape[5][0][1]" />
-        <watch expression="shape[12]" />
-        <watch expression="nodes_left" />
-        <watch expression="nodes_left" />
         <watch expression="nodes_left" />
         <watch expression="base" />
         <watch expression="shape[5][0]" />
         <watch expression="p_shape" />
         <watch expression="target" />
         <watch expression="target" />
-        <watch expression="shape[21][0]" />
-        <watch expression="table[2][3]" />
-        <watch expression="shapes[23]" />
-        <watch expression="shapes[21]" />
-        <watch expression="prepre" />
-        <watch expression="gate_index" />
+        <watch expression="shape" />
+        <watch expression="table" />
+        <watch expression="nodes" />
+        <watch expression="placed" />
+        <watch expression="shapes" />
+        <watch expression="ori_map" />
+        <watch expression="ori_map" />
+        <watch expression="new_map" />
+        <watch expression="shape[8][1]" />
+        <watch expression="rows" />
+        <watch expression="shapes[53][17]" />
+        <watch expression="qubit_record" />
+        <watch expression="shape" />
+        <watch expression="table" />
+        <watch expression="newDAG" />
       </configuration>
     </watches-manager>
   </component>

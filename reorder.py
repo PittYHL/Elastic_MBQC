@@ -9,8 +9,9 @@ import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 7
-rows = 18
+qubits = 10
+rows = 30
+force_right = True#force the second c to the right
 physical_gate = []
 tracker= []
 map = []
@@ -19,7 +20,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/bv7b.txt') as f:
+with open('Benchmarks/iqp10b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -221,7 +222,7 @@ while(new_circuit!=[]):
             tracker[t2] = temp
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
 fill_map(qubits,map)
-print(physical_gate[0]["gate"])
+# physical_gate = remove_SW(qubits, physical_gate)
 DAG = dense(qubits, physical_gate)
 dense_map = cons_new_map(qubits,DAG)
 uti0, use0 = cal_utilization2(dense_map, rows)
@@ -234,9 +235,10 @@ de_map = np.array(dense_map)
 #np.savetxt("qft4_sche.csv", sc_map, fmt = '%s',delimiter=",")
 #de_map = np.array(dense_map)
 new_map = new_eliminate_redundant(dense_map, qubits)
-n_map = np.array(new_map)
-# np.savetxt("example/bv7el.csv", n_map, fmt = '%s',delimiter=",")
-DP(new_map, qubits, rows)
+newnew_map = convert_new_map(new_map)
+n_map = np.array(newnew_map)
+# np.savetxt("example/bv10el.csv", n_map, fmt = '%s',delimiter=",")
+DP(new_map, qubits, rows, force_right)
 # n_map = np.array(new_map)
 # np.savetxt("example/bv4el.csv", n_map, fmt = '%s',delimiter=",")
 # new_map = new_eliminate_redundant(map, qubits)

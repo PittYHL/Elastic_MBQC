@@ -78,7 +78,7 @@ def dense(qubits, physical_gate):
     for i in range(len(DAG)):
         count1 = count1 + len(DAG[i])
         count2 = count2 + len(newDAG[i])
-    for i in range(len(newDAG)):
+    for i in reversed(range(len(newDAG))):
         if newDAG[i] == []:
             newDAG.pop(i)
     if count2 != count1:
@@ -219,7 +219,7 @@ def new_eliminate_redundant(map, qubits):
     # prune the Z
     # new_map = prune_Z(new_map)
 
-    row_len = int(len(map[0]) / 4)
+    row_len = int(len(map[0]))
     for i in range(len(new_map)):
         new_map[i] = ['Z'] * row_len + new_map[i] + ['Z'] * row_len
     #update two qubit gate
@@ -466,3 +466,50 @@ def check_start_end(two_qubit_gate):
         ends.append(gate[-1])
     return starts, ends
 
+def remove_SW(qubits, physical_gate):
+    qubits_gate = []
+    for i in range(qubits):
+        qubits_gate.append([])
+    for gate in physical_gate:
+        if gate['type'] == 'S':
+            qubits_gate[gate['t1']].append(gate)
+        else:
+            qubits_gate[gate['t1']].append(gate)
+            qubits_gate[gate['t2']].append(gate)
+    front_SW = 1
+    remove = []
+    while front_SW: #find the removable swap
+        front_SW = 0
+        for i in range(qubits - 1):
+            for gate1 in qubits_gate[i]:
+                if gate1['type'] == 'D':
+                    break
+            for gate2 in qubits_gate[i + 1]:
+                if gate2['type'] == 'D':
+                    break
+            if gate1 == gate2 and gate1['gate'] == 'SW':
+                qubits_gate[i].remove(gate1)
+                qubits_gate[i + 1].remove(gate1)
+                remove.append(gate1)
+                front_SW = 1
+    new_physical_gate = copy.deepcopy(physical_gate)
+    while remove != []:
+        gate = remove.pop(0)
+        index = new_physical_gate.index(gate)
+        t1 = gate['t1']
+        t2 = gate['t2']
+        for i in range(index):
+            if new_physical_gate[i]['type'] == 'S' and new_physical_gate[i]['t1'] == t1:
+                new_physical_gate[i]['t1'] = t2
+            elif new_physical_gate[i]['type'] == 'S' and new_physical_gate[i]['t1'] == t2:
+                new_physical_gate[i]['t1'] = t1
+        new_physical_gate.remove(gate)
+    return new_physical_gate
+
+def convert_new_map(new_map):
+    newnew_map = copy.deepcopy(new_map)
+    for i in range(len(newnew_map)):
+        for j in range(len(newnew_map[i])):
+            if newnew_map[i][j] == 'Z':
+                newnew_map[i][j] = ''
+    return newnew_map

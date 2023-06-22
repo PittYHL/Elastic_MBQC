@@ -4,9 +4,9 @@ from matplotlib import pyplot as plt
 from placement import  *
 
 la_win = 1
-keep = 3
-long = 3
-def DP(ori_map, qubits, rows):
+keep = 4
+long = 4
+def DP(ori_map, qubits, rows, force_right):
     new_map = []
     for row in ori_map:
         new_map.append([])
@@ -18,7 +18,7 @@ def DP(ori_map, qubits, rows):
             else:
                 new_map[-1].append(0)
     graph, nodes, W_len, first, last, A_loc, B_loc, C_loc = gen_index(new_map)
-    table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc)
+    table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right)
     print('g')
 
 def gen_index(map):
@@ -139,7 +139,7 @@ def check_next_0(map, i, start):
     while(map[i][index] != 0):
         index = index + 1
     return index - start
-def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
+def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right):
     qubits = len(nodes)
     order = list(nx.topological_sort(graph))
     placed = []
@@ -149,6 +149,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
     valid = [] #for chosen patterns
     c_layer = [] #record the current layer
     two_wire = [] #record the node with two wire predecessors
+    qubit_record = []
     current_row = 3
     current_d = 0
     for i in range(len(order)):
@@ -161,6 +162,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
     gate, _ = current.split('.')
     temp_shape = []
     succ = list(graph.successors(current))
+    qubit_record = get_qubit_record(current, nodes, qubit_record)
     if gate == 'A':
         dep = 1
         temp_shape.append([1])
@@ -179,6 +181,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
     valid[0].append(0)
     previous = current
     i = 0
+    only_right = [] #record the C that only can go right (if previous two-qubit gate and later are on the same qubits)
     while nodes_left != []:
         #current version, the wires are added at the end
         next = choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire) #chose the next
@@ -186,7 +189,10 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc):
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire) #place the next node
+        if next == 'B.3':
+            print('g')
+        next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record) #place the next node
+        qubit_record = get_qubit_record(next, nodes, qubit_record)
         i = i + 1
         for j in next_list:
             nodes_left.remove(j)
@@ -259,7 +265,7 @@ def check_loc(nodes, placed, next, graph, two_wire):
         loc = 'd'
     return loc
 
-def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire):
+def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record):
     next_list = [next]
     c_gate, gate_index = next.split('.')
     parents = [] #record parents
@@ -272,6 +278,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
     old_preds = [] #for the old predecessors
     not_placed_preds = [] #for current unplaced predecessors
     end = 0
+    b_end = 0
     not_placed = False #check if there is wire for the previous
     n_preds = list(graph.predecessors(next))
     for pred in n_preds:
@@ -280,42 +287,27 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
             not_placed_preds.append(pred)
     if (c_gate == 'A' or c_gate == 'B') and len(new_sucessors) == 1:
         end = detec_end(next, new_sucessors[0], nodes)
+        if force_right:#detect end point for forward
+            p_gate1, _ = new_sucessors[0].split('.')
+            if p_gate1 == 'C':
+                only_right = detect_only_right(next, graph, only_right, force_right)
+    if (c_gate == 'A' or c_gate == 'B') and len(new_sucessors) == 2: #detect only right(all second C will be forward)
+        p_gate1, _ = new_sucessors[0].split('.')
+        p_gate2, _ = new_sucessors[1].split('.')
+        if p_gate1 == 'C' or p_gate2 == 'C':
+            only_right = detect_only_right(next, graph, only_right, force_right)
+    if (c_gate == 'A' or c_gate == 'B') and len(n_preds) == 1: #detect end point for forward
+        b_end = detec_end_b(next, new_sucessors[0], nodes)
     parent = copy.deepcopy(table[p_index][0])
     successors = parent['successor']
     preds = parent['preds']
-    succs = list(graph.successors(next))  # need to change it, change to based on row number
-    if next in two_wire and loc == 'd':
-        for succ in succs:
-            if succ in placed and loc == 'd':
-                next_succs = list(graph.successors(succ))
-                if len(next_succs) == 2:
-                    index1 = successors.index(next_succs[0]) #choose the deeper one
-                    index2 = successors.index(next_succs[1])
-                    c_index = max(index2, index1) + 1
-                    break
-                elif len(next_succs) == 1 and next_succs[0] in successors:
-                    c_index = successors.index(next_succs[0]) + 1
-                    break
-                elif next_succs == [] or next_succs[0] not in successors:
-                    c_index = len(successors)
-            elif succ in placed and loc == 'u':
-                if len(next_succs) == 2:
-                    index1 = successors.index(next_succs[0])  # choose the deeper one
-                    index2 = successors.index(next_succs[1])
-                    c_index = min(index2, index1)
-                    break
-                elif len(next_succs) == 1 and next_succs[0] in successors:
-                    c_index = successors.index(next_succs[0])
-                    break
-                elif next_succs == [] or next_succs[0] not in successors:
-                    c_index = 0
-    elif not_placed_preds != n_preds:
+    if not_placed_preds != n_preds:
         c_index = successors.index(next)  # remove the next node from the table
         successors.pop(c_index)
     nextnext = 0
     prepre = 0
     if c_gate != 'W':
-        for succ in reversed(new_sucessors):
+        for succ in new_sucessors:
             if succ in successors:
                 nextnext = succ
             if succ not in placed:
@@ -328,6 +320,11 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         parent_node = valid[p_index]
     elif c_gate == 'W' or nextnext != 0 or prepre != 0: #three cases: fill wire and fill the nextnext
         parent_node = list(range(len(shape[p_index])))
+    if c_gate == 'C' and next in only_right:  # check if only right
+        right = 1
+        only_right.remove(next)
+    else:
+        right = 0
     for j in parent_node: #iterate all the feasible node of the parents and create new table
         parent = copy.deepcopy(table[p_index][j])
         front = parent['front']
@@ -338,16 +335,17 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         preds = parent['preds']  # recording the current preds
         if next not in two_wire and not_placed_preds != n_preds: #forward
             base = front.pop(c_index) #start base
-            if c_gate == 'C':
-                shapes, fronts, spaces, new, wire_targets = place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit, wire_target, wire_targets)
+            next_qubit = get_next_qubit(nodes, next)
+            if c_gate == 'C': #check if only right
+                shapes, fronts, spaces, new, wire_targets = place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, qubits - c_qubit, wire_target, wire_targets, right, next_qubit, qubit_record)
             elif c_gate == 'A':
                 shapes, fronts, spaces, new, wire_targets = place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
-                qubits - c_qubit, new_sucessors, end, not_placed, wire_targets, wire_target)
+                qubits - c_qubit, new_sucessors, end, not_placed, wire_targets, wire_target, next_qubit, qubit_record)
             elif c_gate == 'B':
                 shapes, fronts, spaces, new, wire_targets = place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
-                qubits - c_qubit, new_sucessors, end, not_placed, wire_targets, wire_target)
+                qubits - c_qubit, new_sucessors, end, not_placed, wire_targets, wire_target, next_qubit, qubit_record)
             elif c_gate == 'W':
-                wire_len = W_len[int(gate_index)]
+                wire_len = W_len[int(gate_index)] + 1 #for the special combination gate
                 t_index = preds.index(next)
                 preds.remove(next)
                 target = wire_target.pop(t_index)
@@ -361,11 +359,11 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
             if c_gate == 'A':
                 shapes, fronts, spaces, new, wire_targets = reversed_place_A(p_shape, base, loc, rows, p_row, front,
                                                                     shapes, fronts, spaces, qubits - c_qubit,
-                                                                    new_sucessors, wire_targets, wire_target)
+                                                                    new_sucessors, wire_targets, wire_target, b_end)
             elif c_gate == 'B':
                 shapes, fronts, spaces, new, wire_targets = reversed_place_B(p_shape, base, loc, rows, p_row, front,
                                                                     shapes, fronts, spaces, qubits - c_qubit,
-                                                                    new_sucessors, wire_targets, wire_target)
+                                                                    new_sucessors, wire_targets, wire_target, b_end)
             elif c_gate == 'C':
                 shapes, fronts, spaces, new, wire_targets = reversed_place_C(p_shape, base, loc, rows,
                                                                                                p_row, front,
@@ -375,35 +373,44 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
                                                                                                wire_target)
         for i in range(new):
             parents.append([p_index, j])
-            new_preds.append(preds + not_placed_preds)
 
     same_qubit = 0
+    new_preds = preds + not_placed_preds
     while nextnext != 0:
         next = nextnext
         newnew_sucessors = list(graph.successors(nextnext))
         shapes, fronts, spaces, successors, nextnext, parents, same_qubit, wire_targets = fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents,
             nodes, same_qubit, wire_targets)
+        if len(newnew_sucessors) == 1 and force_right:  # detect end point for forward
+            p_gate1, _ = newnew_sucessors[0].split('.')
+            if p_gate1 == 'C':
+                only_right = detect_only_right(next, graph, only_right, force_right)
+        if len(newnew_sucessors) == 2:  # detect only right(all second C will be forward)
+            p_gate1, _ = newnew_sucessors[0].split('.')
+            p_gate2, _ = newnew_sucessors[1].split('.')
+            if p_gate1 == 'C' or p_gate2 == 'C':
+                only_right = detect_only_right(next, graph, only_right, force_right)
         next_list.append(next)
     while prepre != 0:
         next = prepre
         newnew_preds = list(graph.predecessors(prepre))
-        shapes, fronts, spaces, successors, prepre, parents, same_qubit, wire_targets, old_wire_targets = fill_prepre(
-            shapes, fronts, spaces, wire_pred, not_placed_preds, prepre, newnew_preds, parents,
-            nodes, same_qubit, wire_targets, old_wire_targets)
+        shapes, fronts, spaces, new_preds, prepre, parents, same_qubit, wire_targets = fill_prepre(
+            shapes, fronts, spaces, new_preds, not_placed_preds, prepre, newnew_preds, parents,
+            nodes, same_qubit, wire_targets)
         next_list.append(next)
-    update(next, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, rows, wire_targets, new_preds)
+    update(next, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, rows, wire_targets, new_preds, qubits)
     return next_list
 
-def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, row_limit, wire_targets, new_preds):
+def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, valid, successors, p_index, row_limit, wire_targets, new_preds, qubits):
     rows = []
     depths = []
     for i in range(len(shapes)):
         rows.append(len(shapes[i]))
         depths.append(len(shapes[i][0]))
         table[p_index + 1].append({'New': current, 'P': parents[i], 'row': len(shapes[i]), 'S': spaces[i], 'D': depths[i], 'Q': c_qubit,
-        'front': fronts[i], 'successor': successors, 'targets':wire_targets[i], 'preds': new_preds[i]})
+        'front': fronts[i], 'successor': successors, 'targets':wire_targets[i], 'preds': new_preds})
         shape[p_index + 1].append(shapes[i])
-    new_valid = check_valid(rows, depths, spaces, row_limit)
+    new_valid = check_valid(rows, depths, spaces, row_limit, c_qubit, qubits)
     valid[p_index + 1] = new_valid
 
 def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire):
@@ -427,12 +434,14 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
                 if pred in placed:
                     index = placed.index(pred)
                     pred_placed.append(pred)
-                elif pred not in placed and gate1 != 'W' and pred not in two_wire: #if one of the predecessor is wire
+                elif pred not in placed and gate1 != 'W': #if one of the predecessor is wire
                     solved = 0
                 elif gate1 == 'W':
                     wires = wires + 1
                 if pred in placed and p_index > index:
                     p_index = index
+            if len(before) == 2 and pred_placed != [] and (before[0] in two_wire or before[1] in two_wire): #for two wire
+                solved = 1
             if len(pred_placed) == 1 and len(before) == 2:
                 only_one.append(node)
             elif len(pred_placed) == 0 and gate != 'W':#if none of the predecessors have been placed, look for succesor
@@ -484,7 +493,7 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
         elif only_one != []: # cannot find node with both predecessors resolved or wires or
             next_node = only_one[-1]
         elif succ_placed != []:
-            next_node = succ_placed[-1]
+            next_node = succ_placed[0]
     return next_node
 
 def find_qubits(nodes, placed, next):
@@ -505,7 +514,7 @@ def update_layer(c_layer, f_layer, next, graph):
         if element not in f_layer:
             f_layer.append(element)
 
-def check_valid(rows, depths, spaces, row_limit):
+def check_valid(rows, depths, spaces, row_limit, c_qubit, qubits):
     row_collect = copy.deepcopy(rows)
     row_collect = list(set(row_collect))
     row_collect.sort() #row collection
@@ -518,7 +527,9 @@ def check_valid(rows, depths, spaces, row_limit):
         row_index.append(index)
         row_collect_num[index].append(i)
     for i in range(len(row_collect_num)):
-        if row_collect[i] == row_limit:
+        # if row_collect[i] == row_limit:
+        #     keep_more = 2 * keep
+        if c_qubit == qubits:
             keep_more = 2 * keep
         else:
             keep_more = keep
@@ -583,37 +594,47 @@ def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors
         shapes, fronts, spaces, valid = fill_A(shapes, fronts, spaces, locs, same_qubit)
     elif gate == 'B':
         shapes, fronts, spaces, valid = fill_B(shapes, fronts, spaces, locs, same_qubit)
-    same_qubit = 0
+    same_qubit = 0 #if the next two-qubit gate has the same qubits
     if len(newnew_sucessors) == 1: #remove one front
         first_qubit = 0
         second_qubit = 0
+        gate, _ = newnew_sucessors[0].split('.')
         for i in range(len(nodes)):
             if nextnext in nodes[i]:
                 first_qubit = first_qubit + i
             if newnew_sucessors[0] in nodes[i]:
                 second_qubit = second_qubit + i
-        if second_qubit - first_qubit > 0:
-            for front in fronts:
-                front.pop(locs[0])
-        elif second_qubit - first_qubit < 0:
-            for front in fronts:
-                front.pop(locs[1])
+        if gate == 'A' or gate == 'B':
+            if second_qubit - first_qubit > 0:
+                for front in fronts:
+                    front.pop(-2)
+            elif second_qubit - first_qubit < 0:
+                for front in fronts:
+                    front.pop(-1)
+            else:
+                same_qubit = 1
         else:
-            same_qubit = 1
+            if first_qubit == second_qubit * 2 + 1:
+                for front in fronts:
+                    front.pop(-1)
+            else:
+                for front in fronts:
+                    front.pop(-2)
+
     elif len(newnew_sucessors) == 0:
         for front in fronts:
-            front.pop(locs[0])
-            front.pop(locs[0])
+            front.pop(-1)
+            front.pop(-1)
     successors.remove(nextnext)
     successors.remove(nextnext)
     nextnext = 0
-    for succ in reversed(newnew_sucessors):
+    for succ in newnew_sucessors:
         if succ in successors:
             nextnext = succ
         elif same_qubit:
             nextnext = succ
-            successors.insert(locs[0], succ)
-        successors.insert(locs[0], succ)
+            successors.append(succ)
+        successors.append(succ)
     for index in valid:
         new_parents.append(parents[index])
         if wire_targets != []:
@@ -630,10 +651,16 @@ def fill_A(shapes, fronts, spaces, locs, same_qubit):
         front = fronts[i]
         first_base = front[locs[0]]
         second_base = front[locs[1]]
+        if first_base[0] > second_base[0]:
+            temp = first_base
+            first_base = second_base
+            second_base = temp
         if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]:  # rr
             if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit:  # constraints for rr
                 valid.append(i)
-                extra_column = first_base[1] + 2 - len(shape[0])
+                extra_column = 0
+                if first_base[1] == len(shape[0]) - 1:
+                    extra_column = 1
                 for j in range(len(shape)):
                     shape[j] = shape[j] + [0] * extra_column
                 shape[first_base[0]][first_base[1] + 1] = 1
@@ -642,31 +669,28 @@ def fill_A(shapes, fronts, spaces, locs, same_qubit):
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
-                front[locs[0]][1] = front[locs[0]][1] + 1
-                front[locs[1]][1] = front[locs[1]][1] + 1
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0], first_base[1] + 1])
+                front.append([second_base[0], second_base[1] + 1])
                 new_fronts.append(front)
         elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]:  # ru
             if shapes[i][first_base[0] + 1][first_base[1]] == 0:  # constraints for ru
                 valid.append(i)
-                extra_column = first_base[1] + 2 - len(shape[0])
-                for j in range(len(shape)):
-                    shape[j] = shape[j] + [0] * extra_column
                 shape[first_base[0]][first_base[1] + 1] = 1
                 shape[first_base[0] + 1][first_base[1] + 1] = 1
                 shape[first_base[0] + 2][first_base[1] + 1] = 1
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
-                #front[locs[0]][1] = front[locs[0]][1] + 1
-                front[locs[1]][0] = front[locs[1]][0] - 1
-                #front[locs[1]][1] = front[locs[1]][1] + 1
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0], first_base[1] + 1])
+                front.append([second_base[0] - 1, second_base[1]])
                 new_fronts.append(front)
         elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]:  # dr
             if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
                 valid.append(i)
-                # extra_column = first_base[1] + 1 - len(shape[0])
-                # for j in range(len(shape)):
-                #     shape[j] = shape[j] + [0] * extra_column
                 shape[first_base[0] + 1][first_base[1]] = 1
                 shape[first_base[0] + 2][first_base[1]] = 1
                 shape[first_base[0] + 3][first_base[1]] = 1
@@ -674,25 +698,24 @@ def fill_A(shapes, fronts, spaces, locs, same_qubit):
                 new_shapes.append(shape)
                 new_Spaces.append(space)
                 #front[locs[0]][1] = front[locs[0]][1] + 1
-                front[locs[0]][0] = front[locs[0]][0] + 1
-                #front[locs[1]][1] = front[locs[1]][1] + 2
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0] + 1, first_base[1]])
+                front.append([second_base[0], second_base[1] + 1])
                 new_fronts.append(front)
         elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]:  # du
             if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
                 valid.append(i)
-                # extra_column = first_base[1] + 2 - len(shape[0])
-                # for j in range(len(shape)):
-                #     shape[j] = shape[j] + [0] * extra_column
                 shape[first_base[0] + 1][first_base[1]] = 1
                 shape[first_base[0] + 2][first_base[1]] = 1
                 shape[first_base[0] + 3][first_base[1]:] = 1
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
-                # front[locs[0]][1] = front[locs[0]][1] + 1
-                front[locs[0]][0] = front[locs[0]][0] + 1
-                # front[locs[1]][1] = front[locs[1]][1] + 1
-                front[locs[1]][0] = front[locs[1]][0] - 1
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0] + 1, first_base[1] + 1])
+                front.append([second_base[0] - 1, second_base[1] + 1])
                 new_fronts.append(front)
     return new_shapes, new_fronts, new_Spaces, valid
 
@@ -706,6 +729,10 @@ def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more case
         front = fronts[i]
         first_base = front[locs[0]]
         second_base = front[locs[1]]
+        if first_base[0] > second_base[0]:
+            temp = first_base
+            first_base = second_base
+            second_base = temp
         if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]: #rr
             if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit: #constraints for rr
                 valid.append(i)
@@ -718,8 +745,10 @@ def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more case
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
-                front[locs[0]][1] = front[locs[0]][1] + 2
-                front[locs[1]][1] = front[locs[1]][1] + 2
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0], first_base[1] + 2])
+                front.append([second_base[0], second_base[1] + 2])
                 new_fronts.append(front)
         elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]: #ru
             if shapes[i][first_base[0] + 1][first_base[1]] == 0: #constraints for ru
@@ -733,9 +762,10 @@ def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more case
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
-                front[locs[0]][1] = front[locs[0]][1] + 2
-                front[locs[1]][0] = front[locs[1]][0] - 1
-                front[locs[1]][1] = front[locs[1]][1] + 1
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0], first_base[1] + 2])
+                front.append([second_base[0] - 1, second_base[1] + 1])
                 new_fronts.append(front)
         elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]: #dr
             if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0: #constraints for ru
@@ -749,9 +779,10 @@ def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more case
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
-                front[locs[0]][1] = front[locs[0]][1] + 1
-                front[locs[0]][0] = front[locs[0]][0] + 1
-                front[locs[1]][1] = front[locs[1]][1] + 2
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0] + 1, first_base[1] + 1])
+                front.append([second_base[0], second_base[1] + 2])
                 new_fronts.append(front)
         elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]: #du
             if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0: #constraints for ru
@@ -765,27 +796,26 @@ def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more case
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
-                front[locs[0]][1] = front[locs[0]][1] + 1
-                front[locs[0]][0] = front[locs[0]][0] + 1
-                front[locs[1]][1] = front[locs[1]][1] + 1
-                front[locs[1]][0] = front[locs[1]][0] - 1
+                front.pop(max(locs))
+                front.pop(min(locs))
+                front.append([first_base[0] + 1, first_base[1] + 1])
+                front.append([second_base[0] - 1, second_base[1] + 1])
                 new_fronts.append(front)
     return new_shapes, new_fronts, new_Spaces, valid
 
-def fill_prepre(shapes, fronts, spaces, wire_pred, not_placed_preds, prepre, newnew_preds, parents,
-            nodes, same_qubit, wire_targets, old_wire_targets):
+def fill_prepre(shapes, fronts, spaces, new_preds, not_placed_preds, prepre, newnew_preds, parents,
+            nodes, same_qubit, wire_targets):
     locs = []
     new_parents = []
     new_wire_target = []
-    new_old_wire_target = []
+    new_fronts = []
     gate, _ = prepre.split('.')
     # same_qubit = 0 #found node on the same qbits
-    preds = wire_pred + not_placed_preds
-    for i in range(len(preds)):
-        if preds[i] == prepre:
+    for i in range(len(new_preds)):
+        if new_preds[i] == prepre:
             locs.append(i)
     if gate == 'A':
-        shapes, fronts, spaces, valid = fill_A_P(shapes, wire_targets, old_wire_targets, locs, same_qubit)
+        shapes, fronts, spaces, valid, wire_targets = fill_A_P(shapes, fronts, wire_targets, locs, same_qubit)
     # elif gate == 'B':
     #     shapes, fronts, spaces, valid = fill_B(shapes, fronts, spaces, locs, same_qubit)
     same_qubit = 0
@@ -798,109 +828,117 @@ def fill_prepre(shapes, fronts, spaces, wire_pred, not_placed_preds, prepre, new
             if newnew_preds[0] in nodes[i]:
                 second_qubit = second_qubit + i
         if second_qubit - first_qubit > 0:
-            for front in fronts:
+            for front in wire_targets:
                 front.pop(locs[0])
         elif second_qubit - first_qubit < 0:
-            for front in fronts:
+            for front in wire_targets:
                 front.pop(locs[1])
         else:
             same_qubit = 1
     elif len(newnew_preds) == 0:
-        for front in fronts:
+        for front in wire_targets:
             front.pop(locs[0])
             front.pop(locs[0])
-    wire_pred.remove(prepre)
-    wire_pred.remove(prepre)
-    nextnext = 0
+    new_preds.remove(prepre)
+    new_preds.remove(prepre)
+    prepre = 0
     for succ in reversed(newnew_preds):
-        if succ in wire_pred:
-            nextnext = succ
+        if succ in new_preds:
+            prepre = succ
         elif same_qubit:
-            nextnext = succ
-            wire_pred.insert(locs[0], succ)
-        wire_pred.insert(locs[0], succ)
+            prepre = succ
+            new_preds.append(succ)
+        new_preds.append(succ)
     for index in valid:
         new_parents.append(parents[index])
-        if wire_targets != []:
-            new_wire_target.append(wire_targets[index])
-            new_old_wire_target.append(old_wire_targets[index])
-    return shapes, fronts, spaces, wire_pred, nextnext, new_parents, same_qubit, new_wire_target, new_old_wire_target
+    return shapes, fronts, spaces, new_preds, prepre, new_parents, same_qubit, wire_targets
 
-# def fill_A_P(shapes, wire_targets, old_wire_targets, locs, same_qubit):
-#     valid = []  # valid shpae after fill A
-#     new_shapes = []
-#     new_Spaces = []
-#     new_preds = []
-#     for i in range(len(shapes)):
-#         shape = shapes[i]
-#         pred = wire_pred[i]
-#         first_base = pred[locs[0]]
-#         second_base = pred[locs[1]]
-#         if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]:  # rr
-#             if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit:  # constraints for rr
-#                 valid.append(i)
-#                 extra_column = first_base[1] + 2 - len(shape[0])
-#                 for j in range(len(shape)):
-#                     shape[j] = shape[j] + [0] * extra_column
-#                 shape[first_base[0]][first_base[1] + 1] = 1
-#                 shape[first_base[0] + 1][first_base[1] + 1] = 1
-#                 shape[first_base[0] + 2][first_base[1] + 1] = 1
-#                 shape, space = fill_shape(shape)
-#                 new_shapes.append(shape)
-#                 new_Spaces.append(space)
-#                 front[locs[0]][1] = front[locs[0]][1] + 1
-#                 front[locs[1]][1] = front[locs[1]][1] + 1
-#                 new_fronts.append(front)
-#         elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]:  # ru
-#             if shapes[i][first_base[0] + 1][first_base[1]] == 0:  # constraints for ru
-#                 valid.append(i)
-#                 extra_column = first_base[1] + 2 - len(shape[0])
-#                 for j in range(len(shape)):
-#                     shape[j] = shape[j] + [0] * extra_column
-#                 shape[first_base[0]][first_base[1] + 1] = 1
-#                 shape[first_base[0] + 1][first_base[1] + 1] = 1
-#                 shape[first_base[0] + 2][first_base[1] + 1] = 1
-#                 shape, space = fill_shape(shape)
-#                 new_shapes.append(shape)
-#                 new_Spaces.append(space)
-#                 #front[locs[0]][1] = front[locs[0]][1] + 1
-#                 front[locs[1]][0] = front[locs[1]][0] - 1
-#                 #front[locs[1]][1] = front[locs[1]][1] + 1
-#                 new_fronts.append(front)
-#         elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]:  # dr
-#             if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
-#                 valid.append(i)
-#                 # extra_column = first_base[1] + 1 - len(shape[0])
-#                 # for j in range(len(shape)):
-#                 #     shape[j] = shape[j] + [0] * extra_column
-#                 shape[first_base[0] + 1][first_base[1]] = 1
-#                 shape[first_base[0] + 2][first_base[1]] = 1
-#                 shape[first_base[0] + 3][first_base[1]] = 1
-#                 shape, space = fill_shape(shape)
-#                 new_shapes.append(shape)
-#                 new_Spaces.append(space)
-#                 #front[locs[0]][1] = front[locs[0]][1] + 1
-#                 front[locs[0]][0] = front[locs[0]][0] + 1
-#                 #front[locs[1]][1] = front[locs[1]][1] + 2
-#                 new_fronts.append(front)
-#         elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]:  # du
-#             if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
-#                 valid.append(i)
-#                 # extra_column = first_base[1] + 2 - len(shape[0])
-#                 # for j in range(len(shape)):
-#                 #     shape[j] = shape[j] + [0] * extra_column
-#                 shape[first_base[0] + 1][first_base[1]] = 1
-#                 shape[first_base[0] + 2][first_base[1]] = 1
-#                 shape[first_base[0] + 3][first_base[1]:] = 1
-#                 shape, space = fill_shape(shape)
-#                 new_shapes.append(shape)
-#                 new_Spaces.append(space)
-#                 # front[locs[0]][1] = front[locs[0]][1] + 1
-#                 front[locs[0]][0] = front[locs[0]][0] + 1
-#                 # front[locs[1]][1] = front[locs[1]][1] + 1
-#                 front[locs[1]][0] = front[locs[1]][0] - 1
-#                 new_fronts.append(front)
-#     return new_shapes, new_fronts, new_Spaces, valid
+def fill_A_P(shapes, fronts, wire_targets, locs, same_qubit):
+    valid = []  # valid shpae after fill A
+    new_shapes = []
+    new_Spaces = []
+    new_preds = []
+    new_fronts = []
+    for i in range(len(shapes)):
+        shape = shapes[i]
+        front = fronts[i]
+        pred = wire_targets[i]
+        first_base = pred[locs[0]]
+        second_base = pred[locs[1]]
+        if first_base[0] > second_base[0]:
+            temp = first_base
+            first_base = second_base
+            second_base = temp
+        if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]:  # ll
+            if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit:  # constraints for rr
+                valid.append(i)
+                if first_base[1] == 0:
+                    extra_column = 1
+                else:
+                    extra_column = 0
+                for j in range(len(shape)):
+                    shape[j] = [0] * extra_column + shape[j]
+                if extra_column == 0:
+                    shape[first_base[0]][first_base[1] - 1] = 1
+                    shape[first_base[0] + 1][first_base[1] - 1] = 1
+                    shape[first_base[0] + 2][first_base[1] - 1] = 1
+                else:
+                    for element in pred:
+                        element[1] = element[1] + extra_column
+                    for element in front:
+                        element[1] = element[1] + extra_column
+                    pred[locs[0]][1] = pred[locs[0]][1] - 1 #change the locs of pre
+                    pred[locs[1]][1] = pred[locs[1]][1] - 1
+                    shape[first_base[0]][first_base[1]] = 1
+                    shape[first_base[0] + 1][first_base[1]] = 1
+                    shape[first_base[0] + 2][first_base[1]] = 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                new_fronts.append(front)
+                new_preds.append(pred)
+        elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]:  # lu
+            if shapes[i][first_base[0] + 1][first_base[1]] == 0:  # constraints for ru
+                valid.append(i)
+                for j in range(len(shape)):
+                    shape[j] = [0] * extra_column + shape[j]
+                shape[first_base[0]][first_base[1] - 1] = 1
+                shape[first_base[0] + 1][first_base[1] - 1] = 1
+                shape[first_base[0] + 2][first_base[1] - 1] = 1
+                pred[locs[0]][1] = pred[locs[0]][1] - 1  # change the locs of pre
+                pred[locs[1]][0] = pred[locs[1]][0] - 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                new_preds.append(pred)
+                new_fronts.append(front)
+        elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]:  # dl
+            if shapes[i][first_base[0] + 2][first_base[1] + 1] == 0:  # constraints for ru
+                valid.append(i)
+                shape[first_base[0] + 1][first_base[1]] = 1
+                shape[first_base[0] + 2][first_base[1]] = 1
+                shape[first_base[0] + 3][first_base[1]] = 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                pred[locs[0]][0] = pred[locs[0]][0] + 1
+                pred[locs[1]][1] = pred[locs[1]][1] - 1
+                new_fronts.append(front)
+                new_preds.append(pred)
+        elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]:  # du
+            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
+                valid.append(i)
+                shape[first_base[0] + 1][first_base[1]] = 1
+                shape[first_base[0] + 2][first_base[1]] = 1
+                shape[first_base[0] + 3][first_base[1]:] = 1
+                shape, space = fill_shape(shape)
+                new_shapes.append(shape)
+                new_Spaces.append(space)
+                pred[locs[0]][0] = pred[locs[0]][0] + 1
+                pred[locs[1]][0] = pred[locs[1]][0] - 1
+                new_fronts.append(front)
+                new_preds.append(pred)
+    return new_shapes, new_fronts, new_Spaces, valid, new_preds
 
 def detec_end(next, succ, nodes):
     first_qubit = 0
@@ -922,6 +960,66 @@ def detec_end(next, succ, nodes):
         else:
             end = 'u'
     return end
+
+def detec_end_b(next, pred, nodes):
+    first_qubit = 0
+    second_qubit = 0
+    gate, _ = pred.split('.')
+    for i in range(len(nodes)):
+        if next in nodes[i]:
+            first_qubit = first_qubit + i
+        if pred in nodes[i]:
+            second_qubit = second_qubit + i
+    if gate == 'A' or gate == 'B':
+        if second_qubit - first_qubit < 0:
+            end = 'd'
+        elif second_qubit - first_qubit > 0:
+            end = 'u'
+    else:
+        if first_qubit == second_qubit * 2 + 1:
+            end = 'd'
+        else:
+            end = 'u'
+    return end
+def detect_only_right(next, graph, only_right, force_right):
+    sucessors = list(graph.successors(next))
+    if len(sucessors) == 2:
+        s1 = list(graph.successors(sucessors[0]))[0]
+        s2 = list(graph.successors(sucessors[1]))[0]
+        gs1, _ = s1.split('.')
+        if s1 == s2 and (gs1 == 'B' or gs1 == 'C'):
+            only_right.append(sucessors[0])
+            only_right.append(sucessors[1])
+    s1 = sucessors[0]
+    gs1, _ = s1.split('.')
+    while gs1 == 'C':
+        s1 = list(graph.successors(s1))[0]
+        gs1, _ = s1.split('.')
+        if gs1 == 'C' and force_right:
+            only_right.append(s1)
+    if len(sucessors) == 2:
+        s2 = sucessors[1]
+        gs2, _ = s2.split('.')
+        while gs2 == 'C':
+            s2 = list(graph.successors(s2))[0]
+            gs2, _ = s2.split('.')
+            if gs2 == 'C' and force_right:
+                only_right.append(s2)
+    return only_right
+
+def get_qubit_record(current, nodes, qubit_record):
+    for i in range(len(nodes)):
+        if current in nodes[i]:
+            if i + 1 not in qubit_record:
+                qubit_record.append(i + 1)
+    return qubit_record
+
+def get_next_qubit(nodes, next):
+    c_qubit = []
+    for i in range(len(nodes)):
+        if next in nodes[i]:
+            c_qubit.append(i + 1)
+    return c_qubit
 
 # rows = [2,3,4,5]
 # c_depths = [5,4,4,3]

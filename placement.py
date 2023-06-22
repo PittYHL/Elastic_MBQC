@@ -1,7 +1,7 @@
 from DP import *
 import copy
 import math
-def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extra_qubits, wire_target, wire_targets): #place single node
+def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extra_qubits, wire_target, wire_targets, right, next_qubit, qubit_record): #place single node
     new = 0 #how many new node
     new_shape1 = copy.deepcopy(p_shape)
     new_shape2 = copy.deepcopy(p_shape)
@@ -11,6 +11,7 @@ def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     new_front3 = copy.deepcopy(front)
     new_wire_target1 = copy.deepcopy(wire_target)
     new_wire_target2 = copy.deepcopy(wire_target)
+    up_qubits, down_qubit, old_qubit = get_old_qubit(qubit_record, next_qubit, extra_qubits, loc)
     # for front
     if base[1] == len(p_shape[0]) - 1:
         new_shape1[base[0]].append(1)
@@ -25,7 +26,7 @@ def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     new_front1.append([base[0], base[1] + 1])
     fronts.append(new_front1)
     wire_targets.append(new_wire_target1)
-    if loc == 'u' or loc == 'r': #up
+    if (loc == 'u' or loc == 'r') and right == 0: #up
         placed = 0
         if base[0] == 0 and p_row + 1 + extra_qubits * 2<= rows:
             new = new + 1
@@ -38,7 +39,7 @@ def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             for element in new_wire_target2:  # change exsisting element
                 element[0] = element[0] + 1
             new_front2.append([base[0], base[1]])
-        elif feasible_placement(base, [base[0] - 1, base[1]], p_shape, 'C'):
+        elif feasible_placement(base, [base[0] - 1, base[1]], p_shape, 'C') and base[0] - 1 >= up_qubits * 2:
             new = new + 1
             placed = 1
             new_shape2[base[0] - 1][base[1]] = 1
@@ -49,7 +50,7 @@ def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             shapes.append(new_shape2)
             fronts.append(new_front2)
             wire_targets.append(new_wire_target2)
-    if loc == 'd' or loc == 'r': #down
+    if (loc == 'd' or loc == 'r') and right == 0: #down
         placed = 0
         if base[0] == len(p_shape) - 1 and p_row + 1 + extra_qubits * 2 <= rows:
             new = new + 1
@@ -58,7 +59,7 @@ def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             new_shape3.append(new_row)
             new_shape3[base[0] + 1][base[1]] = 1
             new_front3.append([base[0] + 1, base[1]])
-        elif base[0] != len(p_shape) - 1 and feasible_placement(base, [base[0] + 1, base[1]], p_shape, 'C'):
+        elif base[0] != len(p_shape) - 1 and feasible_placement(base, [base[0] + 1, base[1]], p_shape, 'C') and len(p_shape) - base[0] - 2 >= down_qubit * 2:
             new = new + 1
             placed = 1
             new_shape3[base[0] + 1][base[1]] = 1
@@ -72,12 +73,13 @@ def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     return shapes, fronts, spaces, new, wire_targets
 
 def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extra_qubits,
-            new_sucessors, end, wire_not_placed, wire_targets, wire_target): #place B node
+            new_sucessors, end, wire_not_placed, wire_targets, wire_target, next_qubit, qubit_record): #place B node
     #current
     new = 0 #how many new node
     num_succ = len(new_sucessors)
+    up_qubits, down_qubit, old_qubit = get_old_qubit(qubit_record, next_qubit, extra_qubits, loc)
     if loc == 'u':
-        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or (base[0] >= 2): # place the one to the right
+        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or (base[0] >= 2 and base[0] - 2 >= up_qubits * 2): # place the one to the right
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -109,15 +111,15 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             for element in new_wire_target1:
                 element[0] = element[0] + extra_row
             if base[0] < 2:
-                new_front.append([base[0] + extra_row, base[1] + 2])  # add two base
                 new_front.append([0, base[1] + 2])
+                new_front.append([base[0] + extra_row, base[1] + 2])  # add two base
             else:
-                new_front.append([base[0], base[1] + 2])  # add two base
                 new_front.append([base[0] - 2, base[1] + 2])
+                new_front.append([base[0], base[1] + 2])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -131,7 +133,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             wire_targets.append(new_wire_target1)
             spaces.append(space)
         if (base[0] == 0) or \
-            (p_shape[base[0] - 1][base[1] - 1] == 0 and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3)): #first case: on top
+            (p_shape[base[0] - 1][base[1] - 1] == 0 and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or (base[0] >= 3  and base[0] - 3 >= up_qubits * 2))): #first case: on top
             if base[0] == 0 and len(p_shape) + 3 + extra_qubits * 2 > rows:
                 return shapes, fronts, spaces, new, wire_targets
             new_front = []
@@ -166,15 +168,15 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             for element in new_wire_target1: #change exsisting element
                 element[0] = element[0] + extra_row
             if base[0] < 3:
-                new_front.append([base[0] + extra_row - 1, base[1] + 1])  # add two base
                 new_front.append([0, base[1] + 1])
+                new_front.append([base[0] + extra_row - 1, base[1] + 1])  # add two base
             else:
-                new_front.append([base[0] - 1, base[1] + 1])  # add two base
                 new_front.append([base[0] - 3, base[1] + 1])
+                new_front.append([base[0] - 1, base[1] + 1])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -188,7 +190,8 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             wire_targets.append(new_wire_target1)
             spaces.append(space)
     if loc == 'd':
-        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 3 < len(p_shape): # place the one to the right
+        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or \
+                (base[0] + 3 < len(p_shape) and len(p_shape) - base[0] - 3 >= down_qubit * 2): # place the one to the right
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -207,12 +210,12 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             for i in range(base[0], base[0] + 3):
                 for j in range(base[1] + 1, base[1] + 3):
                     new_shape1[i][j] = 1
-            new_front.append([base[0] + 2, base[1] + 2])  # add two base
             new_front.append([base[0], base[1] + 2])
+            new_front.append([base[0] + 2, base[1] + 2])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -224,7 +227,8 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             wire_targets.append(new_wire_target1)
             spaces.append(space)
         if (base[0] == len(p_shape) - 1) or (p_shape[base[0] + 1][base[1] - 1] == 0 \
-            and ((base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape))): #first case: on bot
+            and ((base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) \
+                 or (base[0] + 4 < len(p_shape) and len(p_shape) - base[0] - 4 >= down_qubit * 2))): #first case: on bot
             if base[0] == len(p_shape) - 1 and len(p_shape) + 3 + extra_qubits * 2 > rows:
                 return shapes, fronts, spaces, new, wire_targets
             new_front = []
@@ -247,12 +251,12 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             for i in range(base[0]+1, base[0] + 4):
                 for j in range(base[1], base[1] + 2):
                     new_shape1[i][j] = 1
-            new_front.append([base[0] + 3, base[1] + 1])  # add two base
             new_front.append([base[0] + 1, base[1] + 1])
+            new_front.append([base[0] + 3, base[1] + 1])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -266,11 +270,13 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     return shapes, fronts, spaces, new, wire_targets
 
 def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extra_qubits, new_sucessors,
-            end, wire_not_placed, wire_targets, wire_target): #place A node
+            end, wire_not_placed, wire_targets, wire_target, next_qubit, qubit_record): #place A node
     new = 0  # how many new node
     num_succ = len(new_sucessors)
+    up_qubits, down_qubit, old_qubit = get_old_qubit(qubit_record, next_qubit, extra_qubits, loc)
     if loc == 'u':
-        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or (base[0] >= 2):  # place the one to the right
+        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or\
+            (base[0] >= 2 and p_shape[base[0] - 1][base[1]] == 0 and base[0] - 2 >= up_qubits * 2):  # place the one to the right
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -297,15 +303,15 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             for element in new_wire_target1:  # change exsisting element
                 element[0] = element[0] + extra_row
             if extra_row != 0:
-                new_front.append([base[0] + extra_row, base[1] + 1])  # add two base
                 new_front.append([0, base[1] + 1])
+                new_front.append([base[0] + extra_row, base[1] + 1])  # add two base
             else:
-                new_front.append([base[0], base[1] + 1])  # add two base
                 new_front.append([base[0] - 2, base[1] + 1])
+                new_front.append([base[0], base[1] + 1])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -319,7 +325,8 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             wire_targets.append(new_wire_target1)
             spaces.append(space)
         if (base[0] == 0) or (p_shape[base[0] - 1][base[1] - 1] == 0\
-            and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3)):  # first case: on top
+            and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or \
+                 (base[0] >= 3 and base[0] - 3 >= up_qubits * 2))):  # first case: on top
             if len(p_shape) + 3 + extra_qubits * 2 > rows and base[0] == 0:
                 return shapes, fronts, spaces, new, wire_targets
             new_front = []
@@ -346,15 +353,15 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             for element in new_wire_target1:  # change exsisting element
                 element[0] = element[0] + extra_row
             if extra_row != 0:
-                new_front.append([base[0] + extra_row - 1, base[1]])  # add two base
                 new_front.append([0, base[1]])
+                new_front.append([base[0] + extra_row - 1, base[1]])  # add two base
             else:
-                new_front.append([base[0] - 1, base[1]])  # add two base
                 new_front.append([base[0] - 3, base[1]])
+                new_front.append([base[0] - 1, base[1]])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -368,7 +375,8 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             wire_targets.append(new_wire_target1)
             spaces.append(space)
     if loc == 'd':
-        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 3 < len(p_shape):  # place the one to the right
+        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or\
+                (base[0] + 3 < len(p_shape) and p_shape[base[0] + 1][base[1]] == 0 and len(p_shape) - base[0] - 3 >= down_qubit * 2):  # place the one to the right
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -386,12 +394,12 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
                 new_shape1.append(copy.deepcopy(new_row))
             for i in range(base[0], base[0] + 3):
                 new_shape1[i][base[1] + 1] = 1
-            new_front.append([base[0] + 2, base[1] + 1])  # add two base
             new_front.append([base[0], base[1] + 1])
+            new_front.append([base[0] + 2, base[1] + 1])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -403,7 +411,8 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             wire_targets.append(new_wire_target1)
             spaces.append(space)
         if (base[0] == len(p_shape) - 1) or (p_shape[base[0] + 1][base[1] - 1] == 0 and \
-            ((base[0] + 4 >= len(p_shape) and p_row +base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape))):  # first case: on bot
+            ((base[0] + 4 >= len(p_shape) and p_row +base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or \
+             (base[0] + 4 < len(p_shape) and len(p_shape) - base[0] - 4 >= down_qubit * 2))):  # first case: on bot
             if len(p_shape) + 3 + extra_qubits * 2 > rows and base[0] == len(p_shape) - 1:
                 return shapes, fronts, spaces, new, wire_targets
             new_front = []
@@ -422,12 +431,12 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
                 new_shape1.append(copy.deepcopy(new_row))
             for i in range(base[0] + 1, base[0] + 4):
                 new_shape1[i][base[1]] = 1
-            new_front.append([base[0] + 3, base[1]])  # add two base
             new_front.append([base[0] + 1, base[1]])
+            new_front.append([base[0] + 3, base[1]])  # add two base
             if num_succ == 1 and end == 'u':
-                new_front1.append(new_front[0])
-            elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[1])
+            elif num_succ == 1 and end == 'd':
+                new_front1.append(new_front[0])
             elif num_succ == 2:
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
@@ -722,12 +731,13 @@ def feasible_placement(ori_loc, new_loc, p_shape, gate):
     return legal
 
 def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
-                     extra_qubits, new_sucessors, wire_targets, wire_target): #place B node
+                     extra_qubits, new_sucessors, wire_targets, wire_target, b_end): #place B node
     #current
     new = 0 #how many new node
     num_succ = len(new_sucessors)
     if loc == 'u':
-        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or (base[0] >= 2): # place the one to the left
+        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or \
+                (base[0] >= 2 and p_shape[base[0] - 1][base[1] - 3] == 0): # place the one to the left
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -737,9 +747,18 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
                 extra_row = 2 - base[0]
             else:
                 extra_row = 0
+            extra_col = 0
+            if base[1] == 0:
+                base[1] = 2
+                extra_col = 2
+            elif base[1] == 1:
+                base[1] = 2
+                extra_col = 1
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row):  # insert extra rows
                 new_shape1.insert(0, copy.deepcopy(new_row))
+            for i in range(len(new_shape1)): #insert extra colums
+                new_shape1[i] = [0] * extra_col + new_shape1[i]
             if base[0] < 2:  #place the B
                 for i in range(3):
                     for j in range(base[1] - 2, base[1]):
@@ -750,8 +769,10 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
                         new_shape1[base[0] - i][j] = 1
             for element in new_front1: #change exsisting element
                 element[0] = element[0] + extra_row
+                element[1] = element[1] + extra_col
             for element in new_wire_target: #change exsisting element
                 element[0] = element[0] + extra_row
+                element[1] = element[1] + extra_col
             if base[0] < 2:
                 new_front.append([0, base[1] - 1]) # add two base
             else: # add two base
@@ -764,12 +785,17 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             else:
                 new_wire_target.append([0, base[1] - 2])  # has two wire targets
                 new_wire_target.append([2, base[1] - 2])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
             wire_targets.append(new_wire_target)
             spaces.append(space)
-        if ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3): #first case: on top
+        if (base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or \
+                (base[0] >= 3  and p_shape[base[0] - 2][base[1] - 2] == 0): #first case: on top
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -780,9 +806,15 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
                 extra_row = 3 - base[0]
             else:
                 extra_row = 0
+            extra_col = 0
+            if base[1] == 0:
+                base[1] = 1
+                extra_col = 1
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row): #insert extra rows
                 new_shape1.insert(0, copy.deepcopy(new_row))
+            for i in range(len(new_shape1)): #insert extra colums
+                new_shape1[i] = [0] * extra_col + new_shape1[i]
             if base[0] < 3:  #place the B
                 for i in range(3):
                     for j in range(base[1] - 1, base[1] + 1):
@@ -793,8 +825,10 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
                         new_shape1[base[0] - i - 1][j] = 1
             for element in new_front1: #change exsisting element
                 element[0] = element[0] + extra_row
+                element[1] = element[1] + extra_col
             for element in new_wire_target: #change exsisting element
                 element[0] = element[0] + extra_row
+                element[1] = element[1] + extra_col
             if base[0] < 3:# add two base
                 new_front.append([0, base[1]])
             else:# add two base
@@ -805,14 +839,20 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
                 new_wire_target.append([0, base[1] - 1])
                 new_wire_target.append([2, base[1] - 1])
             elif base[0] >= 3:
-                new_wire_target.append([[base[0] - 3, base[1] - 1], [base[0] - 1, base[1] - 1]])
+                new_wire_target.append([base[0] - 3, base[1] - 1])
+                new_wire_target.append([base[0] - 1, base[1] - 1])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
             wire_targets.append(new_wire_target)
             spaces.append(space)
     if loc == 'd':
-        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 3 < len(p_shape): # place the one to the left
+        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or \
+                (base[0] + 3 < len(p_shape) and p_shape[base[0] + 1][base[1] - 3] == 0): # place the one to the left
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -822,23 +862,41 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
                 extra_row = base[0] + 3 - len(p_shape)
             else:
                 extra_row = 0
+            extra_col = 0
+            if base[1] == 0:
+                base[1] = 2
+                extra_col = 2
+            elif base[1] == 1:
+                base[1] = 2
+                extra_col = 1
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row):  # insert extra rows
                 new_shape1.append(copy.deepcopy(copy.deepcopy(new_row)))
+            for i in range(len(new_shape1)): #insert extra colums
+                new_shape1[i] = [0] * extra_col + new_shape1[i]
             for i in range(base[0], base[0] + 3):
                 for j in range(base[1] - 2, base[1]):
                     new_shape1[i][j] = 1
+            for element in new_front1: #change exsisting element
+                element[1] = element[1] + extra_col
+            for element in new_wire_target: #change exsisting element
+                element[1] = element[1] + extra_col
             new_front.append([base[0] + 2, base[1] - 1])  # add two base
             if num_succ == 2:
                 new_front1.append(new_front[0])
             new_wire_target.append([base[0], base[1] - 2])
             new_wire_target.append([base[0] + 2, base[1] - 2])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
             wire_targets.append(new_wire_target)
             spaces.append(space)
-        if (base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape): #first case: on bot
+        if (base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or \
+                (base[0] + 4 < len(p_shape) and p_shape[base[0] + 2][base[1] - 2] == 0): #first case: on bot
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -849,6 +907,10 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
                 extra_row = base[0] + 4 - len(p_shape)
             else:
                 extra_row = 0
+            extra_col = 0
+            if base[1] == 0:
+                base[1] = 1
+                extra_col = 1
             #base[0] = base[0] + extra_row
             new_row = [0] * len(new_shape1[0])
             for i in range(extra_row): #insert extra rows
@@ -856,11 +918,19 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             for i in range(base[0]+1, base[0] + 4):
                 for j in range(base[1] - 1, base[1] + 1):
                     new_shape1[i][j] = 1
+            for element in new_front1: #change exsisting element
+                element[1] = element[1] + extra_col
+            for element in new_wire_target: #change exsisting element
+                element[1] = element[1] + extra_col
             new_front.append([base[0] + 3, base[1]])  # add two base
             if num_succ == 2:
                 new_front1.append(new_front[0])
             new_wire_target.append([base[0] + 1, base[1] - 1])
             new_wire_target.append([base[0] + 3, base[1] - 1])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -869,12 +939,13 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
     return shapes, fronts, spaces, new, wire_targets
 
 def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
-                     spaces, extra_qubits, new_sucessors, wire_targets, wire_target): #place B node
+                     spaces, extra_qubits, new_sucessors, wire_targets, wire_target, b_end): #place B node
     #current
     new = 0 #how many new node
     num_succ = len(new_sucessors)
     if loc == 'u':
-        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or (base[0] >= 2): # place the one to the left
+        if (base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or \
+                (base[0] >= 2 and p_shape[base[0] - 1][base[1] - 2] == 0): # place the one to the left
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -909,12 +980,17 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             else:
                 new_wire_target.append([0, base[1] - 1])  # has two wire targets
                 new_wire_target.append([2, base[1] - 1])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
             wire_targets.append(new_wire_target)
             spaces.append(space)
-        if ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or base[0] >= 3): #first case: on top
+        if (base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or\
+                (base[0] >= 3 and p_shape[base[0] - 2][base[1] - 1] == 0): #first case: on top
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -950,13 +1026,18 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif base[0] >= 3:
                 new_wire_target.append([base[0] - 3, base[1]])
                 new_wire_target.append([base[0] - 1, base[1]])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
             wire_targets.append(new_wire_target)
             spaces.append(space)
     if loc == 'd':
-        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 3 < len(p_shape): # place the one to the left
+        if (base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or\
+                (base[0] + 3 < len(p_shape) and p_shape[base[0] + 1][base[1] - 2] == 0): # place the one to the left
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -976,12 +1057,17 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
                 new_front1.append(new_front[0])
             new_wire_target.append([base[0], base[1] - 1])
             new_wire_target.append([base[0] + 2, base[1] - 1])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
             wire_targets.append(new_wire_target)
             spaces.append(space)
-        if (base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or base[0] + 4 < len(p_shape): #first case: on bot
+        if (base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or \
+                (base[0] + 4 < len(p_shape) and p_shape[base[0] + 2][base[1] - 1] == 0): #first case: on bot
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)
@@ -1003,6 +1089,10 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
                 new_front1.append(new_front[0])
             new_wire_target.append([base[0] + 1, base[1]])
             new_wire_target.append([base[0] + 3, base[1]])
+            if b_end == 'd':
+                new_wire_target.pop(-1)
+            elif b_end == 'u':
+                new_wire_target.pop(-2)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -1023,18 +1113,28 @@ def reversed_place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
     new_wire_target3 = copy.deepcopy(wire_target)
     # for front
     if base[1] == 0:
-        new_shape1[base[0]].insert(0, 1)
-    else:
+        for i in range(new_shape1):
+            new_shape1[i].insert(0,0)
+        new_shape1[base[0]][base[1]] = 1
+        new = new + 1
+        new_shape1, space = fill_shape(new_shape1)
+        spaces.append(space)
+        shapes.append(new_shape1)
+        new_wire_target1.append([base[0], base[1] - 1])
+        wire_targets.append(new_wire_target1)
+        fronts.append(new_front1)
+    elif p_shape[base[0]][base[1] - 2] == 0:
         x = base[0]
         y = base[1] - 1
         new_shape1[x][y] = 1
-    new = new + 1
-    new_shape1, space = fill_shape(new_shape1)
-    spaces.append(space)
-    shapes.append(new_shape1)
-    new_wire_target1.append([base[0], base[1] - 1])
-    wire_targets.append(new_wire_target1)
-    fronts.append(new_front1)
+        new_shape1[base[0]][base[1]] = 1
+        new = new + 1
+        new_shape1, space = fill_shape(new_shape1)
+        spaces.append(space)
+        shapes.append(new_shape1)
+        new_wire_target1.append([base[0], base[1] - 1])
+        wire_targets.append(new_wire_target1)
+        fronts.append(new_front1)
     if loc == 'u' or loc == 'r':  # up
         placed = 0
         if base[0] == 0 and p_row + 1 + extra_qubits * 2 <= rows:
@@ -1080,4 +1180,14 @@ def reversed_place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             fronts.append(new_front3)
             wire_targets.append(new_wire_target3)
     return shapes, fronts, spaces, new, wire_targets
+
+def get_old_qubit(qubit_record, next_qubit, extra_qubits, loc):
+    inside = 0
+    for qubit in next_qubit:
+        if min(qubit_record) < qubit and max(qubit_record) > qubit:
+            inside = inside + 1
+    if inside < len(next_qubit):
+        return 0, 0, 0
+    elif inside == len(next_qubit):
+        return min(next_qubit) - min(qubit_record),  max(qubit_record) - max(next_qubit), 1
 
