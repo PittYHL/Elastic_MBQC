@@ -569,12 +569,6 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton, w_len, more_wire):
     shape1 = copy.deepcopy(shape)
     shape1[start_loc[0]][start_loc[1]] = 2
     found = 0
-    # if next[0] - current[0] == 1:
-    #     loc = 'u'
-    # elif next[0] - current[0] == -1:
-    #     loc = 'd'
-    # else:
-    #     loc = 'r'
     if (secton == 'b' and direc == 'u') or (secton == 't' and direc == 'u' and more_wire == 1):
         wire_num = 1
         while next != tar_loc:
@@ -604,8 +598,8 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton, w_len, more_wire):
         wire_num = 1
         while next != tar_loc:
             dead_end = 1
-            if (next[0] > 0 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
-            (next[0] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0], next[1] + 1] == tar_loc: #prorize right
+            if next[1] < tar_loc[1] and ((next[0] > 0 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
+            (next[0] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0], next[1] + 1] == tar_loc): #prorize right
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
                 shape1[next[0]][next[1]] = 2
@@ -662,8 +656,8 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton, w_len, more_wire):
         wire_num = 1
         while next != tar_loc:
             dead_end = 1
-            if (next[0] < len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
-            (next[0] == len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or [next[0], next[1] + 1] == tar_loc: #priorize right
+            if next[1] < tar_loc[1] and ((next[0] < len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
+            (next[0] == len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or [next[0], next[1] + 1] == tar_loc): #priorize right
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
                 shape1[next[0]][next[1]] = 2

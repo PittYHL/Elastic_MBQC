@@ -7,7 +7,7 @@ import numpy as np
 from fill_map import *
 
 la_win = 1
-keep = 4
+keep = 3
 long = 4
 def DP(ori_map, qubits, rows, force_right):
     new_map = []
@@ -144,6 +144,8 @@ def check_next_0(map, i, start):
         index = index + 1
     return index - start
 def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right):
+    n_nodes = np.array(nodes)
+    # np.savetxt("example/iqp12_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
     qubits = len(nodes)
     order = list(nx.topological_sort(graph))
     placed = []
@@ -193,7 +195,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'B.3':
+        if next == 'W.1':
             print('g')
         next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record) #place the next node
         qubit_record = get_qubit_record(next, nodes, qubit_record)
@@ -420,6 +422,7 @@ def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, vali
 def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire):
     next = []
     parent_index = [] #the parent of the chosen
+    parent_row = [] #record the row number of the qubit
     found_wire = 0 #choose the wire
     found_C = 0 #choose the C
     only_one = [] #the node that only one preds have been placed
@@ -464,7 +467,7 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
                     next_node = node
                     break
             elif len(succs) == 2:
-                if wires == len(before) and (succs[0] in placed or succs[0] in placed):
+                if wires == len(before) and (succs[0] in placed or succs[1] in placed):
                     found_wire = 1
                     next_node = node
                     break
@@ -491,14 +494,29 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
             else:
                 next.append(node)
                 parent_index.append(loc)
+                for i in range(len(nodes)): #record the row
+                    if node in nodes[i]:
+                        parent_row.append(i)
+                        break
     if found_wire != 1 and found_C != 1:
         if parent_index != []:
-            next_node = next[parent_index.index(min(parent_index))]
+            next_node = available_node(parent_index, next, parent_row)
         elif only_one != []: # cannot find node with both predecessors resolved or wires or
             next_node = only_one[-1]
         elif succ_placed != []:
             next_node = succ_placed[0]
     return next_node
+
+def available_node(parent_index, next, parent_row):
+    min_index = min(parent_index)
+    temp_parent = []
+    indexes = []
+    for i in range(len(parent_index)):
+        if parent_index[i] == min_index:
+            indexes.append(i)
+    for i in indexes:
+        temp_parent.append(parent_row[i])
+    return next[indexes[temp_parent.index(min(temp_parent))]]
 
 def find_qubits(nodes, placed, next):
     qubit = []

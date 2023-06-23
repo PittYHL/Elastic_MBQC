@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="802d548a-b8c7-44b7-99e2-b24a0ccbbe39" name="Changes" comment="finish 15 qubits">
-      <change afterPath="$PROJECT_DIR$/fill_map.py" afterDir="false" />
+    <list default="true" id="8d97cf13-54d2-444a-9e6c-ba870986ea5e" name="Changes" comment="finish 15 qubits">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/New Text Document.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp12b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp12b.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/iqp12el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/iqp12el.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -212,41 +209,6 @@
           <line>25</line>
           <option name="timeStamp" value="888" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>400</line>
-          <option name="timeStamp" value="889" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>659</line>
-          <option name="timeStamp" value="891" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fill_map.py</url>
-          <line>267</line>
-          <option name="timeStamp" value="892" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fill_map.py</url>
-          <line>273</line>
-          <option name="timeStamp" value="893" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fill_map.py</url>
-          <line>288</line>
-          <option name="timeStamp" value="894" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fill_map.py</url>
-          <line>320</line>
-          <option name="timeStamp" value="895" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fill_map.py</url>
-          <line>352</line>
-          <option name="timeStamp" value="896" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -258,43 +220,11 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="x_loc" />
-        <watch expression="map[0]" />
-        <watch expression="lines" />
-        <watch expression="schedule" />
-        <watch expression="schedule" />
-        <watch expression="circuit" />
-        <watch expression="i" />
-        <watch expression="map" />
-        <watch expression="first_row" />
-        <watch expression="middle_DAG" />
-        <watch expression="DAG[16]" />
-        <watch expression="mid_map" />
-        <watch expression="order" />
         <watch expression="shape" />
-        <watch expression="valid" />
-        <watch expression="shapes[31]" />
-        <watch expression="nodes_left" />
-        <watch expression="base" />
-        <watch expression="shape[5][0]" />
+        <watch expression="table" />
         <watch expression="p_shape" />
         <watch expression="target" />
-        <watch expression="target" />
-        <watch expression="shape" />
-        <watch expression="table" />
-        <watch expression="nodes" />
-        <watch expression="placed" />
-        <watch expression="shapes" />
-        <watch expression="ori_map" />
-        <watch expression="ori_map" />
-        <watch expression="new_map" />
-        <watch expression="shape[8][1]" />
-        <watch expression="rows" />
-        <watch expression="shapes[53][17]" />
-        <watch expression="qubit_record" />
-        <watch expression="shape" />
-        <watch expression="table" />
-        <watch expression="newDAG" />
+        <watch expression="wire_len" />
       </configuration>
     </watches-manager>
   </component>
