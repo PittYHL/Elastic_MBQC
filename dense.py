@@ -513,3 +513,11 @@ def convert_new_map(new_map):
             if newnew_map[i][j] == 'Z':
                 newnew_map[i][j] = ''
     return newnew_map
+
+def convert_new_map2(new_map):
+    newnew_map = copy.deepcopy(new_map)
+    for i in range(len(newnew_map)):
+        for j in range(len(newnew_map[i])):
+            if newnew_map[i][j] == 0:
+                newnew_map[i][j] = ''
+    return newnew_map

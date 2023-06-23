@@ -1,7 +1,10 @@
 import copy
 import networkx as nx
 from matplotlib import pyplot as plt
-from placement import  *
+from placement import *
+from dense import convert_new_map2
+import numpy as np
+from fill_map import *
 
 la_win = 1
 keep = 4
@@ -19,6 +22,7 @@ def DP(ori_map, qubits, rows, force_right):
                 new_map[-1].append(0)
     graph, nodes, W_len, first, last, A_loc, B_loc, C_loc = gen_index(new_map)
     table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right)
+    save_shapes(shapes)
     print('g')
 
 def gen_index(map):
@@ -641,174 +645,10 @@ def fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors
             new_wire_target.append(wire_targets[index])
     return shapes, fronts, spaces, successors, nextnext, new_parents, same_qubit, new_wire_target
 
-def fill_A(shapes, fronts, spaces, locs, same_qubit):
-    valid = []  # valid shpae after fill A
-    new_shapes = []
-    new_Spaces = []
-    new_fronts = []
-    for i in range(len(shapes)):
-        shape = shapes[i]
-        front = fronts[i]
-        first_base = front[locs[0]]
-        second_base = front[locs[1]]
-        if first_base[0] > second_base[0]:
-            temp = first_base
-            first_base = second_base
-            second_base = temp
-        if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]:  # rr
-            if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit:  # constraints for rr
-                valid.append(i)
-                extra_column = 0
-                if first_base[1] == len(shape[0]) - 1:
-                    extra_column = 1
-                for j in range(len(shape)):
-                    shape[j] = shape[j] + [0] * extra_column
-                shape[first_base[0]][first_base[1] + 1] = 1
-                shape[first_base[0] + 1][first_base[1] + 1] = 1
-                shape[first_base[0] + 2][first_base[1] + 1] = 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0], first_base[1] + 1])
-                front.append([second_base[0], second_base[1] + 1])
-                new_fronts.append(front)
-        elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]:  # ru
-            if shapes[i][first_base[0] + 1][first_base[1]] == 0:  # constraints for ru
-                valid.append(i)
-                shape[first_base[0]][first_base[1] + 1] = 1
-                shape[first_base[0] + 1][first_base[1] + 1] = 1
-                shape[first_base[0] + 2][first_base[1] + 1] = 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0], first_base[1] + 1])
-                front.append([second_base[0] - 1, second_base[1]])
-                new_fronts.append(front)
-        elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]:  # dr
-            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
-                valid.append(i)
-                shape[first_base[0] + 1][first_base[1]] = 1
-                shape[first_base[0] + 2][first_base[1]] = 1
-                shape[first_base[0] + 3][first_base[1]] = 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                #front[locs[0]][1] = front[locs[0]][1] + 1
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0] + 1, first_base[1]])
-                front.append([second_base[0], second_base[1] + 1])
-                new_fronts.append(front)
-        elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]:  # du
-            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
-                valid.append(i)
-                shape[first_base[0] + 1][first_base[1]] = 1
-                shape[first_base[0] + 2][first_base[1]] = 1
-                shape[first_base[0] + 3][first_base[1]:] = 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0] + 1, first_base[1] + 1])
-                front.append([second_base[0] - 1, second_base[1] + 1])
-                new_fronts.append(front)
-    return new_shapes, new_fronts, new_Spaces, valid
-
-def fill_B(shapes, fronts, spaces, locs, same_qubit): #may need to add more cases
-    valid = [] #valid shpae after fill B
-    new_shapes = []
-    new_Spaces = []
-    new_fronts = []
-    for i in range(len(shapes)):
-        shape = shapes[i]
-        front = fronts[i]
-        first_base = front[locs[0]]
-        second_base = front[locs[1]]
-        if first_base[0] > second_base[0]:
-            temp = first_base
-            first_base = second_base
-            second_base = temp
-        if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]: #rr
-            if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit: #constraints for rr
-                valid.append(i)
-                extra_column = first_base[1] + 3 - len(shape[0])
-                for j in range(len(shape)):
-                    shape[j] = shape[j] + [0]*extra_column
-                shape[first_base[0]][first_base[1] + 1: first_base[1] + 3] = [1,1]
-                shape[first_base[0] + 1][first_base[1] + 1: first_base[1] + 3] = [1, 1]
-                shape[first_base[0] + 2][first_base[1] + 1: first_base[1] + 3] = [1, 1]
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0], first_base[1] + 2])
-                front.append([second_base[0], second_base[1] + 2])
-                new_fronts.append(front)
-        elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]: #ru
-            if shapes[i][first_base[0] + 1][first_base[1]] == 0: #constraints for ru
-                valid.append(i)
-                extra_column = first_base[1] + 3 - len(shape[0])
-                for j in range(len(shape)):
-                    shape[j] = shape[j] + [0] * extra_column
-                shape[first_base[0]][first_base[1] + 1: first_base[1] + 3] = [1, 1]
-                shape[first_base[0] + 1][first_base[1] + 1: first_base[1] + 3] = [1, 1]
-                shape[first_base[0] + 2][first_base[1] + 1: first_base[1] + 3] = [1, 1]
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0], first_base[1] + 2])
-                front.append([second_base[0] - 1, second_base[1] + 1])
-                new_fronts.append(front)
-        elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]: #dr
-            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0: #constraints for ru
-                valid.append(i)
-                extra_column = first_base[1] + 2 - len(shape[0])
-                for j in range(len(shape)):
-                    shape[j] = shape[j] + [0] * extra_column
-                shape[first_base[0] + 1][first_base[1]: first_base[1] + 2] = [1, 1]
-                shape[first_base[0] + 2][first_base[1]: first_base[1] + 2] = [1, 1]
-                shape[first_base[0] + 3][first_base[1]: first_base[1] + 2] = [1, 1]
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0] + 1, first_base[1] + 1])
-                front.append([second_base[0], second_base[1] + 2])
-                new_fronts.append(front)
-        elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]: #du
-            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0: #constraints for ru
-                valid.append(i)
-                extra_column = first_base[1] + 2 - len(shape[0])
-                for j in range(len(shape)):
-                    shape[j] = shape[j] + [0] * extra_column
-                shape[first_base[0] + 1][first_base[1]: first_base[1] + 2] = [1, 1]
-                shape[first_base[0] + 2][first_base[1]: first_base[1] + 2] = [1, 1]
-                shape[first_base[0] + 3][first_base[1]: first_base[1] + 2] = [1, 1]
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                front.pop(max(locs))
-                front.pop(min(locs))
-                front.append([first_base[0] + 1, first_base[1] + 1])
-                front.append([second_base[0] - 1, second_base[1] + 1])
-                new_fronts.append(front)
-    return new_shapes, new_fronts, new_Spaces, valid
-
 def fill_prepre(shapes, fronts, spaces, new_preds, not_placed_preds, prepre, newnew_preds, parents,
             nodes, same_qubit, wire_targets):
     locs = []
     new_parents = []
-    new_wire_target = []
-    new_fronts = []
     gate, _ = prepre.split('.')
     # same_qubit = 0 #found node on the same qbits
     for i in range(len(new_preds)):
@@ -816,33 +656,42 @@ def fill_prepre(shapes, fronts, spaces, new_preds, not_placed_preds, prepre, new
             locs.append(i)
     if gate == 'A':
         shapes, fronts, spaces, valid, wire_targets = fill_A_P(shapes, fronts, wire_targets, locs, same_qubit)
-    # elif gate == 'B':
-    #     shapes, fronts, spaces, valid = fill_B(shapes, fronts, spaces, locs, same_qubit)
+    elif gate == 'B':
+        shapes, fronts, spaces, valid, wire_targets = fill_B_P(shapes, fronts, wire_targets, locs, same_qubit)
     same_qubit = 0
     if len(newnew_preds) == 1:  # remove one front
         first_qubit = 0
         second_qubit = 0
+        gate, _ = newnew_preds[0].split('.')
         for i in range(len(nodes)):
             if prepre in nodes[i]:
                 first_qubit = first_qubit + i
             if newnew_preds[0] in nodes[i]:
                 second_qubit = second_qubit + i
-        if second_qubit - first_qubit > 0:
-            for front in wire_targets:
-                front.pop(locs[0])
-        elif second_qubit - first_qubit < 0:
-            for front in wire_targets:
-                front.pop(locs[1])
+        if gate == 'A' or gate == 'B':
+            if second_qubit - first_qubit > 0:
+                for front in wire_targets:
+                    front.pop(-2)
+            elif second_qubit - first_qubit < 0:
+                for front in wire_targets:
+                    front.pop(-1)
+            else:
+                same_qubit = 1
         else:
-            same_qubit = 1
+            if first_qubit == second_qubit * 2 + 1:
+                for front in wire_targets:
+                    front.pop(-1)
+            else:
+                for front in wire_targets:
+                    front.pop(-2)
     elif len(newnew_preds) == 0:
         for front in wire_targets:
-            front.pop(locs[0])
-            front.pop(locs[0])
+            front.pop(-1)
+            front.pop(-1)
     new_preds.remove(prepre)
     new_preds.remove(prepre)
     prepre = 0
-    for succ in reversed(newnew_preds):
+    for succ in newnew_preds:
         if succ in new_preds:
             prepre = succ
         elif same_qubit:
@@ -852,93 +701,6 @@ def fill_prepre(shapes, fronts, spaces, new_preds, not_placed_preds, prepre, new
     for index in valid:
         new_parents.append(parents[index])
     return shapes, fronts, spaces, new_preds, prepre, new_parents, same_qubit, wire_targets
-
-def fill_A_P(shapes, fronts, wire_targets, locs, same_qubit):
-    valid = []  # valid shpae after fill A
-    new_shapes = []
-    new_Spaces = []
-    new_preds = []
-    new_fronts = []
-    for i in range(len(shapes)):
-        shape = shapes[i]
-        front = fronts[i]
-        pred = wire_targets[i]
-        first_base = pred[locs[0]]
-        second_base = pred[locs[1]]
-        if first_base[0] > second_base[0]:
-            temp = first_base
-            first_base = second_base
-            second_base = temp
-        if first_base[0] + 2 == second_base[0] and first_base[1] == second_base[1]:  # ll
-            if shapes[i][first_base[0] + 1][first_base[1]] == 0 or same_qubit:  # constraints for rr
-                valid.append(i)
-                if first_base[1] == 0:
-                    extra_column = 1
-                else:
-                    extra_column = 0
-                for j in range(len(shape)):
-                    shape[j] = [0] * extra_column + shape[j]
-                if extra_column == 0:
-                    shape[first_base[0]][first_base[1] - 1] = 1
-                    shape[first_base[0] + 1][first_base[1] - 1] = 1
-                    shape[first_base[0] + 2][first_base[1] - 1] = 1
-                else:
-                    for element in pred:
-                        element[1] = element[1] + extra_column
-                    for element in front:
-                        element[1] = element[1] + extra_column
-                    pred[locs[0]][1] = pred[locs[0]][1] - 1 #change the locs of pre
-                    pred[locs[1]][1] = pred[locs[1]][1] - 1
-                    shape[first_base[0]][first_base[1]] = 1
-                    shape[first_base[0] + 1][first_base[1]] = 1
-                    shape[first_base[0] + 2][first_base[1]] = 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                new_fronts.append(front)
-                new_preds.append(pred)
-        elif first_base[0] + 3 == second_base[0] and first_base[1] - 1 == second_base[1]:  # lu
-            if shapes[i][first_base[0] + 1][first_base[1]] == 0:  # constraints for ru
-                valid.append(i)
-                for j in range(len(shape)):
-                    shape[j] = [0] * extra_column + shape[j]
-                shape[first_base[0]][first_base[1] - 1] = 1
-                shape[first_base[0] + 1][first_base[1] - 1] = 1
-                shape[first_base[0] + 2][first_base[1] - 1] = 1
-                pred[locs[0]][1] = pred[locs[0]][1] - 1  # change the locs of pre
-                pred[locs[1]][0] = pred[locs[1]][0] - 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                new_preds.append(pred)
-                new_fronts.append(front)
-        elif first_base[0] + 3 == second_base[0] and first_base[1] + 1 == second_base[1]:  # dl
-            if shapes[i][first_base[0] + 2][first_base[1] + 1] == 0:  # constraints for ru
-                valid.append(i)
-                shape[first_base[0] + 1][first_base[1]] = 1
-                shape[first_base[0] + 2][first_base[1]] = 1
-                shape[first_base[0] + 3][first_base[1]] = 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                pred[locs[0]][0] = pred[locs[0]][0] + 1
-                pred[locs[1]][1] = pred[locs[1]][1] - 1
-                new_fronts.append(front)
-                new_preds.append(pred)
-        elif first_base[0] + 4 == second_base[0] and first_base[1] == second_base[1]:  # du
-            if shapes[i][first_base[0] + 2][first_base[1] - 1] == 0:  # constraints for ru
-                valid.append(i)
-                shape[first_base[0] + 1][first_base[1]] = 1
-                shape[first_base[0] + 2][first_base[1]] = 1
-                shape[first_base[0] + 3][first_base[1]:] = 1
-                shape, space = fill_shape(shape)
-                new_shapes.append(shape)
-                new_Spaces.append(space)
-                pred[locs[0]][0] = pred[locs[0]][0] + 1
-                pred[locs[1]][0] = pred[locs[1]][0] - 1
-                new_fronts.append(front)
-                new_preds.append(pred)
-    return new_shapes, new_fronts, new_Spaces, valid, new_preds
 
 def detec_end(next, succ, nodes):
     first_qubit = 0
@@ -1021,6 +783,34 @@ def get_next_qubit(nodes, next):
             c_qubit.append(i + 1)
     return c_qubit
 
+def save_shapes(shapes):
+    for i in reversed(range(len(shapes))):
+        if shapes[i] == []:
+            shapes.pop(i)
+    final_shapes = shapes[-1]
+    width = []
+    width_shapes = []
+    for shape in final_shapes:
+        if len(shape) not in width:
+            width.append(len(shape))
+    width.sort()
+    width_shapes = [[] for _ in range(len(width))]
+    for i in range(len(width)):
+        for shape in final_shapes:
+            if len(shape) == width[i]:
+                width_shapes[i].append(shape)
+    for i in range(len(width_shapes)):
+        w = len(width_shapes[i][0])
+        min_depth = 1000000000
+        for shape in width_shapes[i]:
+            if len(shape[0]) < min_depth:
+                min_depth = len(shape[0])
+        for shape in width_shapes[i]:
+            if len(shape[0]) == min_depth:
+                new_map = convert_new_map2(shape)
+                n_map = np.array(new_map)
+                np.savetxt("example/iqp12/iqp12ela" + str(w) + ".csv", n_map, fmt='%s', delimiter=",")
+                break
 # rows = [2,3,4,5]
 # c_depths = [5,4,4,3]
 # c_spaces = [2,4/3,3/2,2]

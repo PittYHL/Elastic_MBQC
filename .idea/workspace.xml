@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="802d548a-b8c7-44b7-99e2-b24a0ccbbe39" name="Changes" comment="finish bv7">
+    <list default="true" id="802d548a-b8c7-44b7-99e2-b24a0ccbbe39" name="Changes" comment="finish 15 qubits">
+      <change afterPath="$PROJECT_DIR$/fill_map.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/bv10.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/bv10.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp10b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp10b.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/New Text Document.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp12b.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp12b.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -100,7 +101,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686773947721</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="finish 15 qubits">
+      <created>1687399981686</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1687399981686</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -128,7 +136,8 @@
     <MESSAGE value="doing 7 qubits" />
     <MESSAGE value="finish eliminate" />
     <MESSAGE value="finish bv7" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish bv7" />
+    <MESSAGE value="finish 15 qubits" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish 15 qubits" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -179,29 +188,9 @@
           <option name="timeStamp" value="449" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>20</line>
-          <option name="timeStamp" value="557" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
           <line>240</line>
           <option name="timeStamp" value="581" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>237</line>
-          <option name="timeStamp" value="847" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>21</line>
-          <option name="timeStamp" value="848" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>236</line>
-          <option name="timeStamp" value="862" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
@@ -210,8 +199,53 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>193</line>
-          <option name="timeStamp" value="884" />
+          <line>24</line>
+          <option name="timeStamp" value="882" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>23</line>
+          <option name="timeStamp" value="883" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>25</line>
+          <option name="timeStamp" value="888" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>400</line>
+          <option name="timeStamp" value="889" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>659</line>
+          <option name="timeStamp" value="891" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fill_map.py</url>
+          <line>267</line>
+          <option name="timeStamp" value="892" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fill_map.py</url>
+          <line>273</line>
+          <option name="timeStamp" value="893" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fill_map.py</url>
+          <line>288</line>
+          <option name="timeStamp" value="894" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fill_map.py</url>
+          <line>320</line>
+          <option name="timeStamp" value="895" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fill_map.py</url>
+          <line>352</line>
+          <option name="timeStamp" value="896" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
