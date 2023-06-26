@@ -5,6 +5,7 @@ from placement import *
 from dense import convert_new_map2
 import numpy as np
 from fill_map import *
+from leaves import *
 
 la_win = 1
 keep = 3
@@ -22,7 +23,9 @@ def DP(ori_map, qubits, rows, force_right):
                 new_map[-1].append(0)
     graph, nodes, W_len, first, last, A_loc, B_loc, C_loc = gen_index(new_map)
     table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right)
-    save_shapes(shapes)
+    middle_shapes = shapes[-1]
+    final_shapes = place_leaves(table, shapes, first, last)
+    # save_shapes(shapes)
     print('g')
 
 def gen_index(map):
@@ -145,23 +148,23 @@ def check_next_0(map, i, start):
     return index - start
 def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right):
     n_nodes = np.array(nodes)
-    np.savetxt("example/bv12_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
+    # np.savetxt("example/bv12_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
     qubits = len(nodes)
     order = list(nx.topological_sort(graph))
     placed = []
     #place the first one
-    table = []
-    shape = []
-    valid = [] #for chosen patterns
+    table = [[]]
+    shape = [[]]
+    valid = [[]] #for chosen patterns
     c_layer = [] #record the current layer
     two_wire = [] #record the node with two wire predecessors
     qubit_record = []
     current_row = 3
     current_d = 0
-    for i in range(len(order)):
-        table.append([])
-        shape.append([])
-        valid.append([])
+    # for i in range(len(order)):
+    #     table.append([])
+    #     shape.append([])
+    #     valid.append([])
     nodes_left = copy.deepcopy(order)
     current = nodes_left.pop(0)
     placed.append(current)
@@ -195,7 +198,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'W.1':
+        if next == 'B.4':
             print('g')
         next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record) #place the next node
         qubit_record = get_qubit_record(next, nodes, qubit_record)
@@ -420,6 +423,8 @@ def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, vali
            p_index, row_limit, wire_targets, new_preds, qubits, starts, ends):
     rows = []
     depths = []
+    table.append([])
+    shape.append([])
     for i in range(len(shapes)):
         rows.append(len(shapes[i]))
         depths.append(len(shapes[i][0]))
@@ -431,7 +436,7 @@ def update(current, c_qubit, shapes, fronts, spaces, parents, table, shape, vali
         'front': fronts[i], 'successor': successors, 'targets':wire_targets[i], 'preds': new_preds, 'starts':start, 'ends':end})
         shape[p_index + 1].append(shapes[i])
     new_valid = check_valid(rows, depths, spaces, row_limit, c_qubit, qubits)
-    valid[p_index + 1] = new_valid
+    valid.append(new_valid)
 
 def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire):
     next = []
