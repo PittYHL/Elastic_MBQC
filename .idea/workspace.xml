@@ -4,7 +4,9 @@
     <list default="true" id="8d97cf13-54d2-444a-9e6c-ba870986ea5e" name="Changes" comment="finish 15 qubits">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/iqp12el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/iqp12el.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv12el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv12el.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fill_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/fill_map.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
@@ -43,7 +45,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="802d548a-b8c7-44b7-99e2-b24a0ccbbe39" name="Changes" comment="" />
+      <changelist id="8d97cf13-54d2-444a-9e6c-ba870986ea5e" name="Changes" comment="finish 15 qubits" />
       <created>1680010207783</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -209,6 +211,16 @@
           <line>25</line>
           <option name="timeStamp" value="888" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>199</line>
+          <option name="timeStamp" value="891" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>395</line>
+          <option name="timeStamp" value="899" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -225,6 +237,7 @@
         <watch expression="p_shape" />
         <watch expression="target" />
         <watch expression="wire_len" />
+        <watch expression="table" />
       </configuration>
     </watches-manager>
   </component>
