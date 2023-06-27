@@ -70,7 +70,7 @@ def gen_index(map):
     for node in nodes:
         for i in range(len(node) - 1):
             graph.add_edge(node[i], node[i+1])
-    nx.draw_networkx(graph)
+    # nx.draw_networkx(graph)
     #order = list(nx.topological_sort(graph))
     #next = list(graph.successors('A.0'))
     return graph, nodes, W_len, first, last, A_loc, B_loc, C_loc
@@ -149,7 +149,7 @@ def check_next_0(map, i, start):
     return index - start
 def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right):
     n_nodes = np.array(nodes)
-    # np.savetxt("example/bv12_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
+    # np.savetxt("example/iqp15_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
     qubits = len(nodes)
     order = list(nx.topological_sort(graph))
     placed = []
@@ -199,7 +199,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'B.4':
+        if next == 'W.10':
             print('g')
         next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record) #place the next node
         qubit_record = get_qubit_record(next, nodes, qubit_record)
@@ -290,12 +290,17 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
     b_end = 0
     not_placed = False #check if there is wire for the previous
     n_preds = list(graph.predecessors(next))
+    same_qubit = 0
+    nextnext = 0
     for pred in n_preds:
         if pred not in placed:
             not_placed = True
             not_placed_preds.append(pred)
     if (c_gate == 'A' or c_gate == 'B') and len(new_sucessors) == 1:
         end = detec_end(next, new_sucessors[0], nodes)
+        if end == 0:
+            nextnext = new_sucessors[0]
+            same_qubit = 1
         if force_right:#detect end point for forward
             p_gate1, _ = new_sucessors[0].split('.')
             if p_gate1 == 'C':
@@ -316,15 +321,15 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
     if not_placed_preds != n_preds:
         c_index = successors.index(next)  # remove the next node from the table
         successors.pop(c_index)
-    nextnext = 0
     prepre = 0
     if c_gate != 'W':
         for succ in new_sucessors:
             if succ in successors:
                 nextnext = succ
             if succ not in placed:
-                # successors.insert(c_index, succ)
                 successors.append(succ)
+                if same_qubit == 1:
+                    successors.append(succ)
         for pred in n_preds:
             if pred in preds:
                 prepre = pred
@@ -392,7 +397,6 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         for i in range(new):
             parents.append([p_index, j])
 
-    same_qubit = 0
     new_preds = preds + not_placed_preds
     while nextnext != 0:
         next = nextnext
@@ -768,6 +772,8 @@ def detec_end(next, succ, nodes):
             end = 'd'
         elif second_qubit - first_qubit > 0:
             end = 'u'
+        else:
+            end = 0
     else:
         if first_qubit == second_qubit * 2 + 1:
             end = 'd'

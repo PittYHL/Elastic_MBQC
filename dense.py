@@ -172,6 +172,104 @@ def new_fill_map(n,map, active):
         if len(map[i]) < max:
             map[i].extend(['Z']* (max - len(map[i])))
 
+def remove_wire(map, qubits):
+    new_map = copy.deepcopy(map)
+    fronts = []
+    backs = []
+    front_loc = []
+    back_loc = []
+    front_leaves = []#recording the leaves
+    back_leaves = []
+    for i in range(qubits - 1):
+        for j in range(len(new_map[i])):
+            if new_map[i * 2 + 1][j] != 'Z':
+                fronts.append(j - 1)
+                break
+        for j in reversed(range(len(new_map[i]))):
+            if new_map[i * 2 + 1][j] != 'Z':
+                backs.append(j + 1)
+                break
+    front_loc.append(fronts[0])
+    back_loc.append(backs[0])
+    for i in range(qubits - 2):
+        front_loc.append(min(fronts[i], fronts[i + 1]))
+        back_loc.append(max(backs[i], backs[i + 1]))
+    front_loc.append(fronts[-1])
+    back_loc.append(backs[-1])
+    for i in range(qubits):
+        fl = []
+        bl = []
+        for j in range(front_loc[i] + 1):
+            if new_map[i * 2][j] != 'Z':
+                fl.append(new_map[i * 2].pop(j))
+                new_map[i * 2].insert(j, 'Z')
+        for j in range(back_loc[i], len(new_map[i * 2])):
+            if new_map[i * 2][j] != 'Z':
+                bl.append(new_map[i * 2].pop(j))
+                new_map[i * 2].insert(j, 'Z')
+        front_leaves.append(fl)
+        back_leaves.append(bl)
+    new_map = prune_Z(new_map)
+    two_qubit_loc = []
+    wire_loc = []
+    for i in range(qubits - 1):
+        wire = []
+        for j in range(len(new_map[i])):
+            if new_map[i * 2 + 1][j] != 'Z':
+                wire.append(j)
+        two_qubit_loc.append(wire)
+    wire_loc.append(two_qubit_loc[0])
+    for i in range(len(two_qubit_loc) - 1):
+        current_loc = two_qubit_loc[i] + two_qubit_loc[i + 1]
+        current_loc.sort()
+        wire_loc.append(current_loc)
+    wire_loc.append(two_qubit_loc[-1])
+    wire_locs = remove_middle_part(wire_loc)
+    two_qubit_gate = []
+    wires = [[] for _ in range(qubits)]
+    for i in range(qubits - 1):
+        temp = []
+        indx = 0
+        while indx < len(new_map[i]):
+            if new_map[i * 2 + 1][indx] != 'Z':
+                if new_map[i * 2 + 1][indx + 1] != 'Z':
+                    temp.append(indx + 1)
+                    indx += 1
+                    wires[i].append(indx)
+                    wires[i + 1].append(indx)
+                else:
+                    temp.append(indx)
+                    wires[i].append(indx)
+                    wires[i + 1].append(indx)
+            indx += 1
+        two_qubit_gate.append(temp)
+    partition = []
+    for wire in wires:
+        wire.sort()
+        partition.extend(wire)
+    partition = [*set(partition)]
+    partition.sort()
+    wire_group = []
+    for i in range(len(partition) - 1):
+        start = partition[i]
+        end = partition[i + 1]
+        row = []  # which row to be removed
+        portion = []  # the portion in each row
+        for j in range(qubits):
+            if len(wires[j]) == 1:
+                portion.append([])
+                continue
+            elif start >= wires[j][-1] or end <= wires[j][0]:
+                portion.append([])
+                continue
+            row.append(j)
+            for k in range(len(wires[j]) - 1):
+                if start >= wires[j][k] and end <= wires[j][k + 1]:
+                    portion.append([wires[j][k], wires[j][k + 1]])
+        wire_group.append(portion)
+    wire_group = update_wire_group(wire_group)
+    starts, ends = check_start_end(two_qubit_gate)
+    print('g')
 def new_eliminate_redundant(map, qubits):
     new_map = copy.deepcopy(map)
     two_qubit_gate = []
@@ -521,3 +619,13 @@ def convert_new_map2(new_map):
             if newnew_map[i][j] == 0:
                 newnew_map[i][j] = ''
     return newnew_map
+
+def remove_middle_part(wire_loc):
+    new_wire_loc = []
+    for i in range(len(wire_loc)):
+        wire = []
+        for j in range(len(wire_loc[i]) - 1):
+            if wire_loc[i][j + 1] - wire_loc[i][j] > 1:
+                wire.append([wire_loc[i][j], wire_loc[i][j + 1]])
+        new_wire_loc.append(wire)
+    return new_wire_loc

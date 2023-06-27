@@ -142,7 +142,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[0])
                 new_end_p1.append(new_front[1])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
@@ -216,7 +216,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[0])
                 new_end_p1.append(new_front[1])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
@@ -266,7 +266,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[0])
                 new_end_p1.append(new_front[1])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
@@ -318,7 +318,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_front1.append(new_front[0])
                 new_end_p1.append(new_front[1])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
@@ -390,7 +390,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_end_p1.append(new_front[1])
                 new_front1.append(new_front[0])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
@@ -457,7 +457,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_end_p1.append(new_front[1])
                 new_front1.append(new_front[0])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
@@ -506,7 +506,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_end_p1.append(new_front[1])
                 new_front1.append(new_front[0])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
@@ -554,7 +554,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             elif num_succ == 1 and end == 'd':
                 new_end_p1.append(new_front[1])
                 new_front1.append(new_front[0])
-            elif num_succ == 2:
+            elif num_succ == 2 or (num_succ == 1 and end == 0):
                 new_front1.append(new_front[0])
                 new_front1.append(new_front[1])
             elif num_succ == 0:
