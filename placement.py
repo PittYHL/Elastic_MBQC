@@ -411,7 +411,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or \
                  (base[0] >= 3 and base[0] - 3 >= up_qubits * 2))):  # first case: on top
             if len(p_shape) + 3 + extra_qubits * 2 > rows and base[0] == 0:
-                return shapes, fronts, spaces, new, wire_targets
+                return shapes, fronts, spaces, new, wire_targets, starts, ends
             new_front = []
             new = new + 1
             new_shape1 = copy.deepcopy(p_shape)

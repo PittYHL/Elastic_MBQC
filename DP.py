@@ -10,7 +10,7 @@ from leaves import *
 la_win = 1
 keep = 3
 long = 4
-def DP(ori_map, qubits, rows, force_right):
+def DP(ori_map, qubits, rows, force_right, special):
     new_map = []
     for row in ori_map:
         new_map.append([])
@@ -24,7 +24,8 @@ def DP(ori_map, qubits, rows, force_right):
     graph, nodes, W_len, first, last, A_loc, B_loc, C_loc = gen_index(new_map)
     table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right)
     middle_shapes = shapes[-1]
-    final_shapes = place_leaves(table, shapes, first, last)
+    final_shapes = place_leaves(table, shapes, first, last, rows, special)
+    show_min(middle_shapes, final_shapes)
     # save_shapes(shapes)
     print('g')
 

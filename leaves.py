@@ -1,7 +1,7 @@
 import copy
 from collections import Counter
 
-def place_leaves(table, shapes, first, last):
+def place_leaves(table, shapes, first, last, rows, special):
     last_table = table[-1]
     last_shapes = shapes[-1]
     final_shapes = []
@@ -9,21 +9,25 @@ def place_leaves(table, shapes, first, last):
         starts = last_table[i]['starts']
         ends = last_table[i]['ends']
         shape = last_shapes[i]
-        final_shape = place_final(shape, starts, ends, first, last)
+        shape, starts, ends = fill_shape(shape, rows, starts, ends)
+        final_shape = place_final(shape, starts, ends, first, last, special)
         final_shapes.append(final_shape)
     return final_shapes
 
-def place_final(shape, starts, ends, first, last):
+def place_final(shape, starts, ends, first, last, special):
     start_indexes, up_s, down_s = rank_starts(starts, shape)
     end_indexes, up_e, down_e = rank_ends(ends, shape)
     new_shape = copy.deepcopy(shape)
+    for i in range(len(first)):
+        if first[i] < 0:
+            first[i] = 1
     for i in range(len(new_shape)):
         new_shape[i] = [0]*max(first) + new_shape[i] + [0]*max(last)
     for i in range(len(starts)):
         starts[i][1] = starts[i][1] + max(first)
         ends[i][1] = ends[i][1] + max(first)
-    new_shape = place_front(new_shape, start_indexes, starts, first, up_s, down_s)
-    new_shape = place_end(new_shape, end_indexes, ends, last, up_e, down_e)
+    new_shape = place_front(new_shape, start_indexes, starts, first, up_s, down_s, special)
+    new_shape = place_end(new_shape, end_indexes, ends, last, up_e, down_e, special)
     new_shape = remove_useless(new_shape)
     return new_shape
 
@@ -150,14 +154,14 @@ def find_indices(list_to_check, item_to_find):
             indices.append(idx)
     return indices
 
-def place_front(new_shape, start_indexes, starts, first, up_y, down_y):
+def place_front(new_shape, start_indexes, starts, first, up_y, down_y, special):
     for i in start_indexes:
         current = starts[i]
-        if i == start_indexes[-1]:
+        if i == start_indexes[-1] and special:
             if current[0] < len(new_shape)/2:
-                new_shape = place_leaf_e(new_shape, first[i], current, 'd', len(new_shape) - 1)
+                new_shape = place_leaf_f(new_shape, first[i], current, 'd', len(new_shape) - 1)
             else:
-                new_shape = place_leaf_e(new_shape, first[i], current, 'u', 0)
+                new_shape = place_leaf_f(new_shape, first[i], current, 'u', 0)
         elif current[0] <= up_y:
             if i != len(start_indexes) - 1 and i != start_indexes[-1]:
                 lower_bound = starts[i + 1][0] - 2
@@ -172,10 +176,10 @@ def place_front(new_shape, start_indexes, starts, first, up_y, down_y):
             new_shape = place_leaf_f(new_shape, first[i], current, 'd', upper_bound)
     return new_shape
 
-def place_end(new_shape, end_indexes, ends, last, up_y, down_y):
+def place_end(new_shape, end_indexes, ends, last, up_y, down_y, special):
     for i in end_indexes:
         current = ends[i]
-        if i == end_indexes[-1]:
+        if i == end_indexes[-1] and special:
             if current[0] < len(new_shape)/2:
                 new_shape = place_leaf_e(new_shape, last[i], current, 'd', len(new_shape) - 1)
             else:
@@ -374,3 +378,29 @@ def remove_useless(new_shape):
         for j in range(min_back):
             new_shape[i].pop(-1)
     return new_shape
+
+def show_min(middle_shapes, final_shapes):
+    min_middle = 1000000
+    min_final = 1000000
+    for shape in middle_shapes:
+        if len(shape[0]) < min_middle:
+            min_middle = len(shape[0])
+    for shape in final_shapes:
+        if len(shape[0]) < min_final:
+            min_final = len(shape[0])
+    print("min middle is " + str(min_middle))
+    print("min final is " + str(min_final))
+
+def fill_shape(shape, rows, starts, ends):
+    extra_row = rows - len(shape)
+    up = int(extra_row/2)
+    down = extra_row - up
+    row = [0]*len(shape[0])
+    for i in range(up):
+        shape.insert(0, row)
+    for i in range(down):
+        shape.append(row)
+    for i in range(len(starts)):
+        starts[i][0] = starts[i][0] + up
+        ends[i][0] = ends[i][0] + up
+    return shape, starts, ends
