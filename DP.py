@@ -70,7 +70,6 @@ def gen_index(map):
     for node in nodes:
         for i in range(len(node) - 1):
             graph.add_edge(node[i], node[i+1])
-    # nx.draw_networkx(graph)
     #order = list(nx.topological_sort(graph))
     #next = list(graph.successors('A.0'))
     return graph, nodes, W_len, first, last, A_loc, B_loc, C_loc
@@ -152,6 +151,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
     # np.savetxt("example/iqp15_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
     qubits = len(nodes)
     order = list(nx.topological_sort(graph))
+    order, W_len, graph, nodes = update_all_wires(order, W_len, graph, nodes)
     placed = []
     #place the first one
     table = [[]]
@@ -160,12 +160,6 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
     c_layer = [] #record the current layer
     two_wire = [] #record the node with two wire predecessors
     qubit_record = []
-    current_row = 3
-    current_d = 0
-    # for i in range(len(order)):
-    #     table.append([])
-    #     shape.append([])
-    #     valid.append([])
     nodes_left = copy.deepcopy(order)
     current = nodes_left.pop(0)
     placed.append(current)
@@ -178,13 +172,33 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         temp_shape.append([1])
         temp_shape.append([1])
         temp_shape.append([1])
-        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0], [2, 0]], 'successor':[succ[0], succ[1]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
+        if len(succ) == 2:
+            table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0], [2, 0]], 'successor':[succ[0], succ[1]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
+        elif len(succ) == 1:
+            end = detec_end(current, succ[0], nodes)
+            if end == 'u':
+                table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[2, 0]], 'successor':[succ[0]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
+            else:
+                table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0]], 'successor':[succ[0]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
     else:
         dep = 2
         temp_shape.append([1,1])
         temp_shape.append([1,1])
         temp_shape.append([1,1])
-        table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1], [2, 1]], 'successor':[succ[0], succ[1]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
+        if len(succ) == 2:
+            table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1], [2, 1]], 'successor':[succ[0], succ[1]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
+        elif len(succ) == 1:
+            end = detec_end(current, succ[0], nodes)
+            if end == 'u':
+                table[0].append(
+                    {'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[2, 1]],
+                     'successor': [succ[0]], 'targets': [], 'preds': [], 'starts': [[0, 0], [2, 0]],
+                     'ends': []})
+            else:
+                table[0].append(
+                    {'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1]],
+                     'successor': [succ[0]], 'targets': [], 'preds': [], 'starts': [[0, 0], [2, 0]],
+                     'ends': []})
     c_layer.append(current)
     f_layer = copy.deepcopy(succ) #future layer
     shape[0].append(temp_shape)
@@ -199,7 +213,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'W.10':
+        if next == 'B.5':
             print('g')
         next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record) #place the next node
         qubit_record = get_qubit_record(next, nodes, qubit_record)
@@ -481,8 +495,12 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
                     if succ in placed:
                         solved = 1
                         succ_placed.append(node)
-        else:
+        elif gate != 'W':
             solved = 0
+            for succ in succs:
+                if succ in placed:
+                    found_wire = 1
+                    next_node = node
         if wires == len(before) and before != []: #both predecessors are wires and one of the sucessors is placed
             solved = 0
             if node not in two_wire:
@@ -869,6 +887,56 @@ def save_shapes(shapes):
                 n_map = np.array(new_map)
                 np.savetxt("example/bv12/bv12ela" + str(w) + ".csv", n_map, fmt='%s', delimiter=",")
                 break
+
+def update_all_wires(order, W_len, graph, nodes):
+    to_be_removed= []
+    for node in order:
+        gate, _ = node.split('.')
+        if gate != 'A' and gate != 'B':
+            continue
+        else:
+            all_wire = 1
+            pre = list(graph.predecessors(node))
+            suc = list(graph.successors(node))
+            if pre == [] or suc == []:
+                continue
+            for p in pre:
+                gate, _ = p.split('.')
+                if gate != 'W':
+                    all_wire = 0
+                    break
+            for s in suc:
+                gate, _ = s.split('.')
+                if gate != 'W':
+                    all_wire = 0
+                    break
+            if all_wire == 1:
+                min_len = 100000
+                for p in pre:
+                    gate, index = p.split('.')
+                    if W_len[int(index)] < min_len:
+                        min_len = W_len[int(index)]
+                for p in pre:
+                    gate, index = p.split('.')
+                    W_len[int(index)] = W_len[int(index)] - min_len
+                    if W_len[int(index)] == 0:
+                        to_be_removed.append('W.' + index)
+                for s in suc:
+                    gate, index = s.split('.')
+                    W_len[int(index)] = W_len[int(index)] + min_len
+    if to_be_removed != []:
+        for node in to_be_removed:
+            for j in range(len(nodes)):
+                if node in nodes[j]:
+                    nodes[j].remove(node)
+        new_graph = nx.DiGraph()
+        for node in nodes:
+            for i in range(len(node) - 1):
+                new_graph.add_edge(node[i], node[i + 1])
+        order = list(nx.topological_sort(new_graph))
+        return order, W_len, new_graph, nodes
+    return order, W_len, graph, nodes
+
 # rows = [2,3,4,5]
 # c_depths = [5,4,4,3]
 # c_spaces = [2,4/3,3/2,2]

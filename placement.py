@@ -129,12 +129,12 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             if base[0] < 2:
                 new_front.append([0, base[1] + 2])
                 new_front.append([base[0] + extra_row, base[1] + 2])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([0, base[1] + 1])
             else:
                 new_front.append([base[0] - 2, base[1] + 2])
                 new_front.append([base[0], base[1] + 2])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([base[0] - 2, base[1] + 1])
             if num_succ == 1 and end == 'u':
                 new_front1.append(new_front[1])
@@ -203,12 +203,12 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             if base[0] < 3:
                 new_front.append([0, base[1] + 1])
                 new_front.append([base[0] + extra_row - 1, base[1] + 1])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([0, base[1]])
             else:
                 new_front.append([base[0] - 3, base[1] + 1])
                 new_front.append([base[0] - 1, base[1] + 1])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([base[0] - 3, base[1]])
             if num_succ == 1 and end == 'u':
                 new_front1.append(new_front[1])
@@ -258,7 +258,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
                     new_shape1[i][j] = 1
             new_front.append([base[0], base[1] + 2])
             new_front.append([base[0] + 2, base[1] + 2])  # add two base
-            if new_qubit:
+            if new_qubit and wire_not_placed==False:
                 new_start_p1.append([base[0] + 2, base[1] + 1])
             if num_succ == 1 and end == 'u':
                 new_front1.append(new_front[1])
@@ -310,7 +310,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
                     new_shape1[i][j] = 1
             new_front.append([base[0] + 1, base[1] + 1])
             new_front.append([base[0] + 3, base[1] + 1])  # add two base
-            if new_qubit:
+            if new_qubit and wire_not_placed==False:
                 new_start_p1.append([base[0] + 3, base[1]])
             if num_succ == 1 and end == 'u':
                 new_end_p1.append(new_front[0])
@@ -377,12 +377,12 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             if extra_row != 0:
                 new_front.append([0, base[1] + 1])
                 new_front.append([base[0] + extra_row, base[1] + 1])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([0, base[1] + 1])
             else:
                 new_front.append([base[0] - 2, base[1] + 1])
                 new_front.append([base[0], base[1] + 1])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([base[0] - 2, base[1] + 1])
             if num_succ == 1 and end == 'u':
                 new_end_p1.append(new_front[0])
@@ -444,12 +444,12 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             if extra_row != 0:
                 new_front.append([0, base[1]])
                 new_front.append([base[0] + extra_row - 1, base[1]])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([0, base[1]])
             else:
                 new_front.append([base[0] - 3, base[1]])
                 new_front.append([base[0] - 1, base[1]])  # add two base
-                if new_qubit:
+                if new_qubit and wire_not_placed==False:
                     new_start_p1.append([base[0] - 3, base[1]])
             if num_succ == 1 and end == 'u':
                 new_end_p1.append(new_front[0])
@@ -498,7 +498,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
                 new_shape1[i][base[1] + 1] = 1
             new_front.append([base[0], base[1] + 1])
             new_front.append([base[0] + 2, base[1] + 1])  # add two base
-            if new_qubit:
+            if new_qubit and wire_not_placed==False:
                 new_start_p1.append([base[0] + 2, base[1] + 1])
             if num_succ == 1 and end == 'u':
                 new_end_p1.append(new_front[0])
@@ -546,7 +546,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
                 new_shape1[i][base[1]] = 1
             new_front.append([base[0] + 1, base[1]])
             new_front.append([base[0] + 3, base[1]])  # add two base
-            if new_qubit:
+            if new_qubit and wire_not_placed==False:
                 new_start_p1.append([base[0] + 3, base[1]])
             if num_succ == 1 and end == 'u':
                 new_end_p1.append(new_front[0])
@@ -917,6 +917,11 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -987,6 +992,11 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -1044,6 +1054,11 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -1097,6 +1112,11 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -1172,6 +1192,11 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -1230,6 +1255,11 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -1282,6 +1312,11 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)
@@ -1322,6 +1357,11 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
+            elif b_end == 0:
+                new_start_p1.append(new_wire_target[-2])
+                new_start_p1.append(new_wire_target[-1])
+                new_wire_target.pop(-1)
+                new_wire_target.pop(-1)
             new_shape1, space = fill_shape(new_shape1)
             shapes.append(new_shape1)
             fronts.append(new_front1)

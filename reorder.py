@@ -10,8 +10,8 @@ from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
 qubits = 10
-rows = 29
-force_right = True#force the second c to the right
+rows = 19
+force_right = False#force the second c to the right
 special = 0#for special leaves
 physical_gate = []
 tracker= []
@@ -21,7 +21,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/iqp10b.txt') as f:
+with open('Benchmarks/hlf10b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -223,7 +223,7 @@ while(new_circuit!=[]):
             tracker[t2] = temp
             physical_gate.append({'gate':name, 'type':'D', 't1':tracker[t1], 't2':tracker[t2]})
 fill_map(qubits,map)
-physical_gate = remove_SW(qubits, physical_gate)
+# physical_gate = remove_SW(qubits, physical_gate)
 DAG = dense(qubits, physical_gate)
 dense_map = cons_new_map(qubits,DAG)
 uti0, use0 = cal_utilization2(dense_map, rows)
@@ -239,7 +239,7 @@ new_map = new_eliminate_redundant(dense_map, qubits)
 new_map2 = remove_wire(new_map, qubits)
 newnew_map = convert_new_map(new_map)
 n_map = np.array(newnew_map)
-# np.savetxt("example/iqp15el_b.csv", n_map, fmt = '%s',delimiter=",")
+# np.savetxt("example/hlf10el.csv", n_map, fmt = '%s',delimiter=",")
 DP(new_map, qubits, rows, force_right, special)
 # n_map = np.array(new_map)
 # np.savetxt("example/bv4el.csv", n_map, fmt = '%s',delimiter=",")

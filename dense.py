@@ -230,10 +230,10 @@ def remove_wire(map, qubits):
     for i in range(qubits - 1):
         temp = []
         indx = 0
-        while indx < len(new_map[i]):
+        while indx < len(new_map[i]) - 1:
             if new_map[i * 2 + 1][indx] != 'Z':
                 if new_map[i * 2 + 1][indx + 1] != 'Z':
-                    temp.append(indx + 1)
+                    temp.append(indx)
                     indx += 1
                     wires[i].append(indx)
                     wires[i + 1].append(indx)
@@ -243,32 +243,15 @@ def remove_wire(map, qubits):
                     wires[i + 1].append(indx)
             indx += 1
         two_qubit_gate.append(temp)
-    partition = []
-    for wire in wires:
-        wire.sort()
-        partition.extend(wire)
-    partition = [*set(partition)]
-    partition.sort()
-    wire_group = []
-    for i in range(len(partition) - 1):
-        start = partition[i]
-        end = partition[i + 1]
-        row = []  # which row to be removed
-        portion = []  # the portion in each row
-        for j in range(qubits):
-            if len(wires[j]) == 1:
-                portion.append([])
-                continue
-            elif start >= wires[j][-1] or end <= wires[j][0]:
-                portion.append([])
-                continue
-            row.append(j)
-            for k in range(len(wires[j]) - 1):
-                if start >= wires[j][k] and end <= wires[j][k + 1]:
-                    portion.append([wires[j][k], wires[j][k + 1]])
-        wire_group.append(portion)
-    wire_group = update_wire_group(wire_group)
-    starts, ends = check_start_end(two_qubit_gate)
+    double_wire_loc = []
+    double_wire = 0
+    for i in range(qubits - 1):
+        if len(two_qubit_gate[i]) == 1:
+            continue
+        for j in two_qubit_gate[i]:
+            if j != 0 and new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X':
+                double_wire = 1
+                break
     print('g')
 def new_eliminate_redundant(map, qubits):
     new_map = copy.deepcopy(map)
@@ -318,6 +301,7 @@ def new_eliminate_redundant(map, qubits):
     # new_map = prune_Z(new_map)
 
     row_len = int(len(map[0]))
+    # row_len = 0
     for i in range(len(new_map)):
         new_map[i] = ['Z'] * row_len + new_map[i] + ['Z'] * row_len
     #update two qubit gate
@@ -407,25 +391,11 @@ def new_eliminate_redundant(map, qubits):
                 min_row = ind
             ind = ind + 1
         if (all(ele == 1 for ele in indication)): #found wire in all rows
-            # if row[-1] != qubits - 1:
-            #     if len(x_loc) == 2 and x_loc[1][0] > wires[row[-1] + 1][-1]:
-            #         shift = 0
-            #     elif len(x_loc) == 1 and x_loc[0][0] > wires[row[-1] + 1][-1]:
-            #         shift = 0
-            #     else:
-            #         shift = 1
-            # else:
-            #     shift = 1
             for j in range(len(row)):
-                to_be_remove = []
-                # loc = x_loc[j].pop(0)
                 for k in range(min_x):
                     loc = x_loc[j].pop(0)
                     del new_map[row[j] * 2][loc]
                     del new_map[row[j] * 2][loc]
-                    # if shift:
-                    #     new_map[row[j] * 2].insert(0, 'Z')
-                    #     new_map[row[j] * 2].insert(0, 'Z')
                     if len(x_loc[j]) != 0:
                         for element in x_loc[j]:
                             element = element - 2
@@ -445,15 +415,6 @@ def new_eliminate_redundant(map, qubits):
                         elif new_map[row[j] * 2 - 1][loc] == new_map[row[j] * 2 - 1][loc + 1] == 'Z':
                             del new_map[row[j] * 2 - 1][loc]
                             del new_map[row[j] * 2 - 1][loc]
-                        # if shift:
-                        #     new_map[row[j] * 2 - 1].insert(0, 'Z')
-                        #     new_map[row[j] * 2 - 1].insert(0, 'Z')
-            # if row[0] > 0 and shift:
-            #     for j in range(0, row[0]):
-            #         if start + 1 >= wires[j][0]:
-            #             extra = ['Z'] * (2 * min_x)
-            #             new_map[j * 2] = extra + new_map[j * 2]
-            #             new_map[j * 2 + 1] = extra + new_map[j * 2 + 1]
             #update starts and ends
             for j in range(len(row) - 1):
                 if starts[row[j]] > start:
