@@ -37,8 +37,11 @@ def rank_starts(starts, shape):
     x_locs = []
     up_y = -1 #if y upper than this, go up
     down_y = -1 #if y lower than this, go down
+    left_most = [] #the indexes that store the left most starts
     for start in starts:
         x_locs.append(start[1])
+        if (start[1]) == 0:
+            left_most.append(starts.index(start))
     sort_locs = copy.deepcopy(x_locs)
     sort_locs.sort(reverse=True)
     while(sort_locs) != []:
@@ -48,38 +51,39 @@ def rank_starts(starts, shape):
             sort_locs.pop(0)
         else:
             indexes = find_indices(x_locs, loc)
-            y_locs = []
-            for i in indexes:
-                y_locs.append(starts[i][0])
-            up = min(y_locs)
-            down = width - max(y_locs) - 1
-            if up > down:
-                while(indexes) != []:
-                    ind = y_locs.index(min(y_locs))
-                    start_indexes.append(indexes[ind])
-                    if len(sort_locs) <= 2:
-                        up_y = y_locs[ind]
-                    indexes.pop(ind)
-                    y_locs.pop(ind)
-                    sort_locs.pop(0)
-                    if indexes != []:
-                        ind = y_locs.index(max(y_locs))
-                        start_indexes.append(indexes[ind])
-                        if len(sort_locs) <= 2:
-                            down_y = y_locs[ind]
-                        indexes.pop(ind)
-                        y_locs.pop(ind)
+            together = 1
+            for i in range(len(indexes) - 1):
+                if indexes[i + 1] - indexes[i] != 1:
+                    together = 0
+            if sort_locs[0] != 0 and together and (indexes[0] > left_most[-1] or indexes[-1] < left_most[0]):
+                if indexes[0] > left_most[-1]:
+                    for i in reversed(range(len(indexes))):
+                        start_indexes.append(indexes[i])
                         sort_locs.pop(0)
+                elif indexes[-1] < left_most[0]:
+                    for i in range(len(indexes)):
+                        start_indexes.append(indexes[i])
+                        sort_locs.pop(0)
+            # elif together and sort_locs[0] == 0 and indexes[0] == 0:
+            #     for i in reversed(range(len(indexes))):
+            #         start_indexes.append(indexes[i])
+            #         sort_locs.pop(0)
+            #     up_y = starts[0][0]
+            #     down_y = starts[0][0]
+            # elif together and sort_locs[0] == 0 and indexes[-1] == len(starts) - 1:
+            #     for i in range(len(indexes)):
+            #         start_indexes.append(indexes[i])
+            #         sort_locs.pop(0)
+            #     up_y = starts[-1][0]
+            #     down_y = starts[-1][0]
             else:
-                while(indexes) != []:
-                    ind = y_locs.index(max(y_locs))
-                    start_indexes.append(indexes[ind])
-                    if len(sort_locs) <= 2:
-                        down_y = y_locs[ind]
-                    indexes.pop(ind)
-                    y_locs.pop(ind)
-                    sort_locs.pop(0)
-                    if indexes != []:
+                y_locs = []
+                for i in indexes:
+                    y_locs.append(starts[i][0])
+                up = min(y_locs)
+                down = width - max(y_locs) - 1
+                if up > down:
+                    while(indexes) != []:
                         ind = y_locs.index(min(y_locs))
                         start_indexes.append(indexes[ind])
                         if len(sort_locs) <= 2:
@@ -87,6 +91,31 @@ def rank_starts(starts, shape):
                         indexes.pop(ind)
                         y_locs.pop(ind)
                         sort_locs.pop(0)
+                        if indexes != []:
+                            ind = y_locs.index(max(y_locs))
+                            start_indexes.append(indexes[ind])
+                            if len(sort_locs) <= 2:
+                                down_y = y_locs[ind]
+                            indexes.pop(ind)
+                            y_locs.pop(ind)
+                            sort_locs.pop(0)
+                else:
+                    while(indexes) != []:
+                        ind = y_locs.index(max(y_locs))
+                        start_indexes.append(indexes[ind])
+                        if len(sort_locs) <= 2:
+                            down_y = y_locs[ind]
+                        indexes.pop(ind)
+                        y_locs.pop(ind)
+                        sort_locs.pop(0)
+                        if indexes != []:
+                            ind = y_locs.index(min(y_locs))
+                            start_indexes.append(indexes[ind])
+                            if len(sort_locs) <= 2:
+                                up_y = y_locs[ind]
+                            indexes.pop(ind)
+                            y_locs.pop(ind)
+                            sort_locs.pop(0)
     return start_indexes, up_y, down_y
 
 def rank_ends(ends, shape):
@@ -95,8 +124,15 @@ def rank_ends(ends, shape):
     x_locs = []
     up_y = -1  # if y upper than this, go up
     down_y = -1  # if y lower than this, go down
+    right_most = []  # the indexes that store the left most starts
+    longest = 0
     for end in ends:
         x_locs.append(end[1])
+        if (end[1]) > longest:
+            longest = end[1]
+    for end in ends:
+        if end[1] == longest:
+            right_most.append(ends.index(end))
     sort_locs = copy.deepcopy(x_locs)
     sort_locs.sort()
     while (sort_locs) != []:
@@ -106,38 +142,39 @@ def rank_ends(ends, shape):
             sort_locs.pop(0)
         else:
             indexes = find_indices(x_locs, loc)
-            y_locs = []
-            for i in indexes:
-                y_locs.append(ends[i][0])
-            up = min(y_locs)
-            down = width - max(y_locs) - 1
-            if up > down:
-                while (indexes) != []:
-                    ind = y_locs.index(min(y_locs))
-                    start_indexes.append(indexes[ind])
-                    if len(sort_locs) <= 2:
-                        up_y = y_locs[ind]
-                    indexes.pop(ind)
-                    y_locs.pop(ind)
-                    sort_locs.pop(0)
-                    if indexes != []:
-                        ind = y_locs.index(max(y_locs))
-                        start_indexes.append(indexes[ind])
-                        if len(sort_locs) <= 2:
-                            down_y = y_locs[ind]
-                        indexes.pop(ind)
-                        y_locs.pop(ind)
+            together = 1
+            for i in range(len(indexes) - 1):
+                if indexes[i + 1] - indexes[i] != 1:
+                    together = 0
+            if sort_locs[0] != longest and together and (indexes[0] > right_most[-1] or indexes[-1] < right_most[0]):
+                if indexes[0] > right_most[-1]:
+                    for i in reversed(range(len(indexes))):
+                        start_indexes.append(indexes[i])
                         sort_locs.pop(0)
-            else:
-                while (indexes) != []:
-                    ind = y_locs.index(max(y_locs))
-                    start_indexes.append(indexes[ind])
-                    if len(sort_locs) <= 2:
-                        down_y = y_locs[ind]
-                    indexes.pop(ind)
-                    y_locs.pop(ind)
+                elif indexes[-1] < right_most[0]:
+                    for i in range(len(indexes)):
+                        start_indexes.append(indexes[i])
+                        sort_locs.pop(0)
+            elif together and sort_locs[0] == longest and indexes[0] == 0:
+                for i in reversed(range(len(indexes))):
+                    start_indexes.append(indexes[i])
                     sort_locs.pop(0)
-                    if indexes != []:
+                up_y = ends[0][0]
+                down_y = ends[0][0]
+            elif together and sort_locs[0] == longest and indexes[-1] == len(ends) - 1:
+                for i in range(len(indexes)):
+                    start_indexes.append(indexes[i])
+                    sort_locs.pop(0)
+                up_y = ends[-1][0]
+                down_y = ends[-1][0]
+            else:
+                y_locs = []
+                for i in indexes:
+                    y_locs.append(ends[i][0])
+                up = min(y_locs)
+                down = width - max(y_locs) - 1
+                if up > down:
+                    while (indexes) != []:
                         ind = y_locs.index(min(y_locs))
                         start_indexes.append(indexes[ind])
                         if len(sort_locs) <= 2:
@@ -145,6 +182,31 @@ def rank_ends(ends, shape):
                         indexes.pop(ind)
                         y_locs.pop(ind)
                         sort_locs.pop(0)
+                        if indexes != []:
+                            ind = y_locs.index(max(y_locs))
+                            start_indexes.append(indexes[ind])
+                            if len(sort_locs) <= 2:
+                                down_y = y_locs[ind]
+                            indexes.pop(ind)
+                            y_locs.pop(ind)
+                            sort_locs.pop(0)
+                else:
+                    while (indexes) != []:
+                        ind = y_locs.index(max(y_locs))
+                        start_indexes.append(indexes[ind])
+                        if len(sort_locs) <= 2:
+                            down_y = y_locs[ind]
+                        indexes.pop(ind)
+                        y_locs.pop(ind)
+                        sort_locs.pop(0)
+                        if indexes != []:
+                            ind = y_locs.index(min(y_locs))
+                            start_indexes.append(indexes[ind])
+                            if len(sort_locs) <= 2:
+                                up_y = y_locs[ind]
+                            indexes.pop(ind)
+                            y_locs.pop(ind)
+                            sort_locs.pop(0)
     return start_indexes, up_y, down_y
 
 def find_indices(list_to_check, item_to_find):

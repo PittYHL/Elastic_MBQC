@@ -847,7 +847,7 @@ def feasible_placement(ori_loc, new_loc, p_shape, gate):
     return legal
 
 def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
-                     extra_qubits, new_sucessors, wire_targets, wire_target, b_end, start_p, end_p, starts, ends): #place B node
+    extra_qubits, new_sucessors, wire_targets, wire_target, b_end, start_p, end_p, starts, ends, n_preds): #place B node
     #current
     new = 0 #how many new node
     num_succ = len(new_sucessors)
@@ -917,7 +917,7 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)
@@ -992,7 +992,7 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)
@@ -1054,7 +1054,7 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)
@@ -1112,7 +1112,7 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)
@@ -1127,7 +1127,7 @@ def reversed_place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spa
     return shapes, fronts, spaces, new, wire_targets, starts, ends
 
 def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
-                     spaces, extra_qubits, new_sucessors, wire_targets, wire_target, b_end, start_p, end_p, starts, ends): #place B node
+                     spaces, extra_qubits, new_sucessors, wire_targets, wire_target, b_end, start_p, end_p, starts, ends, n_preds): #place B node
     #current
     new = 0 #how many new node
     num_succ = len(new_sucessors)
@@ -1192,7 +1192,7 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)
@@ -1255,7 +1255,7 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)
@@ -1312,7 +1312,7 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)
@@ -1357,7 +1357,7 @@ def reversed_place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts,
             elif b_end == 'u':
                 new_start_p1.append(new_wire_target[-2])
                 new_wire_target.pop(-2)
-            elif b_end == 0:
+            elif n_preds == []:
                 new_start_p1.append(new_wire_target[-2])
                 new_start_p1.append(new_wire_target[-1])
                 new_wire_target.pop(-1)

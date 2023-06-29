@@ -172,7 +172,7 @@ def new_fill_map(n,map, active):
         if len(map[i]) < max:
             map[i].extend(['Z']* (max - len(map[i])))
 
-def remove_wire(map, qubits):
+def remove_wire(map, qubits, remove_single):
     new_map = copy.deepcopy(map)
     fronts = []
     backs = []
@@ -210,21 +210,6 @@ def remove_wire(map, qubits):
         front_leaves.append(fl)
         back_leaves.append(bl)
     new_map = prune_Z(new_map)
-    two_qubit_loc = []
-    wire_loc = []
-    for i in range(qubits - 1):
-        wire = []
-        for j in range(len(new_map[i])):
-            if new_map[i * 2 + 1][j] != 'Z':
-                wire.append(j)
-        two_qubit_loc.append(wire)
-    wire_loc.append(two_qubit_loc[0])
-    for i in range(len(two_qubit_loc) - 1):
-        current_loc = two_qubit_loc[i] + two_qubit_loc[i + 1]
-        current_loc.sort()
-        wire_loc.append(current_loc)
-    wire_loc.append(two_qubit_loc[-1])
-    wire_locs = remove_middle_part(wire_loc)
     two_qubit_gate = []
     wires = [[] for _ in range(qubits)]
     for i in range(qubits - 1):
@@ -243,23 +228,37 @@ def remove_wire(map, qubits):
                     wires[i + 1].append(indx)
             indx += 1
         two_qubit_gate.append(temp)
-    double_wire_loc = []
     double_wire = 0
     for i in range(qubits - 1):
         for j in two_qubit_gate[i]:
-            if j != 0 and (new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X'\
+            if j != 0 and remove_single and (new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X'\
                 or (new_map[i*2][j - 1] == new_map[i*2][j - 2] == 'X' and new_map[i*2 + 2][j - 1] == 'Z') or
                     (new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X' and new_map[i*2][j - 1] == 'Z')):
+                double_wire = 1
+                break
+            elif j != 0 and remove_single == 0 and \
+                (new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X'):
                 double_wire = 1
                 break
     while double_wire:
         for i in range(qubits - 1):
             for j in two_qubit_gate[i]:
-                if j != 0 and new_map[i * 2][j - 1] == new_map[i * 2][j - 2] == new_map[i * 2 + 2][j - 1] == \
-                        new_map[i * 2 + 2][j - 2] == 'X':
+                found_wire = 0
+                if j != 0 and new_map[i * 2][j - 1] == new_map[i * 2][j - 2] == \
+                        new_map[i * 2 + 2][j - 1] == new_map[i * 2 + 2][j - 2] == 'X':
                     up_len = check_wire_len(new_map, i * 2, j - 1)
                     low_len = check_wire_len(new_map, i * 2 + 2, j - 1)
                     length = min(up_len, low_len)
+                    found_wire = 1
+                elif j != 0 and remove_single and (new_map[i * 2][j - 1] == new_map[i * 2][j - 2] == 'X'
+                    and new_map[i * 2 + 2][j - 1] == 'Z'):  # upper wire
+                    length = check_wire_len(new_map, i * 2, j - 1)
+                    found_wire = 1
+                elif j != 0 and remove_single and (new_map[i * 2 + 2][j - 1] == new_map[i * 2 + 2][j - 2] == 'X'
+                    and new_map[i * 2][j - 1] == 'Z'):  # upper wire
+                    length = check_wire_len(new_map, i * 2 + 2, j - 1)
+                    found_wire = 1
+                if found_wire:
                     for k in range(length):
                         new_map[i * 2].pop(j - length)
                         new_map[i * 2 + 1].pop(j - length)
@@ -268,8 +267,9 @@ def remove_wire(map, qubits):
                         new_map[i * 2].insert(j - length + 2, 'X')
                         new_map[i * 2 + 1].insert(j - length + 2, 'Z')
                         new_map[i * 2 + 2].insert(j - length + 2, 'X')
-        two_qubit_gate = update_two_qubit(new_map, qubits)
-    print('g')
+        new_map, two_qubit_gate, double_wire = update_two_qubit(new_map, qubits, remove_single)
+    new_map = put_back_leaves(new_map, front_leaves, back_leaves, qubits)
+    return new_map
 def new_eliminate_redundant(map, qubits):
     new_map = copy.deepcopy(map)
     two_qubit_gate = []
@@ -617,12 +617,18 @@ def check_wire_len(map, row, start):
             break
     return length
 
-def update_two_qubit(map, qubits):
+def update_two_qubit(map, qubits, remove_single):
     for i in range(qubits):
-        for j in range(len(map[i * 2]) - 1, -1, -2):
-            if j > 0 and map[i * 2][j] == map[i * 2][j - 1] == 'X':
-                map[i * 2].pop(j - 1)
-                map[i * 2].pop(j - 1)
+        indx = len(map[i * 2]) - 1
+        while indx != 1:
+            if map[i * 2][indx] == 'Z':
+                indx = indx - 1
+            elif map[i * 2][indx] == map[i * 2][indx - 1] == 'X':
+                map[i * 2].pop(indx - 1)
+                map[i * 2].pop(indx - 1)
+                map[i * 2].append('Z')
+                map[i * 2].append('Z')
+                indx = indx - 1
             else:
                 break
     two_qubit_gate = []
@@ -643,3 +649,45 @@ def update_two_qubit(map, qubits):
                     wires[i + 1].append(indx)
             indx += 1
         two_qubit_gate.append(temp)
+    double_wire = 0
+    for i in range(qubits - 1):
+        for j in two_qubit_gate[i]:
+            if j != 0 and remove_single and (
+                    map[i * 2][j - 1] == map[i * 2][j - 2] == map[i * 2 + 2][j - 1] == map[i * 2 + 2][
+                j - 2] == 'X' \
+                    or (map[i * 2][j - 1] == map[i * 2][j - 2] == 'X' and map[i * 2 + 2][j - 1] == 'Z') or
+                    (map[i * 2 + 2][j - 1] == map[i * 2 + 2][j - 2] == 'X' and map[i * 2][j - 1] == 'Z')):
+                double_wire = 1
+                break
+            elif j != 0 and remove_single == 0 and \
+                    (map[i * 2][j - 1] == map[i * 2][j - 2] == map[i * 2 + 2][j - 1] == map[i * 2 + 2][
+                        j - 2] == 'X'):
+                double_wire = 1
+                break
+    return map, two_qubit_gate, double_wire
+
+def put_back_leaves(new_map, front_leaves, back_leaves, qubits):
+    new_map = prune_Z(new_map)
+    max_f = 0
+    max_b = 0
+    for i in range(len(front_leaves)):
+        if len(front_leaves[i]) > max_f:
+            max_f = len(front_leaves[i])
+        if len(back_leaves[i]) > max_b:
+            max_b = len(front_leaves[i])
+    for i in range(len(new_map)):
+        new_map[i] = ['Z']*max_f + new_map[i] + ['Z']*max_b
+    for i in range(qubits):
+        front_loc = 0
+        back_loc = 0
+        for j in range(len(new_map[i * 2])):
+            if new_map[i * 2][j] !='Z':
+                front_loc = j
+                break
+        for j in reversed(range(len(new_map[i * 2]))):
+            if new_map[i * 2][j] !='Z':
+                back_loc = j + 1
+                break
+        new_map[i * 2][front_loc - len(front_leaves[i]):front_loc] = front_leaves[i]
+        new_map[i * 2][back_loc:back_loc + len(back_leaves[i])] = back_leaves[i]
+    return new_map

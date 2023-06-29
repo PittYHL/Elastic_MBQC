@@ -177,9 +177,9 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         elif len(succ) == 1:
             end = detec_end(current, succ[0], nodes)
             if end == 'u':
-                table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[2, 0]], 'successor':[succ[0]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
+                table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[2, 0]], 'successor':[succ[0]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[[0, 0]]})
             else:
-                table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0]], 'successor':[succ[0]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[]})
+                table[0].append({'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 0]], 'successor':[succ[0]], 'targets':[], 'preds':[], 'starts':[[0, 0], [2, 0]], 'ends':[[2, 0]]})
     else:
         dep = 2
         temp_shape.append([1,1])
@@ -193,12 +193,12 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
                 table[0].append(
                     {'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[2, 1]],
                      'successor': [succ[0]], 'targets': [], 'preds': [], 'starts': [[0, 0], [2, 0]],
-                     'ends': []})
+                     'ends': [[0,1]]})
             else:
                 table[0].append(
                     {'New': current, 'P': 'NA', 'row': 3, 'S': 0, 'D': dep, 'Q': 2, 'front': [[0, 1]],
                      'successor': [succ[0]], 'targets': [], 'preds': [], 'starts': [[0, 0], [2, 0]],
-                     'ends': []})
+                     'ends': [[2,1]]})
     c_layer.append(current)
     f_layer = copy.deepcopy(succ) #future layer
     shape[0].append(temp_shape)
@@ -213,7 +213,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'B.5':
+        if next == 'B.16':
             print('g')
         next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record) #place the next node
         qubit_record = get_qubit_record(next, nodes, qubit_record)
@@ -387,7 +387,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
                 if new:
                     starts.append(start_p)
                     ends.append(end_p)
-        else: #fbackward
+        else: #backward
             wire_target = parent['targets']
             preds = parent['preds']
             t_index = preds.index(next)
@@ -395,12 +395,12 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
             base = wire_target.pop(t_index)
             if c_gate == 'A':
                 shapes, fronts, spaces, new, wire_targets, starts, ends = reversed_place_A(p_shape, base, loc, rows, p_row, front,
-                                                                    shapes, fronts, spaces, qubits - c_qubit,
-                                                                    new_sucessors, wire_targets, wire_target, b_end, start_p, end_p, starts, ends)
+                                                                    shapes, fronts, spaces, qubits - c_qubit,new_sucessors,
+                                                                    wire_targets, wire_target, b_end, start_p, end_p, starts, ends, n_preds)
             elif c_gate == 'B':
                 shapes, fronts, spaces, new, wire_targets, starts, ends = reversed_place_B(p_shape, base, loc, rows, p_row, front,
-                                                                    shapes, fronts, spaces, qubits - c_qubit,
-                                                                    new_sucessors, wire_targets, wire_target, b_end, start_p, end_p, starts, ends)
+                                                                    shapes, fronts, spaces, qubits - c_qubit, new_sucessors,
+                                                                    wire_targets, wire_target, b_end, start_p, end_p, starts, ends, n_preds)
             elif c_gate == 'C':
                 shapes, fronts, spaces, new, wire_targets, starts, ends = reversed_place_C(p_shape, base, loc, rows,
                                                                                                p_row, front,

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="dc6b269d-0e5c-48fa-893a-3db9101bf5a7" name="Changes" comment="">
+    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish hlf10">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/leaves.py" beforeDir="false" afterPath="$PROJECT_DIR$/leaves.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,12 +163,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>266</line>
+          <line>269</line>
           <option name="timeStamp" value="144" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>260</line>
+          <line>263</line>
           <option name="timeStamp" value="319" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -203,23 +208,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>242</line>
+          <line>245</line>
           <option name="timeStamp" value="901" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/leaves.py</url>
-          <line>31</line>
-          <option name="timeStamp" value="915" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/leaves.py</url>
-          <line>17</line>
-          <option name="timeStamp" value="916" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dense.py</url>
-          <line>227</line>
-          <option name="timeStamp" value="977" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
@@ -228,28 +218,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>216</line>
-          <option name="timeStamp" value="1003" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>217</line>
-          <option name="timeStamp" value="1005" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dense.py</url>
-          <line>270</line>
-          <option name="timeStamp" value="1009" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dense.py</url>
-          <line>623</line>
-          <option name="timeStamp" value="1015" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dense.py</url>
-          <line>622</line>
-          <option name="timeStamp" value="1016" />
+          <line>27</line>
+          <option name="timeStamp" value="1055" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -267,6 +237,11 @@
         <watch expression="table" />
         <watch expression="shape" />
         <watch expression="shape[19]" />
+        <watch expression="new_map" />
+        <watch expression="i" />
+        <watch expression="j" />
+        <watch expression="placed" />
+        <watch expression="nodes" />
       </configuration>
     </watches-manager>
   </component>
