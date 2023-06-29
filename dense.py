@@ -246,12 +246,29 @@ def remove_wire(map, qubits):
     double_wire_loc = []
     double_wire = 0
     for i in range(qubits - 1):
-        if len(two_qubit_gate[i]) == 1:
-            continue
         for j in two_qubit_gate[i]:
-            if j != 0 and new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X':
+            if j != 0 and (new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X'\
+                or (new_map[i*2][j - 1] == new_map[i*2][j - 2] == 'X' and new_map[i*2 + 2][j - 1] == 'Z') or
+                    (new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X' and new_map[i*2][j - 1] == 'Z')):
                 double_wire = 1
                 break
+    while double_wire:
+        for i in range(qubits - 1):
+            for j in two_qubit_gate[i]:
+                if j != 0 and new_map[i * 2][j - 1] == new_map[i * 2][j - 2] == new_map[i * 2 + 2][j - 1] == \
+                        new_map[i * 2 + 2][j - 2] == 'X':
+                    up_len = check_wire_len(new_map, i * 2, j - 1)
+                    low_len = check_wire_len(new_map, i * 2 + 2, j - 1)
+                    length = min(up_len, low_len)
+                    for k in range(length):
+                        new_map[i * 2].pop(j - length)
+                        new_map[i * 2 + 1].pop(j - length)
+                        new_map[i * 2 + 2].pop(j - length)
+                    for k in range(length):
+                        new_map[i * 2].insert(j - length + 2, 'X')
+                        new_map[i * 2 + 1].insert(j - length + 2, 'Z')
+                        new_map[i * 2 + 2].insert(j - length + 2, 'X')
+        two_qubit_gate = update_two_qubit(new_map, qubits)
     print('g')
 def new_eliminate_redundant(map, qubits):
     new_map = copy.deepcopy(map)
@@ -590,3 +607,39 @@ def remove_middle_part(wire_loc):
                 wire.append([wire_loc[i][j], wire_loc[i][j + 1]])
         new_wire_loc.append(wire)
     return new_wire_loc
+
+def check_wire_len(map, row, start):
+    length = 0
+    for j in range(start, -1, -2):
+        if map[row][j] == map[row][j-1] == 'X':
+            length = length + 2
+        else:
+            break
+    return length
+
+def update_two_qubit(map, qubits):
+    for i in range(qubits):
+        for j in range(len(map[i * 2]) - 1, -1, -2):
+            if j > 0 and map[i * 2][j] == map[i * 2][j - 1] == 'X':
+                map[i * 2].pop(j - 1)
+                map[i * 2].pop(j - 1)
+            else:
+                break
+    two_qubit_gate = []
+    wires = [[] for _ in range(qubits)]
+    for i in range(qubits - 1):
+        temp = []
+        indx = 0
+        while indx < len(map[i]) - 1:
+            if map[i * 2 + 1][indx] != 'Z':
+                if map[i * 2 + 1][indx + 1] != 'Z':
+                    temp.append(indx)
+                    indx += 1
+                    wires[i].append(indx)
+                    wires[i + 1].append(indx)
+                else:
+                    temp.append(indx)
+                    wires[i].append(indx)
+                    wires[i + 1].append(indx)
+            indx += 1
+        two_qubit_gate.append(temp)
