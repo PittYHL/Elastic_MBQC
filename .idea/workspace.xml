@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish hlf10">
+    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish the last step">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/leaves.py" beforeDir="false" afterPath="$PROJECT_DIR$/leaves.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -121,7 +117,14 @@
       <option name="project" value="LOCAL" />
       <updated>1687898446965</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="finish the last step">
+      <created>1688063654916</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1688063654917</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -151,7 +154,8 @@
     <MESSAGE value="finish bv7" />
     <MESSAGE value="finish 15 qubits" />
     <MESSAGE value="finish iqp15" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish iqp15" />
+    <MESSAGE value="finish the last step" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish the last step" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
