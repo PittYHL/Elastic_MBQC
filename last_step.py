@@ -75,6 +75,8 @@ def original_reduction(shortest_shape):
                 if row[j] != 0:
                     back_locs.append(j + 1)
                     break
+                elif j == 0:
+                    back_locs.append(0)
         found_reduc = 1
         for i in range(len(new_shape)):
             if new_shape[i][back_locs[i]] != 0:
@@ -113,6 +115,8 @@ def comb_reduction(shortest_shape, combina):
                 if row[j] != 0:
                     back_locs.append(j + 1)
                     break
+                elif j == 0:
+                    back_locs.append(0)
         found_reduc = 1
         for i in range(len(new_shape1)):
             if new_shape1[i][back_locs[i]] != 0:
@@ -140,6 +144,8 @@ def comb_reduction(shortest_shape, combina):
                 if row[j] != 0:
                     back_locs.append(j + 1)
                     break
+                elif j == 0:
+                    back_locs.append(0)
         found_reduc = 1
         for i in range(len(new_shape1)):
             if new_shape2[i][back_locs[i]] != 0:
