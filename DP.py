@@ -6,6 +6,7 @@ from dense import convert_new_map2
 import numpy as np
 from fill_map import *
 from leaves import *
+from last_step import combination
 
 la_win = 1
 keep = 3
@@ -26,6 +27,7 @@ def DP(ori_map, qubits, rows, force_right, special):
     middle_shapes = shapes[-1]
     final_shapes = place_leaves(table, shapes, first, last, rows, special)
     show_min(middle_shapes, final_shapes)
+    combination(final_shapes)
     # save_shapes(shapes)
     print('g')
 
