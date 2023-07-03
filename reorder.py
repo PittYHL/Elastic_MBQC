@@ -9,13 +9,13 @@ import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 7
-rows = 21
+qubits = 15
+rows = 40
 force_right = False#force the second c to the right
 special = 0#for special leaves
-wire_remove = 1
+wire_remove = 0
 remove_single = 0 #for removing the single qubit gate
-remove_SWAP = 0
+remove_SWAP = 1
 physical_gate = []
 tracker= []
 map = []
@@ -24,7 +24,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/hlf7b.txt') as f:
+with open('Benchmarks/bv15b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []

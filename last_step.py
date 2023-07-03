@@ -188,7 +188,8 @@ def comb_reduction(shortest_shape, combina):
             while found_reduc:
                 for i in range(len(new_shape2)):
                     if i == 0 and (new_shape2[i][back_locs[i] + 1] != 0 or
-                    (new_shape2[i + 1][back_locs[i]] != 0 and shape2[i + 1][back_locs[i]] == 0)):
+                    (back_locs[i] < len(shape2[i]) and new_shape2[i + 1][back_locs[i]] != 0
+                     and shape2[i + 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                     elif i == len(new_shape2) - 1 and (new_shape2[i][back_locs[i] + 1] != 0 or
