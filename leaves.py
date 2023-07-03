@@ -6,8 +6,8 @@ def place_leaves(table, shapes, first, last, rows, special):
     last_shapes = shapes[-1]
     final_shapes = []
     for i in range(len(last_table)):
-        starts = last_table[i]['starts']
-        ends = last_table[i]['ends']
+        starts = copy.deepcopy(last_table[i]['starts'])
+        ends = copy.deepcopy(last_table[i]['ends'])
         shape = last_shapes[i]
         shape, starts, ends = fill_shape(shape, rows, starts, ends)
         final_shape = place_final(shape, starts, ends, first, last, special)

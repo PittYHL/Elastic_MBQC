@@ -6,7 +6,7 @@ from dense import convert_new_map2
 import numpy as np
 from fill_map import *
 from leaves import *
-from last_step import combination
+from last_step import *
 
 la_win = 1
 keep = 3
@@ -27,7 +27,9 @@ def DP(ori_map, qubits, rows, force_right, special):
     middle_shapes = shapes[-1]
     final_shapes = place_leaves(table, shapes, first, last, rows, special)
     show_min(middle_shapes, final_shapes)
+    # save_shapes(shapes)
     combination(final_shapes)
+    # combination2(table[-1], middle_shapes, first, last, rows)
     # save_shapes(shapes)
     print('g')
 
@@ -887,7 +889,7 @@ def save_shapes(shapes):
             if len(shape[0]) == min_depth:
                 new_map = convert_new_map2(shape)
                 n_map = np.array(new_map)
-                np.savetxt("example/bv12/bv12ela" + str(w) + ".csv", n_map, fmt='%s', delimiter=",")
+                np.savetxt("example/bv5/bv5ela" + str(w) + ".csv", n_map, fmt='%s', delimiter=",")
                 break
 
 def update_all_wires(order, W_len, graph, nodes):
