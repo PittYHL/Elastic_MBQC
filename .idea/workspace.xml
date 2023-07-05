@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish the last step" />
+    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish the last step">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/bv27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/bv27.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp27.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/qft27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/qft27.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/last_step.py" beforeDir="false" afterPath="$PROJECT_DIR$/last_step.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -215,11 +226,6 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>940</line>
-          <option name="timeStamp" value="991" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
           <line>30</line>
           <option name="timeStamp" value="1059" />
         </line-breakpoint>
@@ -230,17 +236,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>228</line>
+          <line>237</line>
           <option name="timeStamp" value="1088" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>252</line>
+          <line>261</line>
           <option name="timeStamp" value="1093" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>241</line>
+          <line>250</line>
           <option name="timeStamp" value="1095" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -255,18 +261,43 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>146</line>
+          <line>149</line>
           <option name="timeStamp" value="1111" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>186</line>
+          <line>192</line>
           <option name="timeStamp" value="1112" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>208</line>
+          <line>217</line>
           <option name="timeStamp" value="1113" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/last_step.py</url>
+          <line>95</line>
+          <option name="timeStamp" value="1117" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/last_step.py</url>
+          <line>119</line>
+          <option name="timeStamp" value="1118" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>25</line>
+          <option name="timeStamp" value="1120" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/last_step.py</url>
+          <line>110</line>
+          <option name="timeStamp" value="1168" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>220</line>
+          <option name="timeStamp" value="1169" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -279,21 +310,14 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="nodes" />
+        <watch expression="shape[92]" />
+        <watch expression="table[92]" />
         <watch expression="shape" />
         <watch expression="table" />
-        <watch expression="shape" />
-        <watch expression="shape[19]" />
-        <watch expression="new_map" />
-        <watch expression="i" />
-        <watch expression="j" />
-        <watch expression="placed" />
-        <watch expression="nodes" />
-        <watch expression="nodes" />
-        <watch expression="back_locs" />
-        <watch expression="shape" />
-        <watch expression="shortest_shape[0]" />
-        <watch expression="reduc" />
+        <watch expression="shape1" />
+        <watch expression="p_shape" />
+        <watch expression="shape[49]" />
+        <watch expression="parent_node" />
       </configuration>
     </watches-manager>
   </component>

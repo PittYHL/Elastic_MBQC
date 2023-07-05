@@ -151,8 +151,8 @@ def check_next_0(map, i, start):
         index = index + 1
     return index - start
 def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right):
-    n_nodes = np.array(nodes)
-    # np.savetxt("example/iqp15_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
+    # n_nodes = np.array(nodes)
+    # np.savetxt("example/iqp20_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
     qubits = len(nodes)
     order = list(nx.topological_sort(graph))
     order, W_len, graph, nodes = update_all_wires(order, W_len, graph, nodes)
@@ -217,8 +217,9 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'B.16':
+        if next == 'C.25':
             print('g')
+        print(next)
         next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record) #place the next node
         qubit_record = get_qubit_record(next, nodes, qubit_record)
         i = i + 1
@@ -374,8 +375,17 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
             base = front.pop(c_index) #start base
             next_qubit = get_next_qubit(nodes, next)
             if c_gate == 'C': #check if only right
+                avoild_points = check_avoid(front, p_shape)
+                p_gate1, _ = new_sucessors[0].split('.')
+                avoid_dir = 0
+                if p_gate1 == 'A' or p_gate1 == 'B':
+                    new_loc = check_loc(nodes, placed + next_list, new_sucessors[0], graph, two_wire)
+                    if new_loc == 'u':
+                        avoid_dir = 'd'
+                    elif new_loc == 'd':
+                        avoid_dir = 'u'
                 shapes, fronts, spaces, new, wire_targets, starts, ends = place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
-                qubits - c_qubit, wire_target, wire_targets, right, next_qubit, qubit_record, start_p, end_p, starts, ends)
+                qubits - c_qubit, wire_target, wire_targets, right, next_qubit, qubit_record, start_p, end_p, starts, ends, avoild_points, avoid_dir)
             elif c_gate == 'A':
                 shapes, fronts, spaces, new, wire_targets, starts, ends = place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
                 qubits - c_qubit, new_sucessors, end, not_placed, wire_targets, wire_target, next_qubit, qubit_record, start_p, end_p, starts, ends, new_qubit)
@@ -383,7 +393,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
                 shapes, fronts, spaces, new, wire_targets, starts, ends = place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces,
                 qubits - c_qubit, new_sucessors, end, not_placed, wire_targets, wire_target, next_qubit, qubit_record, start_p, end_p, starts, ends, new_qubit)
             elif c_gate == 'W':
-                wire_len = W_len[int(gate_index)] + 1 #for the special combination gate
+                wire_len = W_len[int(gate_index)] + 3 #for the special combination gate
                 t_index = preds.index(next)
                 preds.remove(next)
                 target = wire_target.pop(t_index)
@@ -418,6 +428,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
     new_preds = preds + not_placed_preds
     while nextnext != 0:
         next = nextnext
+        print(next)
         newnew_sucessors = list(graph.successors(nextnext))
         shapes, fronts, spaces, successors, nextnext, parents, same_qubit, wire_targets, starts, ends = fill_nextnext(shapes, fronts, spaces, successors, nextnext, newnew_sucessors, parents,
             nodes, same_qubit, wire_targets, starts, ends)
@@ -433,6 +444,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         next_list.append(next)
     while prepre != 0:
         next = prepre
+        print(next)
         newnew_preds = list(graph.predecessors(prepre))
         shapes, fronts, spaces, new_preds, prepre, parents, same_qubit, wire_targets = fill_prepre(
             shapes, fronts, spaces, new_preds, not_placed_preds, prepre, newnew_preds, parents,
@@ -534,7 +546,7 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
                 if succ[0] in placed:
                     found_wire = 1
                     next_node = node
-                    break
+                    # break
             elif gate1 == 'C' and pred[0] in placed and gate2 == 'C': #choose C if the previous is also C
                 found_C = 1
                 next_node = node
@@ -941,6 +953,29 @@ def update_all_wires(order, W_len, graph, nodes):
         return order, W_len, new_graph, nodes
     return order, W_len, graph, nodes
 
+def check_avoid(front, shape):
+    points = []
+    for point in front:
+        if point[0] == 0:
+            points.append([point[0], point[1] + 2])
+            points.append([point[0] + 1, point[1] + 1])
+            points.append([point[0] + 2, point[1]])
+        elif point[0] != len(shape) - 1 and shape[point[0] - 1][point[1]] != 0 and shape[point[0] + 1][point[1]] != 0:
+            points.append([point[0] - 2, point[1]])
+            points.append([point[0] - 1, point[1] + 1])
+            points.append([point[0] - 1, point[1] + 2])
+            points.append([point[0], point[1] + 2])
+            points.append([point[0], point[1] + 3])
+            points.append([point[0] + 1, point[1] + 2])
+            points.append([point[0] + 1, point[1] + 1])
+            points.append([point[0] + 2, point[1]])
+        else:
+            points.append([point[0] - 2, point[1]])
+            points.append([point[0] - 1, point[1] + 1])
+            points.append([point[0], point[1] + 2])
+            points.append([point[0] + 1, point[1] + 1])
+            points.append([point[0] + 2, point[1]])
+    return points
 # rows = [2,3,4,5]
 # c_depths = [5,4,4,3]
 # c_spaces = [2,4/3,3/2,2]

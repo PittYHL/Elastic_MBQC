@@ -94,6 +94,9 @@ def original_reduction(shortest_shape):
                 break
         if found_reduc:
             reduc = 0
+            temp_shape = copy.deepcopy(shape)
+            for i in range(len(temp_shape)):
+                temp_shape[i].append(0)
             while found_reduc:
                 for i in range(len(new_shape)):
                     if i == 0 and (new_shape[i][back_locs[i] + 1] != 0 or (new_shape[i + 1][back_locs[i]] != 0 and
@@ -101,12 +104,12 @@ def original_reduction(shortest_shape):
                         found_reduc = 0
                         break
                     elif i == len(new_shape) - 1 and (new_shape[i][back_locs[i] + 1] != 0 or
-                    (new_shape[i - 1][back_locs[i]] != 0 and shape[i - 1][back_locs[i]] == 0)):
+                    (new_shape[i - 1][back_locs[i]] != 0 and temp_shape[i - 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                     elif i > 0 and i < len(new_shape) - 1 and (new_shape[i][back_locs[i] + 1] != 0 or
-                    (new_shape[i - 1][back_locs[i]] != 0  and shape[i - 1][back_locs[i]] == 0) or
-                    (new_shape[i + 1][back_locs[i]] != 0 and shape[i + 1][back_locs[i]] == 0)):
+                    (new_shape[i - 1][back_locs[i]] != 0  and temp_shape[i - 1][back_locs[i]] == 0) or
+                    (new_shape[i + 1][back_locs[i]] != 0 and temp_shape[i + 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                 if found_reduc:
@@ -145,19 +148,22 @@ def comb_reduction(shortest_shape, combina):
                 break
         if found_reduc:
             reduc1 = 0
+            temp_shape = copy.deepcopy(shape1)
+            for i in range(len(temp_shape)):
+                temp_shape[i].append(0)
             while found_reduc:
                 for i in range(len(new_shape1)):
                     if i == 0 and (new_shape1[i][back_locs[i] + 1] != 0 or
-                    (new_shape1[i + 1][back_locs[i]] != 0 and shape1[i + 1][back_locs[i]] == 0)):
+                    (new_shape1[i + 1][back_locs[i]] != 0 and temp_shape[i + 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                     elif i == len(new_shape1) - 1 and (new_shape1[i][back_locs[i] + 1] != 0 or
-                    (new_shape1[i - 1][back_locs[i]] != 0 and shape1[i - 1][back_locs[i]] == 0)):
+                    (new_shape1[i - 1][back_locs[i]] != 0 and temp_shape[i - 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                     elif i > 0 and i < len(new_shape1) - 1 and (new_shape1[i][back_locs[i] + 1] != 0 or
-                    (new_shape1[i - 1][back_locs[i]] != 0 and shape1[i - 1][back_locs[i]] == 0) or
-                    (new_shape1[i + 1][back_locs[i]] != 0 and shape1[i + 1][back_locs[i]] == 0)):
+                    (new_shape1[i - 1][back_locs[i]] != 0 and temp_shape[i - 1][back_locs[i]] == 0) or
+                    (new_shape1[i + 1][back_locs[i]] != 0 and temp_shape[i + 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                 if found_reduc:
@@ -185,6 +191,9 @@ def comb_reduction(shortest_shape, combina):
                 break
         if found_reduc:
             reduc2 = 0
+            temp_shape = copy.deepcopy(shape2)
+            for i in range(len(temp_shape)):
+                temp_shape[i].append(0)
             while found_reduc:
                 for i in range(len(new_shape2)):
                     if i == 0 and (new_shape2[i][back_locs[i] + 1] != 0 or
@@ -193,12 +202,12 @@ def comb_reduction(shortest_shape, combina):
                         found_reduc = 0
                         break
                     elif i == len(new_shape2) - 1 and (new_shape2[i][back_locs[i] + 1] != 0 or
-                    (new_shape2[i - 1][back_locs[i]] != 0 and shape2[i - 1][back_locs[i]] == 0)):
+                    (new_shape2[i - 1][back_locs[i]] != 0 and temp_shape[i - 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                     elif i > 0 and i < len(new_shape2) - 1 and (new_shape2[i][back_locs[i] + 1] != 0 or
-                    (new_shape2[i - 1][back_locs[i]] != 0 and shape2[i - 1][back_locs[i]] == 0) or
-                    (new_shape2[i + 1][back_locs[i]] != 0 and shape2[i + 1][back_locs[i]] == 0)):
+                    (new_shape2[i - 1][back_locs[i]] != 0 and temp_shape[i - 1][back_locs[i]] == 0) or
+                    (new_shape2[i + 1][back_locs[i]] != 0 and temp_shape[i + 1][back_locs[i]] == 0)):
                         found_reduc = 0
                         break
                 if found_reduc:

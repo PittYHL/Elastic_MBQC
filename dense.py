@@ -674,7 +674,7 @@ def put_back_leaves(new_map, front_leaves, back_leaves, qubits):
         if len(front_leaves[i]) > max_f:
             max_f = len(front_leaves[i])
         if len(back_leaves[i]) > max_b:
-            max_b = len(front_leaves[i])
+            max_b = len(back_leaves[i])
     for i in range(len(new_map)):
         new_map[i] = ['Z']*max_f + new_map[i] + ['Z']*max_b
     for i in range(qubits):
