@@ -237,13 +237,18 @@ def remove_wire(map, qubits, remove_single):
                 double_wire = 1
                 break
             elif j != 0 and remove_single == 0 and \
-                (new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X'):
+                ((new_map[i*2][j - 1] == new_map[i*2][j - 2] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X') or (new_map[i*2][j] == 'Y'\
+                and new_map[i*2 + 1][j] == 'Y'and new_map[i*2 + 2][j] == 'Y' and new_map[i*2][j - 1] == 'Y'and new_map[i*2][j - 2] == 'Y' and
+                new_map[i*2][j - 3] == new_map[i*2][j - 4] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X') or (new_map[i*2][j] == 'Y'\
+                and new_map[i*2 + 1][j] == 'Y'and new_map[i*2 + 2][j] == 'Y' and new_map[i*2 + 2][j - 1] == 'Y'and new_map[i*2 + 2][j - 2] == 'Y' and
+                new_map[i*2 + 2][j - 3] == new_map[i*2 + 2][j - 4] == new_map[i*2][j - 1] == new_map[i*2][j - 2] == 'X')):
                 double_wire = 1
                 break
     while double_wire:
         for i in range(qubits - 1):
             for j in two_qubit_gate[i]:
                 found_wire = 0
+                CX = 0
                 if j != 0 and new_map[i * 2][j - 1] == new_map[i * 2][j - 2] == \
                         new_map[i * 2 + 2][j - 1] == new_map[i * 2 + 2][j - 2] == 'X':
                     up_len = check_wire_len(new_map, i * 2, j - 1)
@@ -258,7 +263,39 @@ def remove_wire(map, qubits, remove_single):
                     and new_map[i * 2][j - 1] == 'Z'):  # upper wire
                     length = check_wire_len(new_map, i * 2 + 2, j - 1)
                     found_wire = 1
-                if found_wire:
+                elif j != 0 and new_map[i*2][j] == 'Y'and new_map[i*2 + 1][j] == 'Y'and new_map[i*2 + 2][j] == 'Y' and\
+                new_map[i*2][j - 1] == 'Y'and new_map[i*2][j - 2] == 'Y' and\
+                new_map[i*2][j - 3] == new_map[i*2][j - 4] == new_map[i*2 + 2][j - 1] == new_map[i*2 + 2][j - 2] == 'X':
+                    up_len = check_wire_len(new_map, i * 2, j - 3)
+                    low_len = check_wire_len(new_map, i * 2 + 2, j - 1)
+                    length = min(up_len, low_len)
+                    found_wire = 1
+                    CX = 1
+                    for k in range(length):
+                        new_map[i * 2].pop(j - length - 2)
+                        new_map[i * 2 + 1].pop(j - length)
+                        new_map[i * 2 + 2].pop(j - length)
+                    for k in range(length):
+                        new_map[i * 2].insert(j - length + 4, 'X')
+                        new_map[i * 2 + 1].insert(j - length + 2, 'Z')
+                        new_map[i * 2 + 2].insert(j - length + 2, 'X')
+                elif j != 0 and new_map[i*2][j] == 'Y'and new_map[i*2 + 1][j] == 'Y'and new_map[i*2 + 2][j] == 'Y' and\
+                new_map[i*2 + 2][j - 1] == 'Y'and new_map[i*2 + 2][j - 2] == 'Y' and\
+                new_map[i*2 + 2][j - 3] == new_map[i*2 + 2][j - 4] == new_map[i*2][j - 1] == new_map[i*2][j - 2] == 'X':
+                    up_len = check_wire_len(new_map, i * 2, j - 1)
+                    low_len = check_wire_len(new_map, i * 2 + 2, j - 3)
+                    length = min(up_len, low_len)
+                    found_wire = 1
+                    CX = 1
+                    for k in range(length):
+                        new_map[i * 2].pop(j - length)
+                        new_map[i * 2 + 1].pop(j - length)
+                        new_map[i * 2 + 2].pop(j - length - 2)
+                    for k in range(length):
+                        new_map[i * 2].insert(j - length + 2, 'X')
+                        new_map[i * 2 + 1].insert(j - length + 2, 'Z')
+                        new_map[i * 2 + 2].insert(j - length + 4, 'X')
+                if found_wire and CX == 0:
                     for k in range(length):
                         new_map[i * 2].pop(j - length)
                         new_map[i * 2 + 1].pop(j - length)

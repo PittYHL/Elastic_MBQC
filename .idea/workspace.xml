@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish the last step">
+    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/bv27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/bv27.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp27.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/qft27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/qft27.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/last_step.py" beforeDir="false" afterPath="$PROJECT_DIR$/last_step.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -310,14 +303,21 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="shape[92]" />
-        <watch expression="table[92]" />
+        <watch expression="nodes" />
         <watch expression="shape" />
         <watch expression="table" />
-        <watch expression="shape1" />
-        <watch expression="p_shape" />
-        <watch expression="shape[49]" />
-        <watch expression="parent_node" />
+        <watch expression="shape" />
+        <watch expression="shape[19]" />
+        <watch expression="new_map" />
+        <watch expression="i" />
+        <watch expression="j" />
+        <watch expression="placed" />
+        <watch expression="nodes" />
+        <watch expression="nodes" />
+        <watch expression="back_locs" />
+        <watch expression="shape" />
+        <watch expression="shortest_shape[0]" />
+        <watch expression="reduc" />
       </configuration>
     </watches-manager>
   </component>
