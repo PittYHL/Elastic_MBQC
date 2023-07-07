@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish the last step">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
@@ -170,7 +169,8 @@
     <MESSAGE value="finish 15 qubits" />
     <MESSAGE value="finish iqp15" />
     <MESSAGE value="finish the last step" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish the last step" />
+    <MESSAGE value="finish the last benchmarks" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish the last benchmarks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -226,11 +226,6 @@
           <option name="timeStamp" value="888" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>30</line>
-          <option name="timeStamp" value="1059" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
           <line>250</line>
           <option name="timeStamp" value="1085" />
@@ -261,49 +256,14 @@
           <option name="timeStamp" value="1110" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>149</line>
-          <option name="timeStamp" value="1111" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>192</line>
-          <option name="timeStamp" value="1112" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>217</line>
-          <option name="timeStamp" value="1113" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>95</line>
-          <option name="timeStamp" value="1117" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>119</line>
-          <option name="timeStamp" value="1118" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
           <line>25</line>
-          <option name="timeStamp" value="1120" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>110</line>
-          <option name="timeStamp" value="1168" />
+          <option name="timeStamp" value="1278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>235</line>
-          <option name="timeStamp" value="1271" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>415</line>
-          <option name="timeStamp" value="1276" />
+          <line>27</line>
+          <option name="timeStamp" value="1280" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -316,8 +276,21 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="shapes[2][6]" />
-        <watch expression="p_shape" />
+        <watch expression="nodes" />
+        <watch expression="shape" />
+        <watch expression="table" />
+        <watch expression="shape" />
+        <watch expression="shape[19]" />
+        <watch expression="new_map" />
+        <watch expression="i" />
+        <watch expression="j" />
+        <watch expression="placed" />
+        <watch expression="nodes" />
+        <watch expression="nodes" />
+        <watch expression="back_locs" />
+        <watch expression="shape" />
+        <watch expression="shortest_shape[0]" />
+        <watch expression="reduc" />
       </configuration>
     </watches-manager>
   </component>

@@ -99,6 +99,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     if loc == 'u':
         if restricted and new_qubit == 0:
             qubit_row = start_p[next_qubit[0] - 1][0]
+            qubit_row2 = start_p[next_qubit[1] - 1][0]
         if ((restricted and new_qubit == 0 and abs(base[0] - 2 -qubit_row) <= restrict_max) or restricted == 0 or new_qubit == 1) and \
             ((base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or (base[0] >= 2 and base[0] - 2 >= up_qubits * 2)): # place the one to the right
             new_front = []
@@ -170,7 +171,8 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
         if (base[0] == 0) or \
             (p_shape[base[0] - 1][base[1] - 1] == 0 and p_shape[base[0] - 1][base[1]] == 0 and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows)
             or (base[0] >= 3  and base[0] - 3 >= up_qubits * 2))): #first case: on top
-            if (base[0] == 0 and len(p_shape) + 3 + extra_qubits * 2 > rows) or (restricted and new_qubit == 0 and abs(base[0] - 3 -qubit_row) > restrict_max):
+            if (base[0] == 0 and len(p_shape) + 3 + extra_qubits * 2 > rows) or (restricted and new_qubit == 0 and abs(base[0] - 3 -qubit_row) > restrict_max)\
+                    or (restricted and new_qubit == 0 and abs(base[0] - 1 - qubit_row2) > restrict_max):
                 return shapes, fronts, spaces, new, wire_targets, starts, ends
             new_front = []
             new = new + 1
@@ -245,6 +247,7 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     if loc == 'd':
         if restricted and new_qubit == 0:
             qubit_row = start_p[next_qubit[1] - 1][0]
+            qubit_row2 = start_p[next_qubit[0] - 1][0]
         if ((restricted and new_qubit == 0 and abs(base[0] + 2 -qubit_row) <= restrict_max) or restricted == 0 or new_qubit == 1) \
                 and ((base[0] + 3 >= len(p_shape) and p_row + base[0] + 3 - len(p_shape) + extra_qubits * 2 <= rows) or \
                 (base[0] + 3 < len(p_shape) and len(p_shape) - base[0] - 3 >= down_qubit * 2)): # place the one to the right
@@ -296,7 +299,8 @@ def place_B(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
         if (base[0] == len(p_shape) - 1) or (p_shape[base[0] + 1][base[1] - 1] == 0 and p_shape[base[0] + 1][base[1]] == 0\
             and ((base[0] + 4 >= len(p_shape) and p_row + base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) \
                  or (base[0] + 4 < len(p_shape) and len(p_shape) - base[0] - 4 >= down_qubit * 2))): #first case: on bot
-            if (base[0] == len(p_shape) - 1 and len(p_shape) + 3 + extra_qubits * 2 > rows) or (restricted and new_qubit == 0 and abs(base[0] + 3 -qubit_row) > restrict_max):
+            if (base[0] == len(p_shape) - 1 and len(p_shape) + 3 + extra_qubits * 2 > rows) or (restricted and new_qubit == 0 and abs(base[0] + 3 -qubit_row) > restrict_max)\
+                    or (restricted and new_qubit == 0 and abs(base[0] + 1 - qubit_row2) > restrict_max):
                 return shapes, fronts, spaces, new, wire_targets, starts, ends
             new_front = []
             new = new + 1
@@ -480,6 +484,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     if loc == 'u':
         if restricted and new_qubit == 0:
             qubit_row = start_p[next_qubit[0] - 1][0]
+            qubit_row2 = start_p[next_qubit[1] - 1][0]
             temp = abs(base[0] - 2 -qubit_row)
             temp2 = temp <= restrict_max
         if ((restricted and new_qubit == 0 and temp2) or restricted == 0 or new_qubit == 1) and ((base[0] < 2 and p_row + 2 - base[0] + extra_qubits * 2 <= rows) or\
@@ -551,7 +556,8 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
         if (base[0] == 0) or (p_shape[base[0] - 1][base[1] - 1] == 0 and p_shape[base[0] - 1][base[1]] == 0\
             and ((base[0] < 3 and p_row + 3 - base[0] + extra_qubits * 2 <= rows) or \
                  (base[0] >= 3 and base[0] - 3 >= up_qubits * 2 and p_shape[base[0] - 3][base[1]] == 0))):  # first case: on top
-            if (len(p_shape) + 3 + extra_qubits * 2 > rows and base[0] == 0) or (restricted and new_qubit == 0 and abs(base[0] - 3 -qubit_row) > restrict_max):
+            if (len(p_shape) + 3 + extra_qubits * 2 > rows and base[0] == 0) or (restricted and new_qubit == 0 and abs(base[0] - 3 -qubit_row) > restrict_max)\
+                    or (restricted and new_qubit == 0 and abs(base[0] - 1 - qubit_row2) > restrict_max):
                 return shapes, fronts, spaces, new, wire_targets, starts, ends
             new_front = []
             new = new + 1
@@ -618,6 +624,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
     if loc == 'd':
         if restricted and new_qubit == 0:
             qubit_row = start_p[next_qubit[1] - 1][0]
+            qubit_row2 = start_p[next_qubit[1] - 1][0]
             temp = abs(base[0] + 2 -qubit_row)
             temp2 = temp <= restrict_max
         if ((restricted and new_qubit == 0 and temp2) or restricted == 0 or new_qubit == 1) \
@@ -670,7 +677,8 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
         if (base[0] == len(p_shape) - 1) or (p_shape[base[0] + 1][base[1] - 1] == 0 and p_shape[base[0] + 1][base[1]] == 0 and \
             ((base[0] + 4 >= len(p_shape) and p_row +base[0] + 4 - len(p_shape) + extra_qubits * 2 <= rows) or \
              (base[0] + 4 < len(p_shape) and len(p_shape) - base[0] - 4 >= down_qubit * 2 and p_shape[base[0] + 3][base[1]] == 0))):  # first case: on bot
-            if (len(p_shape) + 3 + extra_qubits * 2 > rows and base[0] == len(p_shape) - 1) or (restricted and new_qubit == 0 and abs(base[0] + 3 - qubit_row) > restrict_max):
+            if (len(p_shape) + 3 + extra_qubits * 2 > rows and base[0] == len(p_shape) - 1) or (restricted and new_qubit == 0 and abs(base[0] + 3 - qubit_row) > restrict_max)\
+                    or (restricted and new_qubit == 0 and abs(base[0] + 1 - qubit_row2) > restrict_max):
                 return shapes, fronts, spaces, new, wire_targets, starts, ends
             new_front = []
             new = new + 1
