@@ -77,14 +77,14 @@ def fill_A(shapes, fronts, spaces, locs, same_qubit, starts, ends):
                 valid.append(i)
                 shape[first_base[0] + 1][first_base[1]] = 1
                 shape[first_base[0] + 2][first_base[1]] = 1
-                shape[first_base[0] + 3][first_base[1]:] = 1
+                shape[first_base[0] + 3][first_base[1]] = 1
                 shape, space = fill_shape(shape)
                 new_shapes.append(shape)
                 new_Spaces.append(space)
                 front.pop(max(locs))
                 front.pop(min(locs))
-                front.append([first_base[0] + 1, first_base[1] + 1])
-                front.append([second_base[0] - 1, second_base[1] + 1])
+                front.append([first_base[0] + 1, first_base[1]])
+                front.append([second_base[0] - 1, second_base[1]])
                 new_fronts.append(front)
                 new_starts.append(start)
                 new_ends.append(end)

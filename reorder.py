@@ -10,12 +10,14 @@ from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
 qubits = 8
-rows = 15
+rows = 17
 force_right = False#force the second c to the right
 special = 0#for special leaves
 wire_remove = 1
 remove_single = 1 #for removing the single qubit gate
 remove_SWAP = 1
+restricted = 1 #restrict the qubit locate
+remove_y = 1#for CNOT (QAOA)
 physical_gate = []
 tracker= []
 map = []
@@ -241,11 +243,12 @@ de_map = np.array(dense_map)
 #de_map = np.array(dense_map)
 new_map = new_eliminate_redundant(dense_map, qubits)
 if wire_remove:
-    new_map = remove_wire(new_map, qubits, remove_single)
+    new_map = remove_wire(new_map, qubits, remove_single, remove_y)
+    # new_map = new_eliminate_redundant(new_map, qubits)
 newnew_map = convert_new_map(new_map)
 n_map = np.array(newnew_map)
-np.savetxt("example/qaoa8el2.csv", n_map, fmt = '%s',delimiter=",")
-DP(new_map, qubits, rows, force_right, special)
+# np.savetxt("example/qaoa8el4.csv", n_map, fmt = '%s',delimiter=",")
+DP(new_map, qubits, rows, force_right, special, restricted)
 # n_map = np.array(new_map)
 # np.savetxt("example/bv4el.csv", n_map, fmt = '%s',delimiter=",")
 # new_map = new_eliminate_redundant(map, qubits)
