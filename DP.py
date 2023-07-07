@@ -232,7 +232,7 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'W.14':
+        if next == 'C.40':
             print('g')
         print(next)
         next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record, restricted) #place the next node
@@ -318,6 +318,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
     shapes = [] #record the new shapes
     wire_targets = [] #for the target of wires
     not_placed_preds = [] #for current unplaced predecessors
+    placed_preds = []
     starts = []  # for recording the start points
     ends = []  # for recording the end points
     end = 0
@@ -330,6 +331,9 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         if pred not in placed:
             not_placed = True
             not_placed_preds.append(pred)
+        else:
+            p_gate, _ = pred.split('.')
+            placed_preds.append(p_gate)
     if (c_gate == 'A' or c_gate == 'B' or c_gate == 'B1') and len(new_sucessors) == 1:
         end = detec_end(next, new_sucessors[0], nodes)
         if end == 0:
@@ -367,8 +371,11 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         for pred in n_preds:
             if pred in preds:
                 prepre = pred
+    # if c_gate != 'W' and nextnext == 0 and prepre == 0 and ((c_gate != 'C' and (placed_preds == [] or placed_preds[0] != 'C')) or restricted == 0):
     if c_gate != 'W' and nextnext == 0 and prepre == 0 and (c_gate != 'C' or restricted == 0):
         parent_node = valid[p_index]
+    # elif c_gate == 'W' or nextnext != 0 or prepre != 0 or (c_gate == 'C' and restricted) or (
+            # restricted and placed_preds != [] and placed_preds[0] == 'C'):
     elif c_gate == 'W' or nextnext != 0 or prepre != 0 or (c_gate == 'C' and restricted): #three cases: fill wire and fill the nextnext
         parent_node = list(range(len(shape[p_index])))
     if c_gate == 'C' and next in only_right:  # check if only right

@@ -10,7 +10,7 @@ from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
 qubits = 8
-rows = 17
+rows = 21
 force_right = False#force the second c to the right
 special = 0#for special leaves
 wire_remove = 1
