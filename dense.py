@@ -388,8 +388,8 @@ def new_eliminate_redundant(map, qubits):
     # prune the Z
     # new_map = prune_Z(new_map)
 
-    # row_len = int(len(map[0]))
-    row_len = 0
+    row_len = int(len(map[0]))
+    # row_len = 0
     for i in range(len(new_map)):
         new_map[i] = ['Z'] * row_len + new_map[i] + ['Z'] * row_len
     #update two qubit gate

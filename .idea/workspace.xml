@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish the last step">
-      <change afterPath="$PROJECT_DIR$/regenerate.py" afterDir="false" />
+    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/hlf27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/hlf27.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp27c.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp27c.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -273,7 +270,22 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
           <line>255</line>
-          <option name="timeStamp" value="1332" />
+          <option name="timeStamp" value="1334" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>232</line>
+          <option name="timeStamp" value="1335" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>85</line>
+          <option name="timeStamp" value="1336" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>96</line>
+          <option name="timeStamp" value="1337" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -284,14 +296,5 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="shape" />
-        <watch expression="table" />
-        <watch expression="shape" />
-        <watch expression="shape[152]" />
-        <watch expression="table[152]" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>
