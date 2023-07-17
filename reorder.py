@@ -9,15 +9,16 @@ import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 27
-rows = 104
+qubits = 14
+rows = 35
 force_right = False#force the second c to the right
 special = 0#for special leaves
-wire_remove = 0
+wire_remove = 1
 remove_single = 1 #for removing the single qubit gate
 remove_SWAP = 1
 restricted = 0 #restrict the qubit locate
 remove_y = 0#for CNOT (QAOA)
+special_greedy = 0
 physical_gate = []
 tracker= []
 map = []
@@ -26,7 +27,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/bv27b.txt') as f:
+with open('Benchmarks/vqe14b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -241,14 +242,18 @@ de_map = np.array(dense_map)
 #sc_map = np.array(schedule)
 #np.savetxt("qft4_sche.csv", sc_map, fmt = '%s',delimiter=",")
 #de_map = np.array(dense_map)
+
+# if wire_remove:
+#     new_map = remove_wire(dense_map, qubits, remove_single, remove_y)
+
 new_map = new_eliminate_redundant(dense_map, qubits)
 if wire_remove:
     new_map = remove_wire(new_map, qubits, remove_single, remove_y)
     # new_map = new_eliminate_redundant(new_map, qubits)
 newnew_map = convert_new_map(new_map)
 n_map = np.array(newnew_map)
-# np.savetxt("example/qaoa8el4.csv", n_map, fmt = '%s',delimiter=",")
-DP(new_map, qubits, rows, force_right, special, restricted)
+# np.savetxt("example/vqe14bel.csv", n_map, fmt = '%s',delimiter=",")
+DP(new_map, qubits, rows, force_right, special, restricted, special_greedy)
 # n_map = np.array(new_map)
 # np.savetxt("example/bv4el.csv", n_map, fmt = '%s',delimiter=",")
 # new_map = new_eliminate_redundant(map, qubits)

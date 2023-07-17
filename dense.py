@@ -339,6 +339,7 @@ def remove_wire(map, qubits, remove_single, remove_y):
         new_map, two_qubit_gate, double_wire = update_two_qubit(new_map, qubits, remove_single, remove_y)
     new_map = move_R2(new_map)
     new_map = put_back_leaves(new_map, front_leaves, back_leaves, qubits)
+    new_map = prune_Z(new_map)
     return new_map
 def new_eliminate_redundant(map, qubits):
     new_map = copy.deepcopy(map)
@@ -387,8 +388,8 @@ def new_eliminate_redundant(map, qubits):
     # prune the Z
     # new_map = prune_Z(new_map)
 
-    row_len = int(len(map[0]))
-    # row_len = 0
+    # row_len = int(len(map[0]))
+    row_len = 0
     for i in range(len(new_map)):
         new_map[i] = ['Z'] * row_len + new_map[i] + ['Z'] * row_len
     #update two qubit gate

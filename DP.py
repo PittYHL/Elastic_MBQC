@@ -11,7 +11,7 @@ from last_step import *
 la_win = 1
 keep = 3
 long = 4
-def DP(ori_map, qubits, rows, force_right, special, restricted):
+def DP(ori_map, qubits, rows, force_right, special, restricted, special_greedy):
     new_map = []
     for row in ori_map:
         new_map.append([])
@@ -23,7 +23,7 @@ def DP(ori_map, qubits, rows, force_right, special, restricted):
             else:
                 new_map[-1].append(0)
     graph, nodes, W_len, first, last, A_loc, B_loc, C_loc = gen_index(new_map)
-    table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right, restricted)
+    table, shapes, index = place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right, restricted, special_greedy)
     middle_shapes = shapes[-1]
     final_shapes = place_leaves(table, shapes, first, last, rows, special)
     show_min(middle_shapes, final_shapes)
@@ -165,7 +165,7 @@ def check_next_0(map, i, start):
     while(map[i][index] != 0):
         index = index + 1
     return index - start
-def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right, restricted):
+def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_right, restricted, special_greedy):
     # n_nodes = np.array(nodes)
     # np.savetxt("example/iqp20_nodes.csv", n_nodes, fmt = '%s',delimiter=",")
     qubits = len(nodes)
@@ -232,10 +232,10 @@ def place_core(graph, nodes, W_len, rows, qubits, A_loc, B_loc, C_loc, force_rig
         new_sucessors = list(graph.successors(next))
         loc = check_loc(nodes, placed, next, graph, two_wire)
         #c_layer = update_layer(c_layer, f_layer, next, graph)
-        if next == 'C.40':
+        if next == 'B.152':
             print('g')
         print(next)
-        next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record, restricted) #place the next node
+        next_list = place_next(next, table, shape, valid, i, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record, restricted, special_greedy) #place the next node
         qubit_record = get_qubit_record(next, nodes, qubit_record)
         i = i + 1
         for j in next_list:
@@ -309,7 +309,7 @@ def check_loc(nodes, placed, next, graph, two_wire):
         loc = 'd'
     return loc
 
-def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record, restricted):
+def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, c_qubit, loc, graph, nodes, W_len, placed, two_wire, only_right, force_right, qubit_record, restricted, special_greedy):
     next_list = [next]
     c_gate, gate_index = next.split('.')
     parents = [] #record parents
@@ -348,7 +348,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         p_gate2, _ = new_sucessors[1].split('.')
         if p_gate1 == 'C' or p_gate2 == 'C':
             only_right = detect_only_right(next, graph, only_right, force_right)
-    if (c_gate == 'A' or c_gate == 'B' or c_gate == 'B1') and len(n_preds) == 1: #detect end point for forward
+    if (c_gate == 'A' or c_gate == 'B' or c_gate == 'B1') and len(n_preds) == 1 and new_sucessors != []: #detect end point for backward
         b_end = detec_end_b(next, new_sucessors[0], nodes)
     parent = copy.deepcopy(table[p_index][0])
     successors = parent['successor']
@@ -426,7 +426,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
                 t_index = preds.index(next)
                 preds.remove(next)
                 target = wire_target.pop(t_index)
-                shapes, fronts, spaces, new, wire_targets = place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, wire_len, wire_target, wire_targets)
+                shapes, fronts, spaces, new, wire_targets = place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, wire_len, wire_target, wire_targets, special_greedy)
                 if new:
                     starts.append(start_p)
                     ends.append(end_p)
@@ -475,7 +475,7 @@ def place_next(next, table, shape, valid, p_index, rows, new_sucessors, qubits, 
         next = prepre
         print(next)
         newnew_preds = list(graph.predecessors(prepre))
-        shapes, fronts, spaces, new_preds, prepre, parents, same_qubit, wire_targets = fill_prepre(
+        shapes, fronts, spaces, new_preds, prepre, parents, same_qubit, wire_targets, starts, ends = fill_prepre(
             shapes, fronts, spaces, new_preds, not_placed_preds, prepre, newnew_preds, parents,
             nodes, same_qubit, wire_targets, starts, ends)
         next_list.append(next)
@@ -516,36 +516,37 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
         p_index = 100000
         wires = 0
         gate, _ = node.split('.')
-        if before != []:
-            solved = 1
-            pred_placed = []
-            for pred in before:
-                gate1, _ = pred.split('.')
-                if pred in placed:
-                    index = placed.index(pred)
-                    pred_placed.append(pred)
-                elif pred not in placed and gate1 != 'W': #if one of the predecessor is wire
-                    solved = 0
-                elif gate1 == 'W':
-                    wires = wires + 1
-                if pred in placed and p_index > index:
-                    p_index = index
-            if len(before) == 2 and pred_placed != [] and (before[0] in two_wire or before[1] in two_wire): #for two wire
-                solved = 1
-            if len(pred_placed) == 1 and len(before) == 2:
-                only_one.append(node)
-                solved = 1
-            elif len(pred_placed) == 0 and gate != 'W':#if none of the predecessors have been placed, look for succesor
-                for succ in succs:
-                    if succ in placed:
-                        solved = 1
-                        succ_placed.append(node)
-        elif gate != 'W':
+        solved = 1
+        if before == []:
             solved = 0
+        pred_placed = []
+        for pred in before:
+            gate1, _ = pred.split('.')
+            if pred in placed:
+                index = placed.index(pred)
+                pred_placed.append(pred)
+            elif pred not in placed and gate1 != 'W': #if one of the predecessor is wire
+                solved = 0
+            elif gate1 == 'W':
+                wires = wires + 1
+            if pred in placed and p_index > index:
+                p_index = index
+        if len(before) == 2 and pred_placed != [] and (before[0] in two_wire or before[1] in two_wire): #for two wire
+            solved = 1
+        if len(pred_placed) == 1 and len(before) == 2:
+            only_one.append(node)
+            solved = 1
+        elif len(pred_placed) == 0 and gate != 'W':#if none of the predecessors have been placed, look for succesor
             for succ in succs:
                 if succ in placed:
-                    found_wire = 1
-                    next_node = node
+                    solved = 1
+                    succ_placed.append(node)
+        # elif gate != 'W':
+        #     solved = 0
+        #     for succ in succs:
+        #         if succ in placed:
+        #             found_wire = 1
+        #             next_node = node
         if wires == len(before) and before != []: #both predecessors are wires and one of the sucessors is placed
             solved = 0
             if node not in two_wire:
@@ -563,7 +564,10 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
         elif solved:
             gate1, num = node.split('.')
             pred = list(graph.predecessors(node))
-            gate2, _ = pred[0].split('.')
+            if pred != []:
+                gate2, _ = pred[0].split('.')
+            if succs != []:
+                gate3, _ = succs[0].split('.')
             if gate1 == 'B' or gate1 == 'B1':
                 loc = B_loc[int(num)]
             elif gate1 == 'A':
@@ -576,7 +580,7 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
                     found_wire = 1
                     next_node = node
                     # break
-            elif gate1 == 'C' and pred[0] in placed and gate2 == 'C': #choose C if the previous is also C
+            elif gate1 == 'C' and ((pred[0] in placed and gate2 == 'C') or (succs[0] in placed and gate3 == 'C')): #choose C if the previous is also C
                 found_C = 1
                 next_node = node
                 break
@@ -588,12 +592,12 @@ def choose_next(nodes_left, placed, graph, nodes, A_loc, B_loc, C_loc, two_wire)
                         parent_row.append(i)
                         break
     if found_wire != 1 and found_C != 1:
-        if parent_index != []:
+        if succ_placed != []:
+            next_node = find_higher_node(parent_index, succ_placed, next, parent_row)
+        elif parent_index != []:
             next_node = available_node(parent_index, next, parent_row)
         elif only_one != []: # cannot find node with both predecessors resolved or wires or
             next_node = only_one[-1]
-        elif succ_placed != []:
-            next_node = succ_placed[0]
     return next_node
 
 def available_node(parent_index, next, parent_row):
@@ -822,8 +826,8 @@ def fill_prepre(shapes, fronts, spaces, new_preds, not_placed_preds, prepre, new
                     wire_targets[i].pop(-2)
     elif len(newnew_preds) == 0:
         for i in range(len(wire_targets)):
-            ends[i].append(wire_targets[i][-2])
-            ends[i].append(wire_targets[i][-1])
+            starts[i].append(wire_targets[i][-2])
+            starts[i].append(wire_targets[i][-1])
             wire_targets[i].pop(-1)
             wire_targets[i].pop(-1)
     new_preds.remove(prepre)
@@ -1024,6 +1028,29 @@ def check_avoid(front, shape):
             points.append([point[0] + 1, point[1] + 1])
             points.append([point[0] + 2, point[1]])
     return points
+
+def find_higher_node(parent_index, succ_placed, next, parent_row):
+    if len(succ_placed) == 1:
+        return succ_placed[0]
+    else:
+        indexes = []
+        for node in succ_placed:
+            indexes.append(next.index(node))
+        new_parent_index = []
+        new_parent_row = []
+        for i in indexes:
+            new_parent_index.append(parent_index[i])
+            new_parent_row.append(parent_row)
+        max_index = max(new_parent_index)
+        temp_parent = []
+        max_indexes = []
+        for i in range(len(new_parent_index)):
+            if new_parent_index[i] == max_index:
+                max_indexes.append(i)
+        for i in max_indexes:
+            temp_parent.append(new_parent_row[i])
+        return succ_placed[max_indexes[temp_parent.index(min(temp_parent))]]
+
 # rows = [2,3,4,5]
 # c_depths = [5,4,4,3]
 # c_spaces = [2,4/3,3/2,2]

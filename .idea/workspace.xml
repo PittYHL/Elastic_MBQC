@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="finish the last step">
+      <change afterPath="$PROJECT_DIR$/regenerate.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/hlf27.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/hlf27.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DP.py" beforeDir="false" afterPath="$PROJECT_DIR$/DP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
@@ -182,12 +187,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>274</line>
+          <line>279</line>
           <option name="timeStamp" value="144" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>268</line>
+          <line>273</line>
           <option name="timeStamp" value="319" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -226,11 +231,6 @@
           <option name="timeStamp" value="888" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>250</line>
-          <option name="timeStamp" value="1085" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
           <line>237</line>
           <option name="timeStamp" value="1088" />
@@ -257,13 +257,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>25</line>
-          <option name="timeStamp" value="1278" />
+          <line>27</line>
+          <option name="timeStamp" value="1280" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/leaves.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="1319" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>27</line>
-          <option name="timeStamp" value="1280" />
+          <line>235</line>
+          <option name="timeStamp" value="1329" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>255</line>
+          <option name="timeStamp" value="1332" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -276,21 +286,11 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="nodes" />
         <watch expression="shape" />
         <watch expression="table" />
         <watch expression="shape" />
-        <watch expression="shape[19]" />
-        <watch expression="new_map" />
-        <watch expression="i" />
-        <watch expression="j" />
-        <watch expression="placed" />
-        <watch expression="nodes" />
-        <watch expression="nodes" />
-        <watch expression="back_locs" />
-        <watch expression="shape" />
-        <watch expression="shortest_shape[0]" />
-        <watch expression="reduc" />
+        <watch expression="shape[152]" />
+        <watch expression="table[152]" />
       </configuration>
     </watches-manager>
   </component>

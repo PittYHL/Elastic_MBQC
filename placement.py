@@ -725,7 +725,7 @@ def place_A(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extr
             ends.append(new_end_p1)
     return shapes, fronts, spaces, new, wire_targets, starts, ends
 
-def place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, w_len, wire_target, wire_targets):
+def place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, w_len, wire_target, wire_targets, special_greedy):
     shape = copy.deepcopy(p_shape)
     count = 0
     tar_loc = []
@@ -751,13 +751,19 @@ def place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, w
                     tar_loc = [target[0] + 1, target[1]]
                 if shape[base[0]][base[1] + 2] == 0: #check right start loc
                     start_loc = [base[0], base[1] + 1]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
                 if found == 0 and (p_row < rows or len(shape) > base[0] + 1): #check bot start loc
                     if len(shape) == base[0] + 1:
                         row = [0] * len(shape[0])
                         shape.append(row)
                     start_loc = [base[0] + 1, base[1]]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
             elif direc == 'd':
                 if (p_row < rows or len(shape) > target[0] + 1) and tar_loc == []:
                     tar_loc = [target[0] + 1, target[1]]
@@ -768,10 +774,16 @@ def place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, w
                     return shapes, fronts, spaces, 0
                 if shape[base[0]][base[1] + 2] == 0: #check right start loc
                     start_loc = [base[0], base[1] + 1]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
                 if found == 0: #check bot start loc
                     start_loc = [base[0] + 1, base[1]]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 'b', w_len, 0)
         else: #the case top are empty
             if wire_target != []:
                 more_wire = 0
@@ -794,16 +806,25 @@ def place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, w
                     return shapes, fronts, spaces, 0
                 if shape[base[0]][base[1] + 2] == 0: #check right start loc
                     start_loc = [base[0], base[1] + 1]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
                 if found == 0: #check up start loc
                     start_loc = [base[0] - 1, base[1]]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
             elif direc == 'd':
                 if tar_loc == []:
                     tar_loc = [target[0] - 1, target[1]]
                 if shape[base[0]][base[1] + 2] == 0: #check right start loc
                     start_loc = [base[0], base[1] + 1]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
                 if found == 0 and (p_row < rows or base[0] != 0): #check up start loc
                     if base[0] == 0:
                         row = [0] * len(shape[0])
@@ -813,7 +834,10 @@ def place_W(p_shape, base, rows, p_row, front, shapes, fronts, spaces, target, w
                         for element in wire_target:
                             element[0] = element[0] + 1
                     start_loc = [base[0] - 1, base[1]]
-                    shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    if special_greedy == 0:
+                        shape, found = greedy_W(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
+                    else:
+                        shape, found = greedy_W2(shape, base, start_loc, tar_loc, direc, 't', w_len, more_wire)
     if found:
         all_zero1 = 1
         all_zero2 = 1
@@ -875,7 +899,7 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton, w_len, more_wire):
         wire_num = 1
         while next != tar_loc:
             dead_end = 1
-            if next[1] < tar_loc[1] and ((next[0] > 0 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or \
+            if next[1] < tar_loc[1] and ((next[0] > 0 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0] + 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or \
             (next[0] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0], next[1] + 1] == tar_loc): #prorize right
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
@@ -933,7 +957,132 @@ def greedy_W(shape, base, start_loc, tar_loc, direc, secton, w_len, more_wire):
         wire_num = 1
         while next != tar_loc:
             dead_end = 1
-            if next[1] < tar_loc[1] and ((next[0] < len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
+            if next[1] < tar_loc[1] and ((next[0] < len(shape) - 1 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
+            (next[0] == len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or [next[0], next[1] + 1] == tar_loc): #priorize right
+                current = copy.deepcopy(next)
+                next[1] = next[1] + 1
+                shape1[next[0]][next[1]] = 2
+                wire_num = wire_num + 1
+                loc = 'r'
+                dead_end = 0
+            elif next[0] < tar_loc[0] and next[0] + 2 < len(shape1):
+                if (shape[next[0] + 1][next[1] - 1] == 0 and shape[next[0] + 2][next[1]] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
+                [next[0] + 1,next[1]] == tar_loc:
+                    current = copy.deepcopy(next)
+                    next[0] = next[0] + 1
+                    shape1[next[0]][next[1]] = 2
+                    wire_num = wire_num + 1
+                    loc = 'd'
+                    dead_end = 0
+            elif next[0] < tar_loc[0] and next[0] + 2 == len(shape1): #when reeach the end of the shape
+                if (next[1] > 0 and shape[next[0] + 1][next[1] - 1] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or \
+                (next[1] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0] + 1, next[1]] == tar_loc:
+                    current = copy.deepcopy(next)
+                    next[0] = next[0] + 1
+                    shape1[next[0]][next[1]] = 2
+                    wire_num = wire_num + 1
+                    loc = 'd'
+                    dead_end = 0
+            if dead_end:
+                break
+            if next == tar_loc and wire_num <= w_len:
+                found = 1
+    return shape1, found
+
+def greedy_W2(shape, base, start_loc, tar_loc, direc, secton, w_len, more_wire):
+    current = copy.deepcopy(base)
+    next = copy.deepcopy(start_loc)
+    shape1 = copy.deepcopy(shape)
+    shape1[start_loc[0]][start_loc[1]] = 2
+    found = 0
+    if (secton == 'b' and direc == 'u') or (secton == 't' and direc == 'u' and more_wire == 1):
+        wire_num = 1
+        while next != tar_loc:
+            dead_end = 1
+            if next[0] > tar_loc[0] and ((shape[next[0] - 1][next[1] - 1] == 0 and shape[next[0] - 2][next[1]] == 0 and shape[next[0] - 1][next[1] + 1] == 0) or \
+                [next[0] - 1, next[1]] == tar_loc):  # prorize up
+                    current = copy.deepcopy(next)
+                    next[0] = next[0] - 1
+                    shape1[next[0]][next[1]] = 2
+                    wire_num = wire_num + 1
+                    loc = 'u'
+                    dead_end = 0
+            elif [next[0], next[1] + 1] == tar_loc or (next[0] < len(shape) - 1 and next[1] < len(shape[0]) - 2 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0
+            and shape[next[0] + 1][next[1] + 1] == 0) or (next[0] == len(shape) - 1 and next[1] < len(shape[0]) - 2 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0):
+                current = copy.deepcopy(next)
+                next[1] = next[1] + 1
+                shape1[next[0]][next[1]] = 2
+                wire_num = wire_num + 1
+                loc = 'r'
+                dead_end = 0
+            if dead_end:
+                break
+            if next == tar_loc and wire_num <= w_len:
+                found = 1
+
+    elif secton == 't' and direc == 'u' and more_wire == 0:
+        wire_num = 1
+        while next != tar_loc:
+            dead_end = 1
+            if next[1] < tar_loc[1] and ((next[0] > 0 and shape[next[0]][next[1] + 2] == 0) or \
+            (next[0] == 0 and shape[next[0]][next[1] + 2] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or [next[0], next[1] + 1] == tar_loc): #prorize right
+                current = copy.deepcopy(next)
+                next[1] = next[1] + 1
+                shape1[next[0]][next[1]] = 2
+                wire_num = wire_num + 1
+                loc = 'r'
+                dead_end = 0
+            elif next[0] > tar_loc[0] and next[0] > 1:
+                if (shape[next[0] - 1][next[1] - 1] == 0 and shape[next[0] - 2][next[1]] == 0 and shape[next[0] - 1][next[1] + 1] == 0) or \
+                [next[0] - 1, next[1]] == tar_loc:
+                    current = copy.deepcopy(next)
+                    next[0] = next[0] - 1
+                    shape1[next[0]][next[1]] = 2
+                    wire_num = wire_num + 1
+                    loc = 'u'
+                    dead_end = 0
+            elif next[0] > tar_loc[0] and next[0] == 1:
+                if (next[1] > 0 and shape[next[0] - 1][next[1] - 1] == 0 and shape[next[0] - 1][next[1] + 1] == 0) or \
+                (next[1] == 0 and shape[next[0] - 1][next[1] + 1] == 0) or [next[0] - 1, next[1]] == tar_loc:
+                    current = copy.deepcopy(next)
+                    next[0] = next[0] - 1
+                    shape1[next[0]][next[1]] = 2
+                    wire_num = wire_num + 1
+                    loc = 'u'
+                    dead_end = 0
+            if dead_end:
+                break
+            if next == tar_loc and wire_num <= w_len:
+                found = 1
+    elif secton == 't' and direc == 'd' and more_wire == 0:
+        wire_num = 1
+        while next != tar_loc:
+            dead_end = 1
+            if next[0] < tar_loc[0] and ((shape[next[0] + 1][next[1] - 1] == 0 and shape[next[0] + 2][next[1]] == 0 and shape[next[0] + 1][next[1] + 1] == 0) or\
+                [next[0] + 1,next[1]] == tar_loc): #prorize down
+                    current = copy.deepcopy(next)
+                    next[0] = next[0] + 1
+                    shape1[next[0]][next[1]] = 2
+                    wire_num = wire_num + 1
+                    loc = 'd'
+                    dead_end = 0
+            elif (next[0] > 0 and shape[next[0] - 1][next[1] + 1] == 0 and next[1] < len(shape[0]) - 2 and shape[next[0]][next[1] + 2] == 0) or \
+            (next[0] == 0 and next[1] < len(shape[0]) - 2 and shape[next[0]][next[1] + 2] == 0) or [next[0], next[1] + 1] == tar_loc:
+                current = copy.deepcopy(next)
+                next[1] = next[1] + 1
+                shape1[next[0]][next[1]] = 2
+                wire_num = wire_num + 1
+                loc = 'r'
+                dead_end = 0
+            if dead_end:
+                break
+            if next == tar_loc and wire_num <= w_len:
+                found = 1
+    elif (secton == 'b' and direc == 'd') or (more_wire == 1 and secton == 't' and direc == 'd'):
+        wire_num = 1
+        while next != tar_loc:
+            dead_end = 1
+            if next[1] < tar_loc[1] and ((next[0] < len(shape) - 1 and shape[next[0]][next[1] + 2] == 0) or \
             (next[0] == len(shape) - 1 and shape[next[0] - 1][next[1] + 1] == 0 and shape[next[0]][next[1] + 2] == 0) or [next[0], next[1] + 1] == tar_loc): #priorize right
                 current = copy.deepcopy(next)
                 next[1] = next[1] + 1
