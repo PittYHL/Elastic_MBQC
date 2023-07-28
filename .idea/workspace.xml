@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ce4d68dc-2965-4f05-b70e-d53f924dd046" name="Changes" comment="">
+    <list default="true" id="ce4d68dc-2965-4f05-b70e-d53f924dd046" name="Changes" comment="finish last step">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/Fig/naive_placement.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/naive_placement.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/BV4.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/BV4.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/Wire_removed.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Wire_removed.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/hlf27el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/hlf27el.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/last_step.py" beforeDir="false" afterPath="$PROJECT_DIR$/last_step.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -16,6 +22,14 @@
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="TaskManager">
+    <task id="LOCAL-00001" summary="finish last step">
+      <created>1689709648283</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1689709648283</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -28,5 +42,44 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="finish last step" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish last step" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DP.py</url>
+          <line>28</line>
+          <option name="timeStamp" value="1339" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/reorder.py</url>
+          <line>255</line>
+          <option name="timeStamp" value="1340" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/last_step.py</url>
+          <line>20</line>
+          <option name="timeStamp" value="1342" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/last_step.py</url>
+          <line>97</line>
+          <option name="timeStamp" value="1346" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="final_shapes" />
+        <watch expression="final_shapes" />
+        <watch expression="final_shapes" />
+        <watch expression="shortest_shape" />
+        <watch expression="new_map" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

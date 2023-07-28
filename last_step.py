@@ -75,7 +75,9 @@ def double_shape(shortest_shape):
 
 def original_reduction(shortest_shape):
     reductions = []
+    index = -1
     for shape in shortest_shape:
+        index = index + 1
         new_shape = []
         for row in shape:
             new_shape.append(row + row)
@@ -92,6 +94,9 @@ def original_reduction(shortest_shape):
             if new_shape[i][back_locs[i]] != 0:
                 found_reduc = 0
                 break
+        if found_reduc == 0:
+            n_map = np.array(new_shape)
+            np.savetxt("example/bv10/new" + str(index) + ".csv", n_map, fmt='%s', delimiter=",")
         if found_reduc:
             reduc = 0
             temp_shape = copy.deepcopy(shape)
@@ -118,6 +123,9 @@ def original_reduction(shortest_shape):
                     reduc = reduc + 1
                 else:
                     reductions.append(reduc)
+                    n_map = np.array(new_shape)
+                    np.savetxt("example/bv10/new" + str(index) + ".csv", n_map, fmt = '%s',delimiter=",")
+
         else:
             reductions.append(0)
     print('original depth is ' + str(len(shape[0])) + ". The reduction is " + str(max(reductions)))
