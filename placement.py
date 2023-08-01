@@ -1,7 +1,7 @@
 from DP import *
 import copy
 import math
-restrict_max = 2
+restrict_max = 3
 def place_C(p_shape, base, loc, rows, p_row, front, shapes, fronts, spaces, extra_qubits,
             wire_target, wire_targets, right, next_qubit, qubit_record, start_p, end_p, starts, ends, avoild_points, avoid_dir): #place single node
     new = 0 #how many new node

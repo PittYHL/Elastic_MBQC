@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="">
+    <list default="true" id="ce4d68dc-2965-4f05-b70e-d53f924dd046" name="Changes" comment="finish last step">
+      <change afterPath="$PROJECT_DIR$/example/Fig/BV4.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/Fig/DAG.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/Fig/DAG_result.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/Fig/Fig.patterns.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/Fig/compare_dac.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/Fig/different_width.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/Fig/main_result.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/Fig/replace.PNG" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new0.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new1.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new2.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new3.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new4.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new5.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new6.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new7.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new8.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/example/bv10/new9.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/iqp27c.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/iqp27c.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dense.py" beforeDir="false" afterPath="$PROJECT_DIR$/dense.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/hlf12.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/hlf12.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Benchmarks/qft12.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/qft12.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/Elastic_channel.PNG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/Wire_removed.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Wire_removed.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/naive_placement.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/naive_placement.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/node_placement.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/node_placement.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/hlf27el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/hlf27el.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/last_step.py" beforeDir="false" afterPath="$PROJECT_DIR$/last_step.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -13,134 +39,45 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
-  </component>
-  <component name="ProjectId" id="2Ne2Q6BiGdepHMgPl1B1KCjGlHK" />
+  <component name="ProjectId" id="2TMmpyN6UHZ7VNhVGywhhmeqZwl" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/YIL392/Anaconda3/envs/qiskit_env&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;debugger.dataViews.python.type.renderers&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="b64ccc4d-f1fb-4cbb-b4ff-33cb96a0c0be" name="Changes" comment="" />
-      <created>1680010207783</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1680010207783</updated>
-    </task>
-    <task id="LOCAL-00001" summary="keep doing DP">
-      <created>1685373028230</created>
+    <task id="LOCAL-00001" summary="finish last step">
+      <created>1689709648283</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1685373028230</updated>
+      <updated>1689709648283</updated>
     </task>
-    <task id="LOCAL-00002" summary="need to finish place and update">
-      <created>1685395826305</created>
+    <task id="LOCAL-00002" summary="finish last step">
+      <created>1690569136358</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1685395826305</updated>
+      <updated>1690569136358</updated>
     </task>
-    <task id="LOCAL-00003" summary="finish how to choose order">
-      <created>1685479985738</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1685479985738</updated>
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ce4d68dc-2965-4f05-b70e-d53f924dd046" name="Changes" comment="finish last step" />
+      <created>1690861512045</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1690861512045</updated>
     </task>
-    <task id="LOCAL-00004" summary="finish debugging bv5">
-      <created>1686257886658</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1686257886658</updated>
-    </task>
-    <task id="LOCAL-00005" summary="doing 7 qubits">
-      <created>1686342973975</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1686342973975</updated>
-    </task>
-    <task id="LOCAL-00006" summary="finish eliminate">
-      <created>1686630204854</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1686630204855</updated>
-    </task>
-    <task id="LOCAL-00007" summary="finish bv7">
-      <created>1686773947721</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1686773947721</updated>
-    </task>
-    <task id="LOCAL-00008" summary="finish 15 qubits">
-      <created>1687399981686</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1687399981686</updated>
-    </task>
-    <task id="LOCAL-00009" summary="finish 15 qubits">
-      <created>1687810945086</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1687810945086</updated>
-    </task>
-    <task id="LOCAL-00010" summary="finish iqp15">
-      <created>1687898446965</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1687898446965</updated>
-    </task>
-    <task id="LOCAL-00011" summary="finish the last step">
-      <created>1688063654916</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1688063654917</updated>
-    </task>
-    <task id="LOCAL-00012" summary="finish the last step">
-      <created>1688416082223</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1688416082223</updated>
-    </task>
-    <task id="LOCAL-00013" summary="finish the last step">
-      <created>1688699703632</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1688699703632</updated>
-    </task>
-    <option name="localTasksCounter" value="14" />
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -148,153 +85,49 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="CUSTOM_BOOLEAN_PROPERTIES">
-                <map>
-                  <entry key="Show.Git.Branches" value="true" />
-                </map>
-              </option>
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="keep doing DP" />
-    <MESSAGE value="need to finish place and update" />
-    <MESSAGE value="finish how to choose order" />
-    <MESSAGE value="finish debugging bv5" />
-    <MESSAGE value="doing 7 qubits" />
-    <MESSAGE value="finish eliminate" />
-    <MESSAGE value="finish bv7" />
-    <MESSAGE value="finish 15 qubits" />
-    <MESSAGE value="finish iqp15" />
-    <MESSAGE value="finish the last step" />
-    <MESSAGE value="finish the last benchmarks" />
-    <option name="LAST_COMMIT_MESSAGE" value="finish the last benchmarks" />
+    <MESSAGE value="finish last step" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish last step" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/baseline.py</url>
-          <line>171</line>
-          <option name="timeStamp" value="103" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>279</line>
-          <option name="timeStamp" value="144" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>273</line>
-          <option name="timeStamp" value="319" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>1111</line>
-          <option name="timeStamp" value="431" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>1105</line>
-          <option name="timeStamp" value="433" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>404</line>
-          <option name="timeStamp" value="435" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>411</line>
-          <option name="timeStamp" value="436" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/baseline.py</url>
-          <line>156</line>
-          <option name="timeStamp" value="438" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/elastic.py</url>
-          <line>54</line>
-          <option name="timeStamp" value="449" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>33</line>
-          <option name="timeStamp" value="888" />
+          <line>28</line>
+          <option name="timeStamp" value="1339" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>237</line>
-          <option name="timeStamp" value="1088" />
+          <line>20</line>
+          <option name="timeStamp" value="1342" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>261</line>
-          <option name="timeStamp" value="1093" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>250</line>
-          <option name="timeStamp" value="1095" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="1109" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/last_step.py</url>
-          <line>25</line>
-          <option name="timeStamp" value="1110" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>27</line>
-          <option name="timeStamp" value="1280" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/leaves.py</url>
-          <line>12</line>
-          <option name="timeStamp" value="1319" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DP.py</url>
-          <line>235</line>
-          <option name="timeStamp" value="1329" />
+          <line>102</line>
+          <option name="timeStamp" value="1346" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
           <line>255</line>
-          <option name="timeStamp" value="1334" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>232</line>
-          <option name="timeStamp" value="1335" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>85</line>
-          <option name="timeStamp" value="1336" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/reorder.py</url>
-          <line>96</line>
-          <option name="timeStamp" value="1337" />
+          <option name="timeStamp" value="1347" />
         </line-breakpoint>
       </breakpoints>
-      <default-breakpoints>
-        <breakpoint type="python-exception">
-          <properties notifyOnTerminate="true" exception="BaseException">
-            <option name="notifyOnTerminate" value="true" />
-          </properties>
-        </breakpoint>
-      </default-breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="final_shapes" />
+        <watch expression="final_shapes" />
+        <watch expression="final_shapes" />
+        <watch expression="shortest_shape" />
+        <watch expression="new_map" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
