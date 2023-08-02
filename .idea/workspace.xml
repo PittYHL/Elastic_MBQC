@@ -1,37 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ce4d68dc-2965-4f05-b70e-d53f924dd046" name="Changes" comment="finish last step">
-      <change afterPath="$PROJECT_DIR$/example/Fig/BV4.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/Fig/DAG.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/Fig/DAG_result.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/Fig/Fig.patterns.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/Fig/compare_dac.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/Fig/different_width.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/Fig/main_result.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/Fig/replace.PNG" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new0.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new1.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new2.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new3.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new4.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new5.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new6.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new7.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new8.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/bv10/new9.csv" afterDir="false" />
+    <list default="true" id="9af00f89-2726-46db-a59f-7b9b587845c5" name="Changes" comment="finish last step">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/hlf12.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/hlf12.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Benchmarks/qft12.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Benchmarks/qft12.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/Fig/Elastic_channel.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/Fig/Wire_removed.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Wire_removed.PNG" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/Fig/naive_placement.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/naive_placement.PNG" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/Fig/node_placement.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/node_placement.PNG" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/hlf27el.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/hlf27el.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/result.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/example/result.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/last_step.py" beforeDir="false" afterPath="$PROJECT_DIR$/last_step.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/placement.py" beforeDir="false" afterPath="$PROJECT_DIR$/placement.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/DAG_result.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/DAG_result.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new0.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new0.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new2.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new2.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new3.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new4.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new4.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new5.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new5.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new6.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new6.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new7.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new7.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new8.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new8.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bv10/new9.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new9.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -48,12 +30,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task id="LOCAL-00001" summary="finish last step">
@@ -116,7 +98,7 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/reorder.py</url>
           <line>255</line>
-          <option name="timeStamp" value="1347" />
+          <option name="timeStamp" value="1348" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
