@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9af00f89-2726-46db-a59f-7b9b587845c5" name="Changes" comment="finish last step">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new0.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new0.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new1.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new2.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new2.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new4.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new4.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new5.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new5.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new6.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new6.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new7.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new7.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new8.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new8.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new9.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new9.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
-    </list>
+    <list default="true" id="9af00f89-2726-46db-a59f-7b9b587845c5" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
