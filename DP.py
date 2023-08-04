@@ -28,7 +28,7 @@ def DP(ori_map, qubits, rows, force_right, special, restricted, special_greedy):
     final_shapes = place_leaves(table, shapes, first, last, rows, special)
     show_min(middle_shapes, final_shapes)
     # save_shapes(shapes)
-    combination(final_shapes)
+    combination(final_shapes, new_map)
     # combination2(table[-1], middle_shapes, first, last, rows)
     # save_shapes(shapes)
     print('g')

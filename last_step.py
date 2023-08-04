@@ -5,7 +5,7 @@ maximum = 5
 import numpy as np
 from dense import convert_new_map2
 
-def combination(final_shapes):
+def combination(final_shapes, ori_map):
     shortest_shape = []
     shortest_depth = 100000
     indexes = []
@@ -22,7 +22,7 @@ def combination(final_shapes):
     for i in range(len(shortest_shape)):
         arr.append(i)
     combina = list(combinations(arr, 2))
-    original = original_reduction(shortest_shape)
+    original = original_reduction(shortest_shape, ori_map)
     comb = comb_reduction(shortest_shape, combina)
     print('g')
 
@@ -73,14 +73,16 @@ def double_shape(shortest_shape):
     shortest_shape = shortest_shape + new_shapes
     return shortest_shape
 
-def original_reduction(shortest_shape):
+def original_reduction(shortest, ori_map):
     reductions = []
     index = -1
+    shortest_shape = copy.deepcopy(shortest)
+    shortest_shape.insert(0, ori_map)
     for shape in shortest_shape:
         index = index + 1
         new_shape = []
         for row in shape:
-            new_shape.append(row + row)
+            new_shape.append(row + [0]+row)
         back_locs = []
         for row in shape:
             for j in reversed(range(len(row))):
@@ -96,7 +98,10 @@ def original_reduction(shortest_shape):
                 break
         if found_reduc == 0:
             n_map = np.array(new_shape)
-            np.savetxt("example/bv10/new" + str(index) + ".csv", n_map, fmt='%s', delimiter=",")
+            # np.savetxt("example/bv10/new" + str(index) + ".csv", n_map, fmt='%s', delimiter=",")
+            if index == 0:
+                print('original depth: ' + str(len(ori_map[0])))
+                print('original redc: '+ str(0))
         if found_reduc:
             reduc = 0
             temp_shape = copy.deepcopy(shape)
@@ -122,9 +127,13 @@ def original_reduction(shortest_shape):
                         new_shape[i].pop(back_locs[i])
                     reduc = reduc + 1
                 else:
-                    reductions.append(reduc)
                     n_map = np.array(new_shape)
                     np.savetxt("example/bv10/new" + str(index) + ".csv", n_map, fmt = '%s',delimiter=",")
+                    if index == 0:
+                        print('original depth: ' + str(len(ori_map[0])))
+                        print('original redc: ' + str(reduc))
+                    else:
+                        reductions.append(reduc)
 
         else:
             reductions.append(0)
@@ -132,7 +141,9 @@ def original_reduction(shortest_shape):
 
 def comb_reduction(shortest_shape, combina):
     reductions = []
+    index = -1
     for comb in combina:
+        index = index + 1
         shape1 = shortest_shape[comb[0]]
         shape2 = shortest_shape[comb[1]]
         #for first shape
@@ -140,7 +151,7 @@ def comb_reduction(shortest_shape, combina):
         if len(shape1) != len(shape2):
             print('shape not the same!')
         for i in range(len(shape1)):
-            new_shape1.append(shape1[i] + shape2[i])
+            new_shape1.append(shape1[i] + [0] + shape2[i])
         back_locs = []
         for row in shape1:
             for j in reversed(range(len(row))):
@@ -178,12 +189,15 @@ def comb_reduction(shortest_shape, combina):
                     for i in range(len(new_shape1)):
                         new_shape1[i].pop(back_locs[i])
                     reduc1 = reduc1 + 1
+                else:
+                    n_map = np.array(new_shape1)
+                    # np.savetxt("example/bv10/new" + str(index) + ".csv", n_map, fmt = '%s',delimiter=",")
         else:
             reduc1 = 0
         # for second shape
         new_shape2 = []
         for i in range(len(shape2)):
-            new_shape2.append(shape2[i] + shape1[i])
+            new_shape2.append(shape2[i] + [0]+ shape1[i])
         back_locs = []
         for row in shape2:
             for j in reversed(range(len(row))):
