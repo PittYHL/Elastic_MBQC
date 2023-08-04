@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9af00f89-2726-46db-a59f-7b9b587845c5" name="Changes" comment="" />
+    <list default="true" id="8a777fc4-c80c-4e23-8645-db43911822d8" name="Changes" comment="finish last step">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/DAG_result.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/DAG_result.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/replace.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/replace.PNG" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
