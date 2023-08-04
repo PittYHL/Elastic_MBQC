@@ -9,16 +9,16 @@ import copy
 from dense import *
 def biuld_DAG(gates):
     DAG_list = gates.copy()
-qubits = 15
-rows = 52
+qubits = 23
+rows = 56
 force_right = False#force the second c to the right
 special = 0#for special leaves
 wire_remove = 1
 remove_single = 1 #for removing the single qubit gate
 remove_SWAP = 1
-restricted = 0 #restrict the qubit locate
+restricted = 1 #restrict the qubit locate
 remove_y = 0#for CNOT (QAOA)
-special_greedy = 0
+special_greedy = 1
 physical_gate = []
 tracker= []
 map = []
@@ -27,7 +27,7 @@ for i in range(qubits*2-1):
     map.append([])
 for i in range(qubits):
     tracker.append(i)
-with open('Benchmarks/iqp15b.txt') as f:
+with open('Benchmarks/real_hlf27b.txt') as f:
     lines = f.readlines()
 circuit= lines.copy()
 layer = []
@@ -243,12 +243,12 @@ de_map = np.array(dense_map)
 #np.savetxt("qft4_sche.csv", sc_map, fmt = '%s',delimiter=",")
 #de_map = np.array(dense_map)
 
-# if wire_remove:
-#     new_map = remove_wire(dense_map, qubits, remove_single, remove_y)
-
-new_map = new_eliminate_redundant(dense_map, qubits)
 if wire_remove:
-    new_map = remove_wire(new_map, qubits, remove_single, remove_y)
+    new_map = remove_wire(dense_map, qubits, remove_single, remove_y)
+
+# new_map = new_eliminate_redundant(dense_map, qubits)
+# if wire_remove:
+#     new_map = remove_wire(new_map, qubits, remove_single, remove_y)
     # new_map = new_eliminate_redundant(new_map, qubits)
 newnew_map = convert_new_map(new_map)
 n_map = np.array(newnew_map)
