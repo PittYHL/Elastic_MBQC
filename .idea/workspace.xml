@@ -3,18 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f350ae67-7340-47db-82d8-38e46b52b77f" name="Changes" comment="finish last step">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new0.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new0.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new1.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new10.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new10.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new2.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new2.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new4.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new4.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new5.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new5.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new6.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new6.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new7.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new7.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new8.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new8.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/bv10/new9.csv" beforeDir="false" afterPath="$PROJECT_DIR$/example/bv10/new9.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/reorder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Fig.cluster.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/Fig/Fig.patterns.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/example/Fig/Fig.patterns.PNG" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
